@@ -1,0 +1,273 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Teams Directory</title>
+
+<link rel="stylesheet" href="{% static 'teams/style.css' %}">
+
+</head>
+
+
+<body>
+
+
+<!-- TOP BAR -->
+
+<div class="topbar">
+
+<div class="logo">
+
+<strong>LOGOSKY</strong>
+<p>Engineering Team Directory</p>
+
+</div>
+
+<div class="top-actions">
+
+<input class="top-search" placeholder="Search directory...">
+
+<button class="profile-btn">View Public Profile</button>
+
+<div class="user-circle">JD</div>
+
+</div>
+
+</div>
+
+
+
+<div class="layout">
+
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+<ul class="nav">
+
+<li>
+<span class="icon">D</span>
+Dashboard
+</li>
+
+<li class="active">
+<span class="icon">T</span>
+Teams
+</li>
+
+<li>
+<span class="icon">O</span>
+Organisations
+</li>
+
+<li>
+<span class="icon">M</span>
+Messages
+</li>
+
+<li>
+<span class="icon">S</span>
+Schedule
+</li>
+
+<li>
+<span class="icon">P</span>
+Profile
+</li>
+
+</ul>
+
+
+<p class="admin-label">ADMIN</p>
+
+<ul class="nav">
+
+<li>
+<span class="icon">AD</span>
+Admin Dashboard
+</li>
+
+<li>
+<span class="icon">TM</span>
+Team Management
+</li>
+
+<li>
+<span class="icon">UA</span>
+User Access
+</li>
+
+</ul>
+
+</div>
+
+
+
+<!-- MAIN CONTENT -->
+
+<div class="content">
+
+
+<h1>Teams — Directory</h1>
+
+<p class="subtitle">
+
+Search teams, departments, and managers quickly
+
+</p>
+
+
+
+<!-- SEARCH CARD -->
+
+<div class="card">
+
+<h3>Search and Filters</h3>
+
+<form method="GET">
+
+<div class="filters">
+
+<input
+type="text"
+name="keyword"
+placeholder="Type keywords"
+>
+
+<select name="department">
+<option>All Departments</option>
+<option>Engineering</option>
+<option>Operations</option>
+<option>Data</option>
+</select>
+
+<select name="manager">
+<option>All Managers</option>
+<option>alice</option>
+<option>charlie</option>
+<option>alex</option>
+</select>
+
+<select name="status">
+<option>All Status</option>
+<option>Active</option>
+<option>Disabled</option>
+</select>
+
+</div>
+
+
+<div class="buttons">
+
+<button class="btn-primary" type="submit">
+Search
+</button>
+
+<button class="btn-outline" type="reset">
+Clear
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+
+
+<!-- RESULTS -->
+
+<div class="card">
+
+<h3>Results</h3>
+
+
+<div class="table-header">
+
+<div>TEAM NAME</div>
+<div>DEPARTMENT</div>
+<div>MANAGER</div>
+<div>STATUS</div>
+<div>ACTIONS</div>
+
+</div>
+
+
+{% for team in teams %}
+
+<div class="table-row">
+
+<div class="team-name">
+{{ team.name }}
+</div>
+
+<div>
+Engineering
+</div>
+
+<div>
+{{ team.manager }}
+</div>
+
+<div>
+
+<span class="status active">
+Active
+</span>
+
+</div>
+
+<div class="actions">
+
+<button class="btn-primary small">
+View Team
+</button>
+
+<button class="btn-outline small">
+Message Team
+</button>
+
+<button class="btn-outline small">
+Schedule
+</button>
+
+</div>
+
+</div>
+
+{% empty %}
+
+<p>No teams found.</p>
+
+{% endfor %}
+
+
+
+<div class="pagination">
+
+Prev | Page 1 | Page 2 | Next
+
+</div>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+
+<footer>
+
+© 2026 LOGOSKY • Privacy • Terms • Contact
+
+</footer>
+
+
+</body>
+</html>
