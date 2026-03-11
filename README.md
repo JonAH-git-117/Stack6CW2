@@ -5,3 +5,11 @@ at Sky Broadband to see what teams others are in.
 
     The project also is aimed at improving upon our web development skills, as both 
     HTML and CSS are being utilised to improve upon the look of the webpages.
+
+    If you see ImportError: Couldn't import Django or a SecurityError in PowerShell:
+
+        Switch Terminal: In VS Code, click the + dropdown in the terminal and select Command Prompt.
+
+        Activate: Run Scripts\activate. You should see (Scripts) appear at the start of your command line.
+
+        Unblock PowerShell (Optional): If you must use PowerShell, run "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process" and then try ".\Scripts\activate" again.
