@@ -12,4 +12,6 @@ at Sky Broadband to see what teams others are in.
 
         Activate: Run Scripts\activate. You should see (Scripts) appear at the start of your command line.
 
-        Unblock PowerShell (Optional): If you must use PowerShell, run "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process" and then try ".\Scripts\activate" again.
+        Unblock PowerShell (Optional): If you must use PowerShell, run the following commands in the terminal: 
+        - "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process" 
+        - ".\Scripts\activate"
