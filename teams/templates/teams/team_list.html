@@ -12,7 +12,7 @@
 </head>
 
 
-<body></body>
+<body> 
 
 
 
@@ -48,34 +48,30 @@
 <ul class="nav">
 
 <li>
-<span class="icon">D</span>
-Dashboard
+<span class="icon">D</span>Dashboard
 </li>
 
-<li class="active">
-<span class="icon">T</span>
-Teams
+<li class="active" onclick="window.location.href='/teams/'">
+<span class="icon">T</span>Teams
 </li>
 
 <li>
-<span class="icon">O</span>
-Organisations
+<span class="icon">O</span>Organisations
 </li>
 
 <li>
-<span class="icon">M</span>
-Messages
+<span class="icon">M</span>Messages
+</li>
+
+<li onclick="window.location.href='/teams/schedule-meeting/'">
+<span class="icon">S</span>Schedule
 </li>
 
 <li>
-<span class="icon">S</span>
-Schedule
+<span class="icon">P</span>Profile
 </li>
 
-<li>
-<span class="icon">P</span>
-Profile
-</li>
+</ul>
 
 </ul>
 
@@ -210,25 +206,31 @@ Engineering
 
 <div>
 
+{% if team.status == "Disabled" %}
+<span class="status disabled">
+Disabled
+</span>
+{% else %}
 <span class="status active">
 Active
 </span>
+{% endif %}
 
 </div>
 
 <div class="actions">
 
-<button class="btn-primary small">
+<a href="{% url 'team_detail' team.id %}" class="btn-primary small">
 View Team
-</button>
+</a>
 
-<button class="btn-outline small">
+<a href="#" class="btn-outline small">
 Message Team
-</button>
+</a>
 
-<button class="btn-outline small">
+<a href="{% url 'schedule_meeting' %}" class="btn-outline small">
 Schedule
-</button>
+</a>
 
 </div>
 
@@ -240,29 +242,49 @@ Schedule
 
 {% endfor %}
 
+<div class="table-row">
 
+<div class="team-name">
+Security Team
+</div>
 
-<div class="pagination">
+<div>
+Engineering
+</div>
 
-Prev | Page 1 | Page 2 | Next
+<div>
+alex
+</div>
+
+<div>
+<span class="status disabled">
+Disabled
+</span>
+</div>
+
+<div class="actions">
+
+<a class="btn-primary small" style="pointer-events:none; opacity:0.5;">
+View Team
+</a>
+
+<a class="btn-outline small" style="pointer-events:none; opacity:0.5;">
+Message Team
+</a>
+
+<a class="btn-outline small" style="pointer-events:none; opacity:0.5;">
+Schedule
+</a>
 
 </div>
 
 </div>
 
-
 </div>
-
 </div>
-
-
-
+</div>
 <footer>
-
 © 2026 LOGOSKY • Privacy • Terms • Contact
-
 </footer>
-
-
 </body>
 </html>
