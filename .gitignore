@@ -1,14 +1,15 @@
 # Created by venv; see https://docs.python.org/3/library/venv.html
 
-# Ignore the virtual environment
+# Virtual Environment
+venv/
 Include/
 Lib/
 Scripts/
 pyvenv.cfg
 
-# Ignore the database (Django creates this automatically)
+# Database
 db.sqlite3
 
-# Ignore temporary Python files
+# Python cache
 __pycache__/
 *.pyc
