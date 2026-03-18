@@ -33,3 +33,5 @@ at Sky Broadband to see what teams others are in.
         Sync Database: "python manage.py migrate"
 
         Run Server: "python manage.py runserver"
+
+        Stop Sever: It will display a message in the terminal saying to press Ctrl + C to quit it
