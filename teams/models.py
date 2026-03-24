@@ -68,12 +68,12 @@ class Team(models.Model):
 # Contact Channel was implemented as per the logical ERD
 
 class ContactChannel(models.Model):
-    Channel_Types = [
+    Channel_Types = (
         ("slack", "Slack"),
         ("teams", "Microsoft Teams"),
         ("email", "Email"),
         ("other", "Other"),
-    ]
+    )
 
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="contact_channels")
     Channel_Types = models.CharField(max_length=20, choices=Channel_Types)
@@ -115,12 +115,11 @@ class Dependency(models.Model):
 # Implemented a project 
 
 class Project(models.Model):
-    STATUS_CHOICES = [
-        ("blocked" "Blocked"),
-        ("planned", "Planned"),
-        ("active", "Active"),
-        ("completed", "Completed"),
-    ]
+    STATUS_CHOICES = (
+    ('planned', 'Planned'),
+    ('active', 'Active'),
+    ('completed', 'Completed'),
+)
 
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
@@ -145,10 +144,10 @@ class Project(models.Model):
         return self.name
 
 class Message(models.Model):
-    STATUS_CHOICES = [
+    STATUS_CHOICES = (
         ('draft', 'Draft'),
         ('sent', 'Sent'),
-    ]
+    )
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -169,13 +168,13 @@ class Message(models.Model):
 
 
 class Meeting(models.Model):
-    PLATFORM_CHOICES = [
+    PLATFORM_CHOICES = (
         ('zoom', 'Zoom'),
         ('teams', 'Microsoft Teams'),
         ('google_meet', 'Google Meet'),
         ('in_person', 'In Person'),
         ('other', 'Other'),
-    ]
+    )
     title = models.CharField(max_length=255)
     organiser = models.ForeignKey(
         settings.AUTH_USER_MODEL,
