@@ -149,13 +149,22 @@ font-weight:700;
 margin-bottom:8px;
 }
 
-.status-pill{
-display:inline-block;
-background:#d9eadf;
-color:#2e6e2e;
-padding:6px 16px;
-border-radius:20px;
-font-size:13px;
+.status-pill {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.status-pill.active {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-pill.disabled {
+    background: #f8d7da;
+    color: #721c24;
 }
 
 .card h3{
@@ -315,6 +324,7 @@ margin-top:8px;
 padding-left:18px;
 }
 
+
 @media (max-width:900px){
 
 .content{
@@ -332,5 +342,6 @@ grid-template-columns: 2.5fr 2fr 2fr 1fr 6fr;
 .table-row{
 grid-template-columns: 2.5fr 2fr 2fr 1fr 6fr;
 }
+
 
 }

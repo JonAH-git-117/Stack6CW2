@@ -1,47 +1,30 @@
+
 {% load static %}
 
 <!DOCTYPE html>
 <html>
 
 <head>
-
 <title>Teams Directory</title>
-
-<link rel="stylesheet" href="{% static 'teams/style.css' %}">
-
-</head>
-
-
+<link rel="stylesheet" href="{% static 'teams/style.css' %}?v=99">
 <body> 
-
-
 
 <div class="topbar">
 
 <div class="logo">
-
 <strong>LOGOSKY</strong>
 <p>Engineering Team Directory</p>
-
 </div>
 
 <div class="top-actions">
-
 <input class="top-search" placeholder="Search directory...">
-
 <button class="profile-btn">View Public Profile</button>
-
 <div class="user-circle">JD</div>
-
 </div>
 
 </div>
-
-
 
 <div class="layout">
-
-
 
 <div class="sidebar">
 
@@ -73,9 +56,6 @@
 
 </ul>
 
-</ul>
-
-
 <p class="admin-label">ADMIN</p>
 
 <ul class="nav">
@@ -99,22 +79,13 @@ User Access
 
 </div>
 
-
-
-
 <div class="content">
-
 
 <h1>Teams — Directory</h1>
 
 <p class="subtitle">
-
 Search teams, departments, and managers quickly
-
 </p>
-
-
-
 
 <div class="card">
 
@@ -124,11 +95,7 @@ Search teams, departments, and managers quickly
 
 <div class="filters">
 
-<input
-type="text"
-name="keyword"
-placeholder="Type keywords"
->
+<input type="text" name="keyword" placeholder="Type keywords">
 
 <select name="department">
 <option>All Departments</option>
@@ -152,7 +119,6 @@ placeholder="Type keywords"
 
 </div>
 
-
 <div class="buttons">
 
 <button class="btn-primary" type="submit">
@@ -169,13 +135,9 @@ Clear
 
 </div>
 
-
-
-
 <div class="card">
 
 <h3>Results</h3>
-
 
 <div class="table-header">
 
@@ -187,7 +149,6 @@ Clear
 
 </div>
 
-
 {% for team in teams %}
 
 <div class="table-row">
@@ -196,8 +157,8 @@ Clear
 {{ team.name }}
 </div>
 
-<div>
-Engineering
+<div style="padding-left: 10px;">
+{{ team.department }}
 </div>
 
 <div>
@@ -206,19 +167,26 @@ Engineering
 
 <div>
 
-{% if team.status == "Disabled" %}
-<span class="status disabled">
-Disabled
+<span class="status-pill {% if team.status|lower == 'disabled' %}disabled{% else %}active{% endif %}">    {{ team.status }}
 </span>
-{% else %}
-<span class="status active">
-Active
-</span>
-{% endif %}
-
 </div>
 
 <div class="actions">
+
+{% if team.status|lower == 'disabled' %}
+<a class="btn-primary small" style="pointer-events:none; opacity:0.5;">
+View Team
+</a>
+
+<a class="btn-outline small" style="pointer-events:none; opacity:0.5;">
+Message Team
+</a>
+
+<a class="btn-outline small" style="pointer-events:none; opacity:0.5;">
+Schedule
+</a>
+
+{% else %}
 
 <a href="{% url 'team_detail' team.id %}" class="btn-primary small">
 View Team
@@ -232,6 +200,8 @@ Message Team
 Schedule
 </a>
 
+{% endif %}
+
 </div>
 
 </div>
@@ -242,49 +212,13 @@ Schedule
 
 {% endfor %}
 
-<div class="table-row">
-
-<div class="team-name">
-Security Team
-</div>
-
-<div>
-Engineering
-</div>
-
-<div>
-alex
-</div>
-
-<div>
-<span class="status disabled">
-Disabled
-</span>
-</div>
-
-<div class="actions">
-
-<a class="btn-primary small" style="pointer-events:none; opacity:0.5;">
-View Team
-</a>
-
-<a class="btn-outline small" style="pointer-events:none; opacity:0.5;">
-Message Team
-</a>
-
-<a class="btn-outline small" style="pointer-events:none; opacity:0.5;">
-Schedule
-</a>
-
-</div>
-
-</div>
-
 </div>
 </div>
 </div>
+
 <footer>
 © 2026 LOGOSKY • Privacy • Terms • Contact
 </footer>
+
 </body>
 </html>
