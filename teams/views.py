@@ -1,18 +1,41 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Team
+from django.contrib.auth import get_user_model
+from .models import Team, Department
 
 
 def team_list(request):
 
-    keyword = request.GET.get('keyword')
+    keyword = request.GET.get('keyword') or ""
+    department = request.GET.get('department')
+    manager = request.GET.get('manager')
+    status = request.GET.get('status')
 
     teams = Team.objects.all()
 
     if keyword:
         teams = teams.filter(name__icontains=keyword)
 
+    if department:
+        teams = teams.filter(department__department_name=department)
+
+    if manager:
+        teams = teams.filter(manager__username=manager)
+
+    if status:
+        teams = teams.filter(status__iexact=status)
+
+    User = get_user_model()
+    departments = Department.objects.all()
+    managers = User.objects.all()
+
     context = {
-        'teams': teams
+        'teams': teams,
+        'keyword': keyword,
+        'selected_department': department,
+        'selected_manager': manager,
+        'selected_status': status,
+        'departments': departments,
+        'managers': managers,
     }
 
     return render(request, 'teams/team_list.html', context)
