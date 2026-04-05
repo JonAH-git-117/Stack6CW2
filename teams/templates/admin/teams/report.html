@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sky Engineering Teams Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 12px; color: #333; }
+        h1 { color: #1e3a8a; border-bottom: 2px solid #1e3a8a; padding-bottom: 8px; }
+        h2 { color: #1e3a8a; margin-top: 30px; }
+        .summary { display: block; margin-bottom: 20px; }
+        .stat-box { background: #1e3a8a; color: white; padding: 10px 20px;
+                    border-radius: 5px; text-align: center; margin-bottom: 10px; }
+        .stat-box h3 { margin: 0; font-size: 28px; }
+        .stat-box p  { margin: 0; font-size: 11px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: #1e3a8a; color: white; padding: 6px; text-align: left; }
+        td { padding: 5px; border-bottom: 1px solid #e5e7eb; }
+        tr:nth-child(even) { background: #f5f6fa; }
+        .warning th { background: #cc0000; }
+    </style>
+</head>
+<body>
+
+    <h1>Sky Engineering – Teams Report</h1>
+
+    <!-- Summary Stats -->
+    <div class="summary">
+        <div class="stat-box">
+            <h3>{{ total_teams }}</h3>
+            <p>Total Teams</p>
+        </div>
+        <div class="stat-box">
+            <h3>{{ total_departments }}</h3>
+            <p>Total Departments</p>
+        </div>
+        <div class="stat-box">
+            <h3>{{ teams_without_manager.count }}</h3>
+            <p>Teams Without Manager</p>
+        </div>
+    </div>
+
+    <!-- All Teams Table -->
+    <h2>All Teams ({{ total_teams }})</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Team Name</th>
+                <th>Department</th>
+                <th>Organisation</th>
+                <th>Manager</th>
+                <th>Status</th>
+                <th>Members</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for team in teams %}
+            <tr>
+                <td>{{ team.name }}</td>
+                <td>{{ team.department.department_name }}</td>
+                <td>{{ team.department.organisation.organisation_name }}</td>
+                <td>
+                    {% if team.manager %}
+                        {{ team.manager.get_full_name|default:team.manager.username }}
+                    {% else %}
+                        <strong>No Manager</strong>
+                    {% endif %}
+                </td>
+                <td>{{ team.get_status_display }}</td>
+                <td>{{ team.members.count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Department Summary -->
+    <h2>Department Summary</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Department</th>
+                <th>Organisation</th>
+                <th>Team Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dept in departments %}
+            <tr>
+                <td>{{ dept.department_name }}</td>
+                <td>{{ dept.organisation.organisation_name }}</td>
+                <td>{{ dept.team_count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Teams Without Manager -->
+    {% if teams_without_manager %}
+    <h2>Teams Without a Manager</h2>
+    <table class="warning">
+        <thead>
+            <tr>
+                <th>Team Name</th>
+                <th>Department</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for team in teams_without_manager %}
+            <tr>
+                <td>{{ team.name }}</td>
+                <td>{{ team.department.department_name }}</td>
+                <td>{{ team.get_status_display }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+</body>
+</html>
