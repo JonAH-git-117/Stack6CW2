@@ -1,14 +1,13 @@
 from pathlib import Path
 
-# Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Security
+
 SECRET_KEY = 'django-insecure-development-key'
 DEBUG = True
 ALLOWED_HOSTS = []
 
-# Installed apps
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -19,7 +18,7 @@ INSTALLED_APPS = [
     'teams',
 ]
 
-# Middleware
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -30,10 +29,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# URLs
 ROOT_URLCONF = 'config.urls'
 
-# Templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -49,10 +46,8 @@ TEMPLATES = [
     },
 ]
 
-# WSGI
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -60,7 +55,7 @@ DATABASES = {
     }
 }
 
-# Password validation
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -70,14 +65,15 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Language / time
+
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "teams/static"
+]
 
-# Default primary key type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
