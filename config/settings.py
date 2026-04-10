@@ -83,3 +83,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Redirect to custom login page when login is required
 LOGIN_URL = 'login'
+
+# Use console email backend for development - prints emails to terminal
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
