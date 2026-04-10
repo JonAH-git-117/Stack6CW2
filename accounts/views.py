@@ -9,8 +9,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 # Import messages framework for displaying alerts to the user
 from django.contrib import messages
-# Import our custom signup form from forms.py
-from .forms import CustomUserCreationForm
+# Import our custom forms from forms.py
+from .forms import CustomUserCreationForm, UserUpdateForm
 
 
 def signup(request):
@@ -66,3 +66,31 @@ def logout(request):
     auth_logout(request)
     # Redirect to home page after logout
     return redirect('home')
+
+
+# Restrict this view to logged-in users only
+# as shown in the django4 lecture slides
+@login_required
+def update_profile(request):
+    if request.method == 'POST':
+        # Populate the form with submitted POST data and the current
+        # user instance so we update the existing record, not create a new one
+        user_form = UserUpdateForm(request.POST, instance=request.user)
+        if user_form.is_valid():
+            # Save the updated user data to the database
+            user_form.save()
+            # Display a success flash message to the user
+            messages.success(request, 'Your profile was successfully updated!')
+            # Redirect to home page after successful update
+            return redirect('home')
+        else:
+            # Display an error flash message if the form is invalid
+            messages.error(request, 'Please correct the error below.')
+    else:
+        # GET request - pre-populate the form with the current user's
+        # existing data using instance=request.user
+        user_form = UserUpdateForm(instance=request.user)
+    # Render the update profile template passing the form as context
+    return render(request, 'accounts/update_profile.html', {
+        'user_form': user_form,
+    })
