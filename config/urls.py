@@ -22,5 +22,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', team_list, name='home'),
     path('teams/', include('teams.urls')),
+    # Student 5 - Reports
     path('reports/', include('reports.urls')),
+    # Student 6 - Visualisation
+    path('visualisation/', include('visualisation.urls')),
 ]

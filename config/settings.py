@@ -18,6 +18,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'teams',
     'reports',
+    'visualisation',
 ]
 
 # Middleware
