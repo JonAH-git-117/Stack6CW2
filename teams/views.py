@@ -45,6 +45,9 @@ def team_detail(request, id):
 
     team = get_object_or_404(Team, id=id)
 
+   
+    member_count = team.members.count()
+
     if team.name == "Backend Engineering":
         upstream = ["Infrastructure", "Authentication"]
         downstream = ["Frontend Engineering", "Mobile Apps"]
@@ -100,6 +103,9 @@ def team_detail(request, id):
         'downstream': downstream,
         'skills': skills,
         'teams': Team.objects.all(),
+
+       
+        'member_count': member_count,
     }
 
     return render(request, 'teams/team_detail.html', context)
