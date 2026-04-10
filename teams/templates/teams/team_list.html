@@ -1,0 +1,239 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Teams Directory</title>
+<link rel="stylesheet" href="{% static 'teams/style.css' %}?v=99">
+</head>
+<body> 
+
+<div class="topbar">
+
+<div class="logo">
+<strong>LOGOSKY</strong>
+<p>Engineering Team Directory</p>
+</div>
+
+<div class="top-actions">
+<input class="top-search" placeholder="Search directory...">
+<button class="profile-btn">View Public Profile</button>
+<div class="user-circle">JD</div>
+</div>
+
+</div>
+
+<div class="layout">
+
+<div class="sidebar">
+
+<ul class="nav">
+
+<li>
+<span class="icon">D</span>Dashboard
+</li>
+
+<li class="active" onclick="window.location.href='/teams/'">
+<span class="icon">T</span>Teams
+</li>
+
+<li onclick="window.location.href='/organisations/'">
+<span class="icon">O</span>Organisations
+</li>
+
+<li>
+<span class="icon">M</span>Messages
+</li>
+
+<li onclick="window.location.href='/teams/schedule-meeting/'">
+<span class="icon">S</span>Schedule
+</li>
+
+<li>
+<span class="icon">P</span>Profile
+</li>
+
+</ul>
+
+<p class="admin-label">ADMIN</p>
+
+<ul class="nav">
+
+<li>
+<span class="icon">AD</span>
+Admin Dashboard
+</li>
+
+<li>
+<span class="icon">TM</span>
+Team Management
+</li>
+
+<li>
+<span class="icon">UA</span>
+User Access
+</li>
+
+</ul>
+
+</div>
+
+<div class="content">
+
+<h1>Teams — Directory</h1>
+
+<p class="subtitle">
+Search teams, departments, and managers quickly
+</p>
+
+<div class="card">
+
+<h3>Search and Filters</h3>
+
+<form method="GET">
+
+<div class="filters">
+
+<input type="text" name="keyword" value="{{ keyword }}" placeholder="Type keywords">
+
+<select name="department">
+<option value="">All Departments</option>
+<option value="Engineering" {% if selected_department == "Engineering" %}selected{% endif %}>Engineering</option>
+<option value="Operations" {% if selected_department == "Operations" %}selected{% endif %}>Operations</option>
+<option value="Data" {% if selected_department == "Data" %}selected{% endif %}>Data</option>
+</select>
+
+<select name="manager">
+<option value="">All Managers</option>
+<option value="alice" {% if selected_manager == "alice" %}selected{% endif %}>alice</option>
+<option value="charlie" {% if selected_manager == "charlie" %}selected{% endif %}>charlie</option>
+<option value="alex" {% if selected_manager == "alex" %}selected{% endif %}>alex</option>
+<option value="john" {% if selected_manager == "john" %}selected{% endif %}>john</option>
+<option value="emma" {% if selected_manager == "emma" %}selected{% endif %}>emma</option>
+<option value="sara" {% if selected_manager == "sara" %}selected{% endif %}>sara</option>
+<option value="michael" {% if selected_manager == "michael" %}selected{% endif %}>michael</option>
+</select>
+
+<select name="status">
+<option value="">All Status</option>
+<option value="active" {% if selected_status == "active" %}selected{% endif %}>Active</option>
+<option value="disabled" {% if selected_status == "disabled" %}selected{% endif %}>Disabled</option>
+</select>
+
+</div>
+
+<div class="buttons">
+
+<button class="btn-primary" type="submit">Search</button>
+
+<a href="/teams/" class="btn-outline" style="text-decoration: none;">
+Clear
+</a>
+
+</div>
+
+</form>
+
+</div>
+
+<div class="card">
+
+<h3>Results</h3>
+
+<div class="table-header">
+
+<div>TEAM NAME</div>
+<div>DEPARTMENT</div>
+<div>MANAGER</div>
+<div>STATUS</div>
+<div>ACTIONS</div>
+
+</div>
+
+{% for team in teams %}
+
+<div class="table-row">
+
+<div class="team-name">
+    {{ team.name }}
+
+    <div style="font-size: 12px; color: gray; margin-top: 5px;">
+        {% for member in team.members.all %}
+            {{ member.username }}{% if not forloop.last %}, {% endif %}
+        {% empty %}
+            No members
+        {% endfor %}
+    </div>
+</div>
+
+<div style="padding-left: 10px;">
+{{ team.department }}
+</div>
+
+<div>
+{% if team.manager %}
+    {{ team.manager.username }}
+{% else %}
+    <span style="color: gray;">Not assigned</span>
+{% endif %}
+</div>
+
+<div>
+
+<span class="status-pill {% if team.status|lower == 'disabled' %}disabled{% else %}active{% endif %}">
+    {{ team.status }}
+</span>
+</div>
+
+<div class="actions">
+
+{% if team.status|lower == 'disabled' %}
+<a class="btn-primary small" style="pointer-events:none; opacity:0.5;">
+View Team
+</a>
+
+<a class="btn-outline small" style="pointer-events:none; opacity:0.5;">
+Message Team
+</a>
+
+<a class="btn-outline small" style="pointer-events:none; opacity:0.5;">
+Schedule
+</a>
+
+{% else %}
+
+<a href="{% url 'team_detail' team.id %}" class="btn-primary small">
+View Team
+</a>
+
+<a href="#" class="btn-outline small">
+Message Team
+</a>
+
+<a href="{% url 'schedule_meeting' %}" class="btn-outline small">
+Schedule
+</a>
+
+{% endif %}
+
+</div>
+
+</div>
+
+{% empty %}
+
+<p>No teams found.</p>
+
+{% endfor %}
+
+</div>
+</div>
+</div>
+
+<footer>
+© 2026 LOGOSKY • Privacy • Terms • Contact
+</footer>
+
+</body>
+</html>

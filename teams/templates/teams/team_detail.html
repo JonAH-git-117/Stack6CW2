@@ -1,0 +1,270 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Team Profile</title>
+<link rel="stylesheet" href="{% static 'teams/team_detail.css' %}?v=11">
+</head>
+
+<body>
+
+<div class="topbar">
+<div class="logo">
+<strong>LOGOSKY</strong>
+<p>Engineering Team Directory</p>
+</div>
+
+<div class="top-actions">
+<input class="top-search" placeholder="Search directory...">
+<button class="profile-btn">View Public Profile</button>
+<div class="user-circle">JD</div>
+</div>
+</div>
+
+<div class="layout">
+
+<div class="sidebar">
+<ul class="nav">
+
+<li onclick="window.location.href='/dashboard/'">
+<span class="icon">D</span>Dashboard
+</li>
+
+<li class="active" onclick="window.location.href='/teams/'">
+<span class="icon">T</span>Teams
+</li>
+
+<li onclick="window.location.href='/organisations/'">
+<span class="icon">O</span>Organisations
+</li>
+
+<li>
+<span class="icon">M</span>Messages
+</li>
+
+<li onclick="window.location.href='/teams/schedule-meeting/'">
+<span class="icon">S</span>Schedule
+</li>
+
+<li>
+<span class="icon">P</span>Profile
+</li>
+
+</ul>
+
+<p class="admin-label">ADMIN</p>
+
+<ul class="nav">
+<li><span class="icon">AD</span>Admin Dashboard</li>
+<li><span class="icon">TM</span>Team Management</li>
+<li><span class="icon">UA</span>User Access</li>
+</ul>
+</div>
+
+<div class="content">
+
+<div class="page-container">
+
+<h1 class="page-title">{{ team.name }}</h1>
+
+<div class="card summary-card">
+
+<div class="switch-team">
+<p class="switch-label">Switch Team</p>
+
+<select onchange="switchTeam(this.value)">
+<option value="">Select Team</option>
+
+{% for t in teams %}
+<option value="/teams/team/{{ t.id }}/" {% if t.id == team.id %}selected{% endif %}>
+{{ t.name }}
+</option>
+{% endfor %}
+
+</select>
+</div>
+
+<div class="team-info">
+<p class="info-label">Department Status</p>
+
+<span class="status-pill {% if team.status|lower == 'disabled' %}disabled{% else %}active{% endif %}">
+{{ team.status }}
+</span>
+</div>
+
+</div>
+
+<div class="card">
+<h3>Primary Actions</h3>
+
+<div class="buttons">
+<a href="mailto:{{ team.manager }}@logosky.com" class="btn">Email Team</a>
+<a href="/teams/schedule-meeting/" class="btn">Schedule Meeting</a>
+<a href="#" class="btn">View Organisation</a>
+<a href="/teams/" class="btn back-btn">Back to Directory</a>
+</div>
+</div>
+
+<div class="card">
+<h3>Overview</h3>
+
+<p class="overview-text">
+The {{ team.name }} is responsible for designing, building and maintaining
+core engineering systems within Logosky. The team focuses on developing
+reliable, scalable and secure services while collaborating closely with
+other engineering teams across the organisation.
+</p>
+</div>
+
+<div class="card">
+<h3>Manager and Contact</h3>
+
+<div class="contact-wrapper">
+
+<div class="contact-box">
+<p><strong>Manager</strong></p>
+<p>{{ team.manager }}</p>
+<p>{{ team.manager }}@logosky.com</p>
+</div>
+
+<div class="contact-box">
+<p><strong>Contact Channels</strong></p>
+
+<ul>
+<li>Teams: {{ team.name }} Channel</li>
+<li>Slack: #{{ team.name|lower|cut:" " }}-team</li>
+<li>Shared Email: {{ team.name|lower|cut:" " }}@logosky.com</li>
+</ul>
+</div>
+
+</div>
+</div>
+
+<div class="card">
+<h3>Members</h3>
+
+<table class="members-table">
+<tr>
+<th>Name</th>
+<th>Role</th>
+<th>Email</th>
+</tr>
+
+<tr>
+<td>James Turner</td>
+<td>Backend Developer</td>
+<td>james.turner@logosky.com</td>
+</tr>
+
+<tr>
+<td>Sarah Khan</td>
+<td>Frontend Developer</td>
+<td>sarah.khan@logosky.com</td>
+</tr>
+
+<tr>
+<td>David Chen</td>
+<td>DevOps Engineer</td>
+<td>david.chen@logosky.com</td>
+</tr>
+
+<tr>
+<td>Emma Walker</td>
+<td>Data Engineer</td>
+<td>emma.walker@logosky.com</td>
+</tr>
+</table>
+</div>
+
+
+<div class="card">
+<h3>Repositories</h3>
+
+<div class="repo-wrapper">
+
+<div class="repo-box">
+<ul>
+<li>Backend API Service</li>
+<li>Authentication Service</li>
+<li>Payment Gateway API</li>
+<li>Monitoring Infrastructure</li>
+</ul>
+</div>
+
+<div class="repo-box">
+<ul>
+<li>Frontend Dashboard</li>
+<li>Mobile Application UI</li>
+<li>Analytics Portal</li>
+<li>Internal Admin Panel</li>
+</ul>
+</div>
+
+<div class="repo-box">
+<ul>
+<li>Data Processing Engine</li>
+<li>Machine Learning Pipelines</li>
+<li>Reporting Systems</li>
+<li>Data Warehouse Connectors</li>
+</ul>
+</div>
+
+</div>
+</div>
+
+
+<div class="card">
+<h3>Dependencies</h3>
+
+<div class="dependency-wrapper">
+
+<div class="dependency-box">
+<h4>Upstream Teams</h4>
+<ul>
+{% for item in upstream %}
+<li>{{ item }}</li>
+{% endfor %}
+</ul>
+</div>
+
+<div class="dependency-box">
+<h4>Downstream Teams</h4>
+<ul>
+{% for item in downstream %}
+<li>{{ item }}</li>
+{% endfor %}
+</ul>
+</div>
+
+</div>
+</div>
+
+<div class="card">
+<h3>Skills</h3>
+
+<div class="skills-list">
+{% for skill in skills %}
+<span class="skill">{{ skill }}</span>
+{% endfor %}
+</div>
+</div>
+
+</div>
+</div>
+</div>
+
+<footer>
+© 2026 LOGOSKY • Privacy • Terms • Contact
+</footer>
+
+<script>
+function switchTeam(url){
+if(url){
+window.location.href=url
+}
+}
+</script>
+
+</body>
+</html>

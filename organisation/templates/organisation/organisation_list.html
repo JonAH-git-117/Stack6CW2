@@ -1,0 +1,146 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Organisations Directory</title>
+<link rel="stylesheet" href="{% static 'teams/style.css' %}?v=99">
+</head>
+
+<body> 
+
+<div class="topbar">
+
+<div class="logo">
+<strong>LOGOSKY</strong>
+<p>Organisation Directory</p>
+</div>
+
+<div class="top-actions">
+<input class="top-search" placeholder="Search organisations...">
+<button class="profile-btn">View Public Profile</button>
+<div class="user-circle">JD</div>
+</div>
+
+</div>
+
+<div class="layout">
+
+<!-- SIDEBAR (same as teams, just fix active state) -->
+<div class="sidebar">
+
+<ul class="nav">
+
+<li>
+<span class="icon">D</span>Dashboard
+</li>
+
+<li onclick="window.location.href='/teams/'">
+<span class="icon">T</span>Teams
+</li>
+
+<li class="active" onclick="window.location.href='/organisations/'">
+<span class="icon">O</span>Organisations
+</li>
+
+<li>
+<span class="icon">M</span>Messages
+</li>
+
+<li onclick="window.location.href='/teams/schedule-meeting/'">
+<span class="icon">S</span>Schedule
+</li>
+
+<li>
+<span class="icon">P</span>Profile
+</li>
+
+</ul>
+
+<p class="admin-label">ADMIN</p>
+
+<ul class="nav">
+
+<li>
+<span class="icon">AD</span>Admin Dashboard
+</li>
+
+<li>
+<span class="icon">TM</span>Team Management
+</li>
+
+<li>
+<span class="icon">UA</span>User Access
+</li>
+
+</ul>
+
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="content">
+
+<h1>Organisations — Directory</h1>
+
+<p class="subtitle">
+Browse organisations and explore their departments
+</p>
+
+<div class="card">
+
+<h3>Organisations</h3>
+
+<div class="table-header">
+
+<div>ORGANISATION NAME</div>
+<div>DESCRIPTION</div>
+<div>DEPARTMENTS</div>
+
+</div>
+
+{% for org in organisations %}
+
+<div class="table-row">
+
+<!-- Organisation Name -->
+<div class="team-name">
+    {{ org.organisation_name }}
+</div>
+
+<!-- Description -->
+<div style="padding-left: 10px;">
+    {{ org.organisation_description|default:"No description available" }}
+</div>
+
+<!-- Departments -->
+<div>
+    {% for dept in org.departments.all %}
+        <div style="font-size: 13px;">
+            <a href="/teams/department/{{ dept.id }}/">
+                {{ dept.department_name }}
+            </a>
+        </div>
+    {% empty %}
+        <span style="color: gray;">No departments</span>
+    {% endfor %}
+</div>
+
+</div>
+
+{% empty %}
+
+<p>No organisations found.</p>
+
+{% endfor %}
+
+</div>
+</div>
+</div>
+
+<footer>
+© 2026 LOGOSKY • Privacy • Terms • Contact
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,145 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Department Profile</title>
+<link rel="stylesheet" href="{% static 'teams/team_detail.css' %}?v=11">
+</head>
+
+<body>
+
+<div class="topbar">
+<div class="logo">
+<strong>LOGOSKY</strong>
+<p>Engineering Team Directory</p>
+</div>
+
+<div class="top-actions">
+<input class="top-search" placeholder="Search directory...">
+<button class="profile-btn">View Public Profile</button>
+<div class="user-circle">JD</div>
+</div>
+</div>
+
+<div class="layout">
+
+<div class="sidebar">
+<ul class="nav">
+
+<li onclick="window.location.href='/dashboard/'">
+<span class="icon">D</span>Dashboard
+</li>
+
+<li onclick="window.location.href='/teams/'">
+<span class="icon">T</span>Teams
+</li>
+
+<li class="active">
+<span class="icon">O</span>Departments
+</li>
+
+<li>
+<span class="icon">M</span>Messages
+</li>
+
+<li onclick="window.location.href='/teams/schedule-meeting/'">
+<span class="icon">S</span>Schedule
+</li>
+
+<li>
+<span class="icon">P</span>Profile
+</li>
+
+</ul>
+
+<p class="admin-label">ADMIN</p>
+
+<ul class="nav">
+<li><span class="icon">AD</span>Admin Dashboard</li>
+<li><span class="icon">TM</span>Team Management</li>
+<li><span class="icon">UA</span>User Access</li>
+</ul>
+</div>
+
+<div class="content">
+
+<div class="page-container">
+
+<h1 class="page-title">{{ department.department_name }}</h1>
+
+<!-- Department Info -->
+<div class="card summary-card">
+
+<div class="team-info">
+<p class="info-label">Location</p>
+<p>{{ department.department_location }}</p>
+</div>
+
+<div class="team-info">
+<p class="info-label">Organisation</p>
+<p>{{ department.organisation }}</p>
+</div>
+
+</div>
+
+<!-- Actions -->
+<div class="card">
+<h3>Primary Actions</h3>
+
+<div class="buttons">
+<a href="#" class="btn">Contact Department</a>
+<a href="/teams/" class="btn back-btn">Back to Directory</a>
+</div>
+</div>
+
+<!-- Overview -->
+<div class="card">
+<h3>Overview</h3>
+
+<p class="overview-text">
+{{ department.department_description }}
+</p>
+</div>
+
+<!-- Department Head -->
+<div class="card">
+<h3>Department Head</h3>
+
+<div class="contact-wrapper">
+
+<div class="contact-box">
+<p><strong>Head</strong></p>
+<p>{{ department.dept_head }}</p>
+<p>{{ department.dept_head }}@logosky.com</p>
+</div>
+
+</div>
+</div>
+
+<!-- Teams Section -->
+<div class="card">
+<h3>Teams in this Department</h3>
+
+<ul>
+{% for team in teams %}
+    <li>
+        <a href="/team/{{ team.id }}/">{{ team.name }}</a>
+    </li>
+{% empty %}
+    <li>No teams found</li>
+{% endfor %}
+</ul>
+
+</div>
+
+</div>
+</div>
+</div>
+
+<footer>
+© 2026 LOGOSKY • Privacy • Terms • Contact
+</footer>
+
+</body>
+</html>

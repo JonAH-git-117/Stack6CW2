@@ -1,0 +1,350 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Meeting Scheduler</title>
+<link rel="stylesheet" href="{% static 'teams/schedule_meeting.css' %}">
+</head>
+
+<body>
+
+<div class="topbar">
+
+<div class="logo">
+<strong>LOGOSKY</strong>
+<p>Engineering Team Directory</p>
+</div>
+
+<div class="top-actions">
+<input class="top-search" placeholder="Search directory...">
+<button class="profile-btn">View Public Profile</button>
+<div class="user-circle">JD</div>
+</div>
+
+</div>
+
+
+
+<div class="layout">
+
+<div class="sidebar">
+
+<ul class="nav">
+
+<li>
+<span class="icon">D</span>Dashboard
+</li>
+
+<li onclick="window.location.href='/teams/'">
+<span class="icon">T</span>Teams
+</li>
+
+<li>
+<span class="icon">O</span>Organisations
+</li>
+
+<li>
+<span class="icon">M</span>Messages
+</li>
+
+<li class="active" onclick="window.location.href='/teams/schedule-meeting/'">
+<span class="icon">S</span>Schedule
+</li>
+
+<li>
+<span class="icon">P</span>Profile
+</li>
+
+</ul>
+<p class="admin-label">ADMIN</p>
+
+<ul class="nav">
+<li><span class="icon">AD</span>Admin Dashboard</li>
+<li><span class="icon">TM</span>Team Management</li>
+<li><span class="icon">UA</span>User Access</li>
+</ul>
+
+</div>
+
+
+
+<div class="content">
+
+<h1>Meeting Scheduler</h1>
+
+
+
+<div class="card">
+
+<div class="calendar-controls">
+
+<select id="viewMode">
+<option value="month">Monthly</option>
+<option value="week">Weekly</option>
+</select>
+
+<select id="month"></select>
+<select id="year"></select>
+
+<button onclick="renderCalendar()" class="btn-apply">Apply</button>
+
+</div>
+
+
+<table class="calendar">
+
+<thead>
+<tr>
+<th>Mon</th>
+<th>Tue</th>
+<th>Wed</th>
+<th>Thu</th>
+<th>Fri</th>
+<th class="weekend">Sat</th>
+<th class="weekend">Sun</th>
+</tr>
+</thead>
+
+<tbody id="calendarBody"></tbody>
+
+</table>
+
+</div>
+
+
+
+<div class="card">
+
+<h3>Schedule a Meeting</h3>
+
+<form id="meetingForm" class="meeting-form">
+
+<label>Meeting Title</label>
+<input id="title" type="text" required>
+
+<label>Date</label>
+<input id="date" type="date" required>
+
+
+<div class="two-col">
+
+<div>
+<label>Start Time</label>
+<input type="time">
+</div>
+
+<div>
+<label>End Time</label>
+<input type="time">
+</div>
+
+</div>
+
+
+
+<div class="two-col">
+
+<div>
+<label>Platform</label>
+
+<select>
+<option>Microsoft Teams</option>
+<option>Google Meet</option>
+<option>Zoom</option>
+</select>
+</div>
+
+
+<div>
+<label>Participants</label>
+
+<select>
+<option>Backend Engineering Team</option>
+<option>Frontend Engineering Team</option>
+<option>DevOps Infrastructure Team</option>
+</select>
+
+</div>
+
+</div>
+
+
+
+<label>Agenda</label>
+<textarea></textarea>
+
+
+
+<div class="buttons">
+
+<button class="btn-primary">Save Meeting</button>
+
+<button type="reset" class="btn-outline">Clear</button>
+
+<a href="/" class="btn-outline">Back to Team Directory</a>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+</div>
+
+
+
+<footer>
+© 2026 LOGOSKY • Privacy • Terms • Contact
+</footer>
+
+
+
+<script>
+
+let meetings = [
+
+{title:"Backend Planning Session",day:10,month:2,year:2026},
+{title:"Infrastructure Synchronisation",day:18,month:2,year:2026},
+{title:"API Architecture Review",day:25,month:2,year:2026}
+
+]
+
+
+const months=[
+"January","February","March","April","May","June",
+"July","August","September","October","November","December"
+]
+
+
+const monthSelect=document.getElementById("month")
+const yearSelect=document.getElementById("year")
+
+
+months.forEach((m,i)=>{
+let option=document.createElement("option")
+option.value=i
+option.text=m
+monthSelect.appendChild(option)
+})
+
+
+for(let y=2024;y<=2035;y++){
+let option=document.createElement("option")
+option.value=y
+option.text=y
+yearSelect.appendChild(option)
+}
+
+
+monthSelect.value=new Date().getMonth()
+yearSelect.value=new Date().getFullYear()
+
+
+
+function renderCalendar(){
+
+const month=Number(monthSelect.value)
+const year=Number(yearSelect.value)
+
+const firstDay=new Date(year,month,1).getDay()
+const daysInMonth=new Date(year,month+1,0).getDate()
+
+const calendar=document.getElementById("calendarBody")
+
+calendar.innerHTML=""
+
+let date=1
+
+for(let i=0;i<6;i++){
+
+let row=document.createElement("tr")
+
+for(let j=1;j<=7;j++){
+
+let cell=document.createElement("td")
+
+if(i===0 && j<firstDay){
+cell.innerHTML=""
+}
+
+else if(date>daysInMonth){
+cell.innerHTML=""
+}
+
+else{
+
+let dayDiv=document.createElement("div")
+dayDiv.className="day"
+dayDiv.innerText=date
+
+cell.appendChild(dayDiv)
+
+meetings.forEach(m=>{
+
+if(m.day===date && m.month===month && m.year===year){
+
+let meeting=document.createElement("div")
+meeting.className="meeting"
+meeting.innerText=m.title
+
+cell.appendChild(meeting)
+
+}
+
+})
+
+date++
+
+}
+
+if(j===6 || j===7){
+cell.classList.add("weekend")
+}
+
+row.appendChild(cell)
+
+}
+
+calendar.appendChild(row)
+
+}
+
+}
+
+
+
+document.getElementById("meetingForm").addEventListener("submit",function(e){
+
+e.preventDefault()
+
+const title=document.getElementById("title").value
+const date=document.getElementById("date").value
+
+let d=new Date(date)
+
+meetings.push({
+title:title,
+day:d.getDate(),
+month:d.getMonth(),
+year:d.getFullYear()
+})
+
+renderCalendar()
+
+this.reset()
+
+alert("Meeting scheduled successfully")
+
+})
+
+
+renderCalendar()
+
+</script>
+
+
+</body>
+</html
