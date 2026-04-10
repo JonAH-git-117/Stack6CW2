@@ -3,19 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <title>Sky Engineering Teams Report</title>
+    <!--
+        This is a standalone HTML template used only for PDF generation.
+        It does NOT extend the base template — as shown in the lecture slides,
+        PDF templates should be self-contained so WeasyPrint can render them
+        independently without needing Django's template inheritance.
+
+        CSS is defined inline here because WeasyPrint renders this HTML
+        in isolation. Note: WeasyPrint has limited support for flexbox/grid
+        so we use display:block for layouts instead.
+    -->
     <style>
+        /* Base page styles — Arial is used as it renders cleanly in PDFs */
         body { font-family: Arial, sans-serif; font-size: 12px; color: #333; }
+
+        /* Headings use the site's primary blue colour (#1e3a8a) for consistency */
         h1 { color: #1e3a8a; border-bottom: 2px solid #1e3a8a; padding-bottom: 8px; }
         h2 { color: #1e3a8a; margin-top: 30px; }
+
+        /* Summary section uses block display — flexbox not reliable in WeasyPrint */
         .summary { display: block; margin-bottom: 20px; }
+
+        /* Stat boxes — blue background with white text for visual impact */
         .stat-box { background: #1e3a8a; color: white; padding: 10px 20px;
                     border-radius: 5px; text-align: center; margin-bottom: 10px; }
         .stat-box h3 { margin: 0; font-size: 28px; }
         .stat-box p  { margin: 0; font-size: 11px; }
+
+        /* Table styles — collapsed borders and alternating row colours */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th { background: #1e3a8a; color: white; padding: 6px; text-align: left; }
         td { padding: 5px; border-bottom: 1px solid #e5e7eb; }
+        /* nth-child(even) gives alternating row colours for readability */
         tr:nth-child(even) { background: #f5f6fa; }
+
+        /* Warning table has a red header to highlight missing managers */
         .warning th { background: #cc0000; }
     </style>
 </head>
@@ -23,23 +45,35 @@
 
     <h1>Sky Engineering – Teams Report</h1>
 
-    <!-- Summary Stats -->
+    <!--
+        Summary Stats Section
+        These values are passed in from the generate_pdf view in views.py
+        via the render_to_string() context dictionary
+    -->
     <div class="summary">
+        <!-- {{ total_teams }} — total count of all teams in the database -->
         <div class="stat-box">
             <h3>{{ total_teams }}</h3>
             <p>Total Teams</p>
         </div>
+        <!-- {{ total_departments }} — total count of all departments -->
         <div class="stat-box">
             <h3>{{ total_departments }}</h3>
             <p>Total Departments</p>
         </div>
+        <!-- .count calls the QuerySet count on teams_without_manager -->
         <div class="stat-box">
             <h3>{{ teams_without_manager.count }}</h3>
             <p>Teams Without Manager</p>
         </div>
     </div>
 
-    <!-- All Teams Table -->
+    <!--
+        All Teams Table
+        Loops through the teams QuerySet passed in from the view
+        select_related means department, organisation and manager
+        data is already pre-fetched — no extra queries needed here
+    -->
     <h2>All Teams ({{ total_teams }})</h2>
     <table>
         <thead>
@@ -53,26 +87,37 @@
             </tr>
         </thead>
         <tbody>
+            <!-- {% for %} loops through each team in the QuerySet -->
             {% for team in teams %}
             <tr>
                 <td>{{ team.name }}</td>
+                <!-- Dot notation accesses related model fields -->
                 <td>{{ team.department.department_name }}</td>
                 <td>{{ team.department.organisation.organisation_name }}</td>
                 <td>
+                    <!-- Check if manager exists before displaying their name -->
                     {% if team.manager %}
+                        <!-- get_full_name returns "First Last" -->
+                        <!-- default filter falls back to username if name is empty -->
                         {{ team.manager.get_full_name|default:team.manager.username }}
                     {% else %}
                         <strong>No Manager</strong>
                     {% endif %}
                 </td>
+                <!-- get_status_display returns the human readable status label -->
                 <td>{{ team.get_status_display }}</td>
+                <!-- .count on ManyToMany field returns number of members -->
                 <td>{{ team.members.count }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 
-    <!-- Department Summary -->
+    <!--
+        Department Summary Table
+        dept_summary QuerySet is annotated with team_count in the view
+        using Django's annotate() and Count() functions
+    -->
     <h2>Department Summary</h2>
     <table>
         <thead>
@@ -86,14 +131,20 @@
             {% for dept in departments %}
             <tr>
                 <td>{{ dept.department_name }}</td>
+                <!-- Access the related organisation via dot notation -->
                 <td>{{ dept.organisation.organisation_name }}</td>
+                <!-- team_count is added by annotate() in the view -->
                 <td>{{ dept.team_count }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 
-    <!-- Teams Without Manager -->
+    <!--
+        Teams Without a Manager Table
+        Only shown if the teams_without_manager QuerySet is non-empty
+        The warning CSS class gives this table a red header to flag the issue
+    -->
     {% if teams_without_manager %}
     <h2>Teams Without a Manager</h2>
     <table class="warning">
