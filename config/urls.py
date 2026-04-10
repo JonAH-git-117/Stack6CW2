@@ -26,4 +26,5 @@ urlpatterns = [
     path('reports/', include('reports.urls')),
     # Student 6 - Visualisation
     path('visualisation/', include('visualisation.urls')),
+    path('accounts/', include('accounts.urls')),
 ]

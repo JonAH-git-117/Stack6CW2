@@ -18,6 +18,7 @@ INSTALLED_APPS = [
     'teams',
     'reports',
     'visualisation',
+    'accounts.apps.AccountsConfig',
 ]
 
 
@@ -80,4 +81,5 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_URL = '/admin/login/'
+# Redirect to custom login page when login is required
+LOGIN_URL = 'login'
