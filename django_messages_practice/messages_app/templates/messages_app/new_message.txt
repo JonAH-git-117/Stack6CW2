@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>New Message</title>
+</head>
+<body>
+    <h1>New Message</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit">Send Message</button>
+        <button type="submit" name="save_draft">Save Draft</button>
+    </form>
+
+    <br>
+    <a href="/messages/inbox/">Back to Inbox</a>
+</body>
+</html>
