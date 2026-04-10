@@ -1,0 +1,111 @@
+{% load static %}
+{# Load the static template tag so we can reference CSS files using {% static %} #}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Data Visualisation</title>
+    {# Use the shared teams stylesheet to keep consistent styling across the app #}
+    <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=99">
+    {# Bokeh's base JavaScript file — must be loaded before the chart scripts #}
+    {# This file contains the core Bokeh rendering engine #}
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.9.0.min.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+{# Top Navigation Bar #}
+<div class="topbar">
+    <div class="logo">
+        <strong>LOGOSKY</strong>
+        <p>Engineering Team Directory</p>
+    </div>
+    <div class="top-actions">
+        <input class="top-search" placeholder="Search directory...">
+        <button class="profile-btn">View Public Profile</button>
+        <div class="user-circle">JD</div>
+    </div>
+</div>
+
+<div class="layout">
+
+    {# Sidebar Navigation #}
+    <div class="sidebar">
+        <ul class="nav">
+            <li onclick="window.location.href='/'">
+                <span class="icon">D</span>Dashboard
+            </li>
+            <li onclick="window.location.href='/teams/'">
+                <span class="icon">T</span>Teams
+            </li>
+            <li>
+                <span class="icon">O</span>Organisations
+            </li>
+            <li>
+                <span class="icon">M</span>Messages
+            </li>
+            <li onclick="window.location.href='/teams/schedule-meeting/'">
+                <span class="icon">S</span>Schedule
+            </li>
+            <li onclick="window.location.href='/reports/'">
+                <span class="icon">R</span>Reports
+            </li>
+            {# active class highlights this page in the sidebar #}
+            <li class="active">
+                <span class="icon">V</span>Visualisation
+            </li>
+        </ul>
+
+        <p class="admin-label">ADMIN</p>
+        <ul class="nav">
+            <li>
+                <span class="icon">AD</span>Admin Dashboard
+            </li>
+            <li>
+                <span class="icon">TM</span>Team Management
+            </li>
+            <li>
+                <span class="icon">UA</span>User Access
+            </li>
+        </ul>
+    </div>
+
+    {# Main Content Area #}
+    <div class="content">
+
+        <h1>Data Visualisation</h1>
+        <p class="subtitle">Charts and graphs for Sky Engineering teams</p>
+
+        {# Chart 1: Teams per Department #}
+        <div class="card">
+            <h3>Teams per Department</h3>
+            {# plot1_html is the Bokeh-generated HTML div for chart 1 #}
+            {# |safe prevents Django from escaping the HTML markup #}
+            {{ plot1_html|safe }}
+        </div>
+
+        {# Chart 2: Active vs Disabled Teams #}
+        <div class="card">
+            <h3>Active vs Disabled Teams</h3>
+            {# plot2_html is the Bokeh-generated HTML div for chart 2 #}
+            {# |safe prevents Django from escaping the HTML markup #}
+            {{ plot2_html|safe }}
+        </div>
+
+    </div>
+</div>
+
+<footer>
+    © 2026 LOGOSKY • Privacy • Terms • Contact
+</footer>
+
+{# Bokeh Chart Scripts #}
+{# These scripts must be placed at the bottom of the page AFTER the HTML divs #}
+{# They contain the JavaScript needed to render each chart into its div #}
+{# |safe prevents Django from escaping the JavaScript #}
+{{ script1|safe }}
+{{ script2|safe }}
+
+</body>
+</html>
