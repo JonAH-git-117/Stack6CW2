@@ -12,6 +12,8 @@ from django.contrib import messages
 # Import our custom forms from forms.py
 from .forms import CustomUserCreationForm, UserUpdateForm
 
+from django.contrib.auth.decorators import login_required
+
 
 def signup(request):
     # Initialise an empty form for GET requests

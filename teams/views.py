@@ -1,8 +1,11 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import get_user_model
 from .models import Team, Department
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
 
 
+@login_required
 def team_list(request):
 
     keyword = request.GET.get('keyword') or ""
@@ -41,8 +44,8 @@ def team_list(request):
     return render(request, 'teams/team_list.html', context)
 
 
+@login_required
 def team_detail(request, id):
-
     team = get_object_or_404(Team, id=id)
 
    
@@ -111,5 +114,6 @@ def team_detail(request, id):
     return render(request, 'teams/team_detail.html', context)
 
 
+@login_required
 def schedule_meeting(request):
-    return render(request, 'teams/schedule_meeting.html')
+        return render(request, 'teams/schedule_meeting.html')
