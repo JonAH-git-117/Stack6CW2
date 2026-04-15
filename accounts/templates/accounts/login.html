@@ -3,9 +3,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=200">
+
+    <link rel="stylesheet" href="{% static 'teams/login.css' %}">
 </head>
 
 <body>
@@ -20,48 +20,66 @@
 <div class="layout">
 
     <div class="sidebar">
-        <ul class="nav">
-            <li onclick="window.location.href='/teams/'">
-                <span class="icon">T</span>Teams
-            </li>
-            <li onclick="window.location.href='/accounts/signup/'">
-                <span class="icon">S</span>Sign Up
-            </li>
-        </ul>
+      <ul class="nav">
+
+    <li class="active" onclick="location.href='/teams/'">
+        <div class="icon">T</div>
+        <span>Teams</span>
+    </li>
+
+    <li onclick="location.href='/accounts/logout/'">
+        <div class="icon">S</div>
+        <span>Sign Out</span>
+    </li>
+
+</ul>
     </div>
 
-    <div class="content">
+    <div class="content-center">
 
-        <h1>Login</h1>
-        <p class="subtitle">Sign in to access the SKY Engineering Team Directory</p>
+        <div class="login-box">
 
-        <div class="card">
-            <h3>Sign In</h3>
-
-            <!-- Display any error messages -->
-            {% if messages %}
-                {% for message in messages %}
-                    <p class="error">{{ message }}</p>
-                {% endfor %}
-            {% endif %}
+            <h1>Login</h1>
+            <p class="subtitle">Sign in to access your account</p>
 
             <form method="POST">
                 {% csrf_token %}
-                {{ form.as_p }}
+
+                <div class="login-type">
+                    <p>Login Type</p>
+
+                    <label>
+                        <input type="radio" name="type" checked>
+                        Standard User
+                    </label>
+
+                    <label>
+                        <input type="radio" name="type">
+                        Admin
+                    </label>
+                </div>
+
+                <label>Username or Email</label>
+                <input type="text" name="username" placeholder="example@logosky.com">
+
+                <label>Password</label>
+                <input type="password" name="password">
+
                 <div class="buttons">
-                    <button class="btn-primary" type="submit">Login</button>
-                    <p><a href="/accounts/reset-password/">Forgot Password?</a></p>
-                    <a href="/accounts/signup/" class="btn-outline">Need an account? Sign Up</a>
+                    <button type="submit" class="btn-primary">Log in</button>
+                    <a href="/" class="btn-outline">Cancel</a>
                 </div>
             </form>
+
+            <a class="forgot" href="{% url 'password_reset' %}">
+                Forgot password?
+            </a>
+
         </div>
 
     </div>
-</div>
 
-<footer>
-    © 2026 LOGOSKY • Privacy • Terms • Contact
-</footer>
+</div>
 
 </body>
 </html>

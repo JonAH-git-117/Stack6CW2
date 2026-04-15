@@ -9,7 +9,7 @@ urlpatterns = [
     # URL path for the signup page
     path('signup/', views.signup, name='signup'),
     # URL path for the login page
-    path('login/', views.login, name='login'),
+path('login/', views.login_view, name='login'),
     # URL path for logout - no template needed, just redirects
     path('logout/', views.logout, name='logout'),
     # URL path for updating the user's profile

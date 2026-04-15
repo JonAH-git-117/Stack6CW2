@@ -1,13 +1,14 @@
 from pathlib import Path
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+# SECURITY
 SECRET_KEY = 'django-insecure-development-key'
 DEBUG = True
 ALLOWED_HOSTS = []
 
 
+# APPLICATIONS
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -15,13 +16,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'teams',
-    'reports',
-    'visualisation',
-    'accounts.apps.AccountsConfig',
+    'accounts',   
 ]
 
 
+# MIDDLEWARE
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -32,13 +33,22 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
+# URL CONFIG
 ROOT_URLCONF = 'config.urls'
 
+
+# TEMPLATES
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  
+
+        # global templates folder (optional)
+        'DIRS': [BASE_DIR / 'templates'],
+
+        # 🔥 REQUIRED to load app templates
         'APP_DIRS': True,
+
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
@@ -49,8 +59,12 @@ TEMPLATES = [
     },
 ]
 
+
+# WSGI
 WSGI_APPLICATION = 'config.wsgi.application'
 
+
+# DATABASE
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -59,6 +73,7 @@ DATABASES = {
 }
 
 
+# PASSWORD VALIDATION
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -69,20 +84,29 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+# LANGUAGE & TIME
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
+
+# STATIC FILES (CSS, JS)
 STATIC_URL = '/static/'
+
 STATICFILES_DIRS = [
-    BASE_DIR / "teams/static"
+    BASE_DIR / "accounts/static"
 ]
 
+# DEFAULT FIELD
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Redirect to custom login page when login is required
-LOGIN_URL = 'login'
 
-# Use console email backend for development - prints emails to terminal
+# LOGIN SETTINGS
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = '/teams/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
+
+
+# EMAIL (dev only)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

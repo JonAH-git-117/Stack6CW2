@@ -33,8 +33,7 @@ def signup(request):
     })
 
 
-def login(request):
-    # Initialise an empty authentication form for GET requests
+def login_view(request):       # Initialise an empty authentication form for GET requests
     form = AuthenticationForm()
     if request.method == 'POST':
         # Populate the form with the submitted POST data
