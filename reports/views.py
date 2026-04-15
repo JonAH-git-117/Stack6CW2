@@ -17,7 +17,7 @@ from django.template.loader import render_to_string
 
 # WeasyPrint converts HTML strings into PDF documents
 # HTML handles the conversion, CSS allows us to pass stylesheets to the PDF
-from weasyprint import HTML, CSS
+#from weasyprint import HTML, CSS
 
 # Import models from the teams app — reports has no models of its own
 # as it only reads and displays existing data from the shared database
