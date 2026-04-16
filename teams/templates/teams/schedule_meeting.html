@@ -12,19 +12,20 @@
 
 <div class="topbar">
 
-<div class="logo">
-<strong>LOGOSKY</strong>
-<p>Engineering Team Directory</p>
+    <div class="logo">
+    <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo"style="height:75px; width:auto; border:3px">
+        <p>Engineering Team Directory</p>
+    </div>
+
+    <div class="top-actions">
+        <input class="top-search" placeholder="Search directory...">
+        <a href="/accounts/update-profile/" class="profile-btn">View Public Profile</a> 
+        <div class="user-circle">
+            {{ request.user.username|slice:":2"|upper }}
+        </div>
+    </div>
+
 </div>
-
-<div class="top-actions">
-<input class="top-search" placeholder="Search directory...">
-<a href="/accounts/update-profile/" class="profile-btn">View Public Profile</a> <div class="user-circle">
-        {{ request.user.username|slice:":2"|upper }}
-       </div></div>
-
-</div>
-
 
 
 <div class="layout">

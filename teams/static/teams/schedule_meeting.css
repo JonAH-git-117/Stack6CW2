@@ -4,7 +4,22 @@ margin:0;
 background:#f5f6fa;
 color:#333;
 }
+.logo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
 
+.logo img {
+    height: 28px;
+    width: auto;
+}
+
+.logo p {
+    font-size: 12px;
+    color: #0A3D93;
+    margin: 0;
+}
 .topbar{
 display:flex;
 justify-content:space-between;
