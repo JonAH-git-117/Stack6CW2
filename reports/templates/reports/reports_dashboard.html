@@ -33,9 +33,9 @@
     {# Sidebar Navigation #}
     <div class="sidebar">
         <ul class="nav">
-            <li onclick="window.location.href='/'">
-                <span class="icon">D</span>Dashboard
-            </li>
+                  <li  onclick="window.location.href='/teams/dashboard/'">
+    <span class="icon">D</span>Dashboard
+</li>
             <li onclick="window.location.href='/teams/'">
                 <span class="icon">T</span>Teams
             </li>
@@ -171,7 +171,6 @@
             <h3>Download Report</h3>
             <div class="buttons">
                 {# Links to generate_pdf view which returns a PDF FileResponse #}
-                <a href="{% url 'generate_pdf' %}" class="btn-primary" style="text-decoration:none;">
                     ⬇ Download PDF Report
                 </a>
                 {# Links to generate_excel view which returns an xlsx HttpResponse #}

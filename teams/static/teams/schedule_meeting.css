@@ -1,9 +1,12 @@
-/* Calendar controls */
 .calendar-controls {
     display: flex;
     gap: 10px;
     margin-bottom: 15px;
     align-items: center;
+}
+.profile-btn {
+    text-decoration: none !important;
+    color: white; 
 }
 
 .btn-apply {
@@ -16,11 +19,11 @@
 }
 
 .btn-apply:hover {
-    background: #1e3a8a;
+    background: #0A3D93;
     color: white;
 }
 
-/* Calendar table */
+
 .calendar {
     width: 100%;
     border-collapse: collapse;
@@ -48,9 +51,8 @@
     margin-bottom: 4px;
 }
 
-/* Meeting pills */
 .meeting {
-    background: #1e3a8a;
+    background: #0A3D93;
     color: white;
     font-size: 12px;
     padding: 4px 8px;
@@ -76,7 +78,6 @@
     background: rgba(255, 255, 255, 0.2);
 }
 
-/* Meeting form */
 .meeting-form {
     display: flex;
     flex-direction: column;
@@ -105,7 +106,6 @@ textarea {
     flex: 1;
 }
 
-/* Card widths */
 .calendar-card {
     max-width: 1000px;
 }

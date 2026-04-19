@@ -4,7 +4,18 @@ body{
     background: #f5f6fa;
     color: #222;
 }
+.profile-btn {
+    text-decoration: none !important;
+    color: white; 
+}
 
+.profile-btn,
+.profile-btn:link,
+.profile-btn:visited,
+.profile-btn:hover,
+.profile-btn:active {
+    text-decoration: none !important;
+}
 .topbar{
     display:flex;
     justify-content:space-between;
@@ -52,7 +63,7 @@ background:#162d6a;
 }
 
 .user-circle{
-background:#1e3a8a;
+background:#162d6a;
 color:white;
 width:36px;
 height:36px;

@@ -5,7 +5,7 @@
 <head>
     <title>Profile - {{ profile.user.username }}</title>
     {# Use the shared teams stylesheet to keep consistent styling across the app #}
-    <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=201">
+<link rel="stylesheet" href="{% static 'teams/style.css' %}?v=202"></head>
 </head>
 
 <body>
@@ -31,9 +31,9 @@
     {# Sidebar Navigation #}
     <div class="sidebar">
         <ul class="nav">
-            <li onclick="window.location.href='/'">
-                <span class="icon">D</span>Dashboard
-            </li>
+             <li  onclick="window.location.href='/teams/dashboard/'">
+    <span class="icon">D</span>Dashboard
+</li>
             <li onclick="window.location.href='/teams/'">
                 <span class="icon">T</span>Teams
             </li>

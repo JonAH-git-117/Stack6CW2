@@ -1,5 +1,7 @@
+
+
 # Import render and redirect shortcuts
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 # Import authentication functions - aliased to avoid naming conflicts
 # with our own login/logout view functions
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
@@ -103,7 +105,9 @@ def update_profile(request):
 def profile_view(request, username):
     # Retrieve the profile using the username from the URL
     # as shown in the lecture slides
-    profile = Profile.objects.get(user__username=username)
+    from django.contrib.auth.models import User
+    user_obj = get_object_or_404(User, username=username)
+    profile, created = Profile.objects.get_or_create(user=user_obj)
     # Render the profile template passing the profile as context
     return render(request, 'accounts/profile.html', {
         'profile': profile,

@@ -3,8 +3,19 @@ from django.contrib.auth import get_user_model
 from .models import Team, Department
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
+from django.utils import timezone
+from .models import Meeting
 
+def dashboard(request):
+    upcoming_meetings = Meeting.objects.filter(
+        scheduled_at__gte=timezone.now()
+    ).order_by('scheduled_at')[:5]
 
+    context = {
+        'upcoming_meetings': upcoming_meetings,
+    }
+
+    return render(request, 'teams/dashboard.html', context)
 @login_required
 def team_list(request):
 

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teams Directory</title>
-<link rel="stylesheet" href="{% static 'teams/style.css' %}?v=201"></head>
+<link rel="stylesheet" href="{% static 'teams/style.css' %}?v=202"></head>
 
 
 <body>
@@ -30,9 +30,9 @@
 
     <div class="sidebar">
         <ul class="nav">
-            <li>
-                <span class="icon">D</span>Dashboard
-            </li>
+            <li  onclick="window.location.href='/teams/dashboard/'">
+    <span class="icon">D</span>Dashboard
+</li>
             <li class="active" onclick="window.location.href='/teams/'">
                 <span class="icon">T</span>Teams
             </li>
