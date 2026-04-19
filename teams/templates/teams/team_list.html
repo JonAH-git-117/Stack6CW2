@@ -160,13 +160,8 @@
                         View Team
                     </a>
 
-                    {% if team.manager %}
-                        <a href="mailto:{{ team.manager.username }}@logosky.com" class="action-btn secondary-action">
-                            Email Team
-                        </a>
-                    {% else %}
-                        <span class="action-btn disabled-action">Email Team</span>
-                    {% endif %}
+                    <a href="mailto:{{ team.name|lower|cut:' ' }}@logosky.com" class="action-btn secondary-action">
+                        Email Team </a>
 
                     {% if team.status|lower == 'disabled' %}
                         <span class="action-btn disabled-action">Schedule</span>
