@@ -1,307 +1,115 @@
-body{
-font-family:Arial, sans-serif;
-margin:0;
-background:#f5f6fa;
-color:#333;
+/* Calendar controls */
+.calendar-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    align-items: center;
 }
 
-.topbar{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    padding:10px 20px;
-    background:#f8f9fc;
-    border-bottom:1px solid #e5e7eb;
-}
-.logo{
-    display:flex;
-    flex-direction:column;
+.btn-apply {
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
 }
 
-.top-actions{
-display:flex;
-align-items:center;
-gap:12px;
+.btn-apply:hover {
+    background: #1e3a8a;
+    color: white;
 }
 
-.top-search{
-padding:8px 12px;
-border-radius:8px;
-border:1px solid #ddd;
+/* Calendar table */
+.calendar {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-.profile-btn{
-background:#1e3a8a;
-color:white;
-border:none;
-padding:8px 16px;
-border-radius:8px;
-cursor:pointer;
-transition:0.2s;
+.calendar th {
+    background: #f3f4f6;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
 }
 
-.profile-btn:hover{
-background:#162d6a;
+.calendar td {
+    height: 85px;
+    vertical-align: top;
+    border: 1px solid #e5e7eb;
+    padding: 8px;
 }
 
-.user-circle{
-background:#1e3a8a;
-color:white;
-width:36px;
-height:36px;
-display:flex;
-align-items:center;
-justify-content:center;
-border-radius:50%;
+.weekend {
+    background: #faf4d6;
 }
 
-.layout{
-display:flex;
+.day {
+    font-weight: 600;
+    margin-bottom: 4px;
 }
 
-
-.sidebar{
-width:230px;
-background:#f1f3f7;
-padding:20px;
-min-height:100vh;
-border-right:1px solid #ddd;
+/* Meeting pills */
+.meeting {
+    background: #1e3a8a;
+    color: white;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
 }
 
-.nav{
-list-style:none;
-padding:0;
-margin:0;
+.delete-btn {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
 }
 
-.nav li{
-display:flex;
-align-items:center;
-gap:10px;
-padding:10px;
-margin-bottom:8px;
-border-radius:10px;
-cursor:pointer;
+.delete-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
 }
 
-.nav li.active{
-background:#e6ecff;
-}
-
-.icon{
-width:30px;
-height:30px;
-border-radius:50%;
-background:#e9edf5;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:12px;
-}
-
-.admin-label{
-font-size:12px;
-margin-top:25px;
-color:#777;
-}
-
-
-.content{
-flex:1;
-padding:30px;
-}
-
-.card{
-background:white;
-padding:25px;
-border-radius:14px;
-border:1px solid #e5e7eb;
-margin-bottom:15px;
-}
-
-.calendar-controls{
-display:flex;
-gap:10px;
-margin-bottom:15px;
-align-items:center;
-}
-
-.btn-apply{
-background:#f3f4f6;
-border:1px solid #d1d5db;
-padding:6px 12px;
-border-radius:6px;
-cursor:pointer;
-transition:0.2s;
-}
-
-.btn-apply:hover{
-background:#1e3a8a;
-color:white;
-}
-
-.calendar{
-width:100%;
-border-collapse:collapse;
-margin-bottom:0;
-}
-
-.calendar th{
-background:#f3f4f6;
-padding:12px;
-border:1px solid #e5e7eb;
-}
-
-.calendar td{
-height:85px;
-vertical-align:top;
-border:1px solid #e5e7eb;
-padding:8px;
-}
-
-.weekend{
-background:#faf4d6;
-}
-
-.day{
-font-weight:600;
-margin-bottom:4px;
-}
-
-.meeting{
-background:#1e3a8a;
-color:white;
-font-size:12px;
-padding:4px 8px;
-border-radius:6px;
-display:block;
-margin-top:4px;
-}
-
-.meeting-form{
-display:flex;
-flex-direction:column;
-gap:14px;
+/* Meeting form */
+.meeting-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
 }
 
 .meeting-form input,
 .meeting-form select,
-.meeting-form textarea{
-padding:8px;
-border-radius:8px;
-border:1px solid #ddd;
+.meeting-form textarea {
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
 }
 
-textarea{
-height:90px;
-resize:none;
+textarea {
+    height: 90px;
+    resize: none;
 }
 
-.two-col{
-display:flex;
-gap:25px;
+.two-col {
+    display: flex;
+    gap: 25px;
 }
 
-.two-col div{
-flex:1;
+.two-col div {
+    flex: 1;
 }
 
-.buttons{
-display:flex;
-gap:12px;
-margin-top:10px;
+/* Card widths */
+.calendar-card {
+    max-width: 1000px;
 }
 
-.btn-primary{
-background:#1e3a8a;
-color:white;
-border:none;
-padding:10px 16px;
-border-radius:8px;
-cursor:pointer;
-transition:0.2s;
-}
-
-.btn-primary:hover{
-background:#e8f1ff;
-color:#1e3a8a;
-border:1px solid #1e3a8a;
-}
-
-button[type="reset"]{
-border:1px solid #1e3a8a;
-color:#1e3a8a;
-padding:10px 16px;
-border-radius:8px;
-background:white;
-cursor:pointer;
-transition:0.2s;
-}
-
-button[type="reset"]:hover{
-background:#e8f1ff;
-color:#1e3a8a;
-}
-
-a.btn-outline{
-border:1px solid #1e3a8a;
-color:#1e3a8a;
-padding:10px 16px;
-border-radius:8px;
-text-decoration:none;
-background:white;
-cursor:pointer;
-transition:0.2s;
-}
-
-a.btn-outline:hover{
-background:#1e3a8a;
-color:white;
-}
-
-footer{
-text-align:center;
-padding:20px;
-font-size:13px;
-color:#777;
-}
-
-.meeting{
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:6px;
-}
-
-.delete-btn{
-background:transparent;
-border:none;
-color:white;
-font-size:12px;
-cursor:pointer;
-padding:2px 6px;
-border-radius:4px;
-}
-
-.delete-btn:hover{
-background:rgba(255,255,255,0.2);
-}
-
-@media (max-width:900px){
-
-.content{
-padding:25px;
-}
-
-.top-search{
-width:180px;
-}
-
-.table-header{
-grid-template-columns: 2.5fr 2fr 2fr 1fr 6fr;
-}
-
-.table-row{
-grid-template-columns: 2.5fr 2fr 2fr 1fr 6fr;
-}
+.form-card {
+    max-width: 1000px;
 }

@@ -18,7 +18,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'teams',
-    'accounts',   
+    'accounts',
+    'reports',
+    'visualisation',
 ]
 
 
@@ -95,7 +97,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / "accounts/static"
+    BASE_DIR / "teams/static",
 ]
 
 # DEFAULT FIELD

@@ -4,20 +4,21 @@
 
 <head>
 <title>Meeting Scheduler</title>
-<link rel="stylesheet" href="{% static 'teams/schedule_meeting.css' %}?v=6">
+<link rel="stylesheet" href="{% static 'teams/style.css' %}?v=201">
+<link rel="stylesheet" href="{% static 'teams/schedule_meeting.css' %}?v=8">
 </head>
 
 <body>
 
 <div class="topbar">
     <div class="logo">
-        <img src="{% static 'teams/sky-logo.png' %}" height="45">
+        <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo" style="height:75px; width:auto; border:3px">
         <p>Engineering Team Directory</p>
     </div>
 
     <div class="top-actions">
         <input class="top-search" placeholder="Search directory...">
-        <a href="/accounts/update-profile/" class="profile-btn">View Public Profile</a>
+        <a href="/accounts/profile/{{ request.user.username }}/" class="profile-btn">View Public Profile</a>
         <div class="user-circle">
             {{ request.user.username|slice:":2"|upper }}
         </div>
@@ -33,7 +34,9 @@
 <li><span class="icon">O</span>Organisations</li>
 <li><span class="icon">M</span>Messages</li>
 <li class="active"><span class="icon">S</span>Schedule</li>
-<li onclick="window.location.href='/accounts/update-profile/'"><span class="icon">P</span>Profile</li>
+<li onclick="window.location.href='/reports/'"><span class="icon">R</span>Reports</li>
+<li onclick="window.location.href='/visualisation/'"><span class="icon">V</span>Visualisation</li>
+<li onclick="window.location.href='/accounts/profile/{{ request.user.username }}/'"><span class="icon">P</span>Profile</li>
 </ul>
 
 {% if request.user.is_staff %}
@@ -50,7 +53,7 @@
 
 <h1>Meeting Scheduler</h1>
 
-<div class="card">
+<div class="card calendar-card">
 
 <div class="calendar-controls">
 <select id="viewMode">
@@ -76,7 +79,7 @@
 
 </div>
 
-<div class="card">
+<div class="card form-card">
 <h3>Schedule a Meeting</h3>
 
 <form id="meetingForm" class="meeting-form">
@@ -150,7 +153,6 @@ function deleteMeeting(id){
     renderCalendar();
 }
 
-/* ===== CALENDAR ===== */
 const months=["January","February","March","April","May","June","July","August","September","October","November","December"]
 
 const monthSelect=document.getElementById("month")

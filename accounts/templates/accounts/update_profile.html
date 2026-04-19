@@ -5,30 +5,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update Profile</title>
-    <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=200">
+    <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=201">
 </head>
 
 <body>
 
 <div class="topbar">
-
     <div class="logo">
-    <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo"style="height:75px; width:auto; border:3px">
-    <p>Engineering Team Directory</p>
-</div>
+        <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo" style="height:75px; width:auto; border:3px">
+        <p>Engineering Team Directory</p>
+    </div>
+    <div class="top-actions">
+        <input class="top-search" placeholder="Search directory...">
+        <a href="/accounts/profile/{{ request.user.username }}/" class="profile-btn">View Public Profile</a>
+        <div class="user-circle">
+            {{ request.user.username|slice:":2"|upper }}
+        </div>
+    </div>
 </div>
 
 <div class="layout">
 
     <div class="sidebar">
         <ul class="nav">
+            <li onclick="window.location.href='/'">
+                <span class="icon">D</span>Dashboard
+            </li>
             <li onclick="window.location.href='/teams/'">
                 <span class="icon">T</span>Teams
             </li>
-            <li onclick="window.location.href='/accounts/logout/'">
-                <span class="icon">L</span>Logout
+            <li onclick="window.location.href='/organisations/'">
+                <span class="icon">O</span>Organisations
+            </li>
+            <li onclick="window.location.href='/messages/'">
+                <span class="icon">M</span>Messages
+            </li>
+            <li onclick="window.location.href='/teams/schedule-meeting/'">
+                <span class="icon">S</span>Schedule
+            </li>
+            <li onclick="window.location.href='/reports/'">
+                <span class="icon">R</span>Reports
+            </li>
+            <li onclick="window.location.href='/visualisation/'">
+                <span class="icon">V</span>Visualisation
+            </li>
+            <li class="active" onclick="window.location.href='/accounts/profile/{{ request.user.username }}/'">
+                <span class="icon">P</span>Profile
             </li>
         </ul>
+
+        {% if request.user.is_staff %}
+        <p class="admin-label">ADMIN</p>
+        <ul class="nav">
+            <li><span class="icon">AD</span>Admin Dashboard</li>
+            <li><span class="icon">TM</span>Team Management</li>
+            <li><span class="icon">UA</span>User Access</li>
+        </ul>
+        {% endif %}
     </div>
 
     <div class="content">
@@ -39,7 +72,6 @@
         <div class="card">
             <h3>Your Details</h3>
 
-            <!-- Display any success or error messages -->
             {% if messages %}
                 {% for message in messages %}
                     <p class="error">{{ message }}</p>

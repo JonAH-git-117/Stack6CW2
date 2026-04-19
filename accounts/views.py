@@ -11,6 +11,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 # Import our custom forms from forms.py
 from .forms import CustomUserCreationForm, UserUpdateForm
+# Import Profile model to retrieve profile data for the view
+from .models import Profile
 
 from django.contrib.auth.decorators import login_required
 
@@ -94,4 +96,15 @@ def update_profile(request):
     # Render the update profile template passing the form as context
     return render(request, 'accounts/update_profile.html', {
         'user_form': user_form,
+    })
+
+# Profile view page — read only display of user profile (profile_view)
+@login_required
+def profile_view(request, username):
+    # Retrieve the profile using the username from the URL
+    # as shown in the lecture slides
+    profile = Profile.objects.get(user__username=username)
+    # Render the profile template passing the profile as context
+    return render(request, 'accounts/profile.html', {
+        'profile': profile,
     })

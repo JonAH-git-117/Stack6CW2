@@ -14,15 +14,17 @@
 
 {# Top Navigation Bar #}
 <div class="topbar">
-   <div class="logo">
-    <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo">
-    <p>Engineering Team Directory</p>
-</div>
+    <div class="logo">
+        {# Fixed: added style attribute to match other pages #}
+        <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo" style="height:75px; width:auto; border:3px">
+        <p>Engineering Team Directory</p>
+    </div>
     <div class="top-actions">
         <input class="top-search" placeholder="Search directory...">
-<a href="/accounts/update-profile/" class="profile-btn">View Public Profile</a>        <div class="user-circle">
-        {{ request.user.username|slice:":2"|upper }}
-       </div>
+        <a href="/accounts/update-profile/" class="profile-btn">View Public Profile</a>
+        <div class="user-circle">
+            {{ request.user.username|slice:":2"|upper }}
+        </div>
     </div>
 </div>
 
@@ -47,20 +49,28 @@
                 <span class="icon">S</span>Schedule
             </li>
             {# active class highlights the current page in the sidebar #}
-            <li onclick="window.location.href='/reports/'">
-            <span class="icon">R</span>Reports
+            <li class="active" onclick="window.location.href='/reports/'">
+                <span class="icon">R</span>Reports
+            </li>
+            {# Added Visualisation link as it is a menu item per the spec #}
+            <li onclick="window.location.href='/visualisation/'">
+                <span class="icon">V</span>Visualisation
+            </li>
+            {# Added Profile link to match other pages #}
+            <li onclick="window.location.href='/accounts/update-profile/'">
+                <span class="icon">P</span>Profile
             </li>
         </ul>
 
+        {# Only show admin links to staff users #}
         {% if request.user.is_staff %}
         <p class="admin-label">ADMIN</p>
-        
         <ul class="nav">
-    <li><span class="icon">AD</span>Admin Dashboard</li>
-    <li><span class="icon">TM</span>Team Management</li>
-    <li><span class="icon">UA</span>User Access</li>
-</ul>
-{% endif %}
+            <li><span class="icon">AD</span>Admin Dashboard</li>
+            <li><span class="icon">TM</span>Team Management</li>
+            <li><span class="icon">UA</span>User Access</li>
+        </ul>
+        {% endif %}
     </div>
 
     {# Main Content Area #}
