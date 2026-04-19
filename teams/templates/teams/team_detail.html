@@ -6,21 +6,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team Profile</title>
-    <link rel="stylesheet" href="{% static 'teams/team_detail.css' %}?v=200">
-</head>
-
+<link rel="stylesheet" href="{% static 'teams/team_detail.css' %}?v=200">
 <body>
 
 <div class="topbar">
+
     <div class="logo">
-    <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo"style="height:75px; width:auto; border:3px">
+<img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo" height="45">
         <p>Engineering Team Directory</p>
     </div>
-
-
     <div class="top-actions">
         <input class="top-search" placeholder="Search directory...">
-<a href="/accounts/update-profile/" class="profile-btn">View Public Profile</a>        <div class="user-circle">
+<a href="/accounts/update-profile/" class="profile-btn">View Public Profile</a>
+    <div class="user-circle">
         {{ request.user.username|slice:":2"|upper }}
         </div>
     </div>

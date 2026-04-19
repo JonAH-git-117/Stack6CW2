@@ -4,65 +4,68 @@ body{
     background: #f5f6fa;
     color: #222;
 }
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    padding:10px 20px;
+    background:#f8f9fc;
+    border-bottom:1px solid #e5e7eb;
 }
 
-.logo img {
-    height: 45px;
-    width: auto;
-    display: block;
-}
-
+.logo img{
+    height:40px;
+    display:block;
+} 
 .topbar {
-    height: 60px;
-    padding: 10px 20px;
-}
+    background: #f8f9fc;
+    padding: 15px 30px;
+    border-bottom: 1px solid #e5e7eb;
 
+}
 
 .top-actions{
-    display: flex;
-    align-items: center;
-    gap: 15px;
+display:flex;
+align-items:center;
+gap:12px;
 }
-.logo p {
-    font-size: 12px;
-    margin: 0;
-    color: #777;
-}
+
 .top-search{
-    padding: 10px 15px;
-    border-radius: 20px;
-    border: 1px solid #ddd;
-    width: 220px;
+padding:8px 12px;
+border-radius:8px;
+border:1px solid #ddd;
 }
 
 .profile-btn{
-    background: #0A3D93;
-    color: white;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 8px;
-    cursor: pointer;
+background:#1e3a8a;
+color:white;
+border:none;
+padding:8px 16px;
+border-radius:8px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.profile-btn:hover{
+background:#162d6a;
 }
 
 .user-circle{
-    background: #0A3D93;
-    color: white;
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
+background:#1e3a8a;
+color:white;
+width:36px;
+height:36px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:50%;
 }
 
 .layout{
-    display: flex;
+display:flex;
 }
+
 
 .sidebar{
     width: 230px;
@@ -111,7 +114,7 @@ body{
 
 .content{
     flex: 1;
-    padding: 40px;
+    padding: 30px;
 }
 
 .subtitle{
@@ -319,7 +322,10 @@ footer{
     background: #f1f3f7;
 }
 
-
+.layout {
+    display: flex;
+    align-items: flex-start;
+}
 @media (max-width: 1200px){
     .table-header,
     .table-row{
