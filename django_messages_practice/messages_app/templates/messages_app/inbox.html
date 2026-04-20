@@ -1,39 +1,23 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html>
 <html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2685.2">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+    <title>Inbox</title>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Inbox&lt;/title&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;h1&gt;Inbox&lt;/h1&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>{% if messages %}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;ul&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{% for message in messages %}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;strong&gt;{{ message.subject }}&lt;/strong&gt;&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>To: {{ message.recipient }}&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{{ message.body }}&lt;br&gt;&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>{% endfor %}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/ul&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>{% else %}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;p&gt;No messages found.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>{% endif %}</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+    <h1>Inbox</h1>
+
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>
+                    <strong>{{ message.subject }}</strong><br>
+                    To: {{ message.recipient }}<br>
+                    {{ message.body }}<br><br>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No messages found.</p>
+    {% endif %}
 </body>
 </html>

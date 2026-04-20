@@ -25,3 +25,13 @@ def new_message(request):
         form = MessageForm()
 
     return render(request, 'messages_app/new_message.html', {'form': form})
+
+
+def drafts(request):
+    messages = Message.objects.filter(is_draft=True)
+    return render(request, 'messages_app/drafts.html', {'messages': messages})
+
+
+def sent(request):
+    messages = Message.objects.filter(is_draft=False)
+    return render(request, 'messages_app/sent.html', {'messages': messages})
