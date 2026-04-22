@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Access Management — Admin</title>
     <!-- Load the shared site stylesheet from the teams static folder -->
-    <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=99">
+    <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=202">
     <style>
         /* Card-style container for form sections */
         .form-section {
@@ -181,7 +181,7 @@
         <!-- Sidebar navigation — consistent across all pages -->
         <div class="sidebar">
             <ul class="nav">
-                <li onclick="window.location.href='/'"><span class="icon">D</span>Dashboard</li>
+                <li onclick="window.location.href='/teams/dashboard/'"><span class="icon">D</span>Dashboard</li>
                 <li onclick="window.location.href='/teams/'"><span class="icon">T</span>Teams</li>
                 <li><span class="icon">O</span>Organisations</li>
                 <li><span class="icon">M</span>Messages</li>
@@ -244,9 +244,9 @@
                             <select name="status"
                                 style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;">
                                 <option value="">All</option>
-                                <option value="active" {% if status_filter=="active" %}selected{% endif %}>Active
+                                <option value="active" {% if status_filter == "active" %}selected{% endif %}>Active
                                 </option>
-                                <option value="disabled" {% if status_filter=="disabled" %}selected{% endif %}>Disabled
+                                <option value="disabled" {% if status_filter == "disabled" %}selected{% endif %}>Disabled
                                 </option>
                             </select>
                         </div>
@@ -276,8 +276,7 @@
                         <!-- Loop through all users passed from the view -->
                         {% for u in users %}
                         <!-- Highlight the row if this user is currently selected -->
-                        <tr style="border-bottom:1px solid #e5e7eb;" {% if selected_user.id==u.id
-                            %}class="selected-highlight" {% endif %}>
+                        <tr style="border-bottom:1px solid #e5e7eb;" {% if selected_user.id == u.id %}class="selected-highlight"{% endif %}>
                             <td style="padding:10px;">{{ u.get_full_name|default:u.username }}</td>
                             <td style="padding:10px;">{{ u.username }}</td>
                             <td style="padding:10px;">{{ u.email|default:"—" }}</td>

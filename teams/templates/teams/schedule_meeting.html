@@ -4,7 +4,7 @@
 
 <head>
     <title>Meeting Scheduler</title>
-    <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=201">
+    <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=202">
     <link rel="stylesheet" href="{% static 'teams/schedule_meeting.css' %}?v=8">
 </head>
 
@@ -21,7 +21,11 @@
             <!-- User menu dropdown — shows profile/logout options when clicked -->
             <div class="user-menu">
                 <div class="user-circle" onclick="toggleMenu()">
+                    {% if request.user.first_name %}
                     {{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}
+                    {% else %}
+                    {{ request.user.username|slice:":2"|upper }}
+                    {% endif %}
                 </div>
                 <div class="dropdown-menu" id="dropdownMenu">
                     {% if request.user.is_authenticated %}
@@ -42,7 +46,7 @@
 
         <div class="sidebar">
             <ul class="nav">
-                <li><span class="icon">D</span>Dashboard</li>
+                <li onclick="window.location.href='/teams/dashboard/'"><span class="icon">D</span>Dashboard</li>
                 <li onclick="window.location.href='/teams/'"><span class="icon">T</span>Teams</li>
                 <li><span class="icon">O</span>Organisations</li>
                 <li><span class="icon">M</span>Messages</li>

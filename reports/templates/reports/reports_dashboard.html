@@ -7,7 +7,7 @@
 <head>
     <title>Reports Dashboard</title>
     {# Use the shared teams stylesheet to keep consistent styling across all apps #}
-    <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=99">
+    <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=202">
 </head>
 
 <body>
@@ -25,7 +25,11 @@
         {# User menu dropdown — shows profile/logout options when clicked #}
         <div class="user-menu">
             <div class="user-circle" onclick="toggleMenu()">
-                {{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}
+                {% if request.user.first_name %}
+                    {{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}
+                {% else %}
+                    {{ request.user.username|slice:":2"|upper }}
+                {% endif %}
             </div>
             <div class="dropdown-menu" id="dropdownMenu">
                 {% if request.user.is_authenticated %}
@@ -47,7 +51,7 @@
     {# Sidebar Navigation #}
     <div class="sidebar">
         <ul class="nav">
-            <li onclick="window.location.href='/'">
+            <li onclick="window.location.href='/teams/dashboard/'">
                 <span class="icon">D</span>Dashboard
             </li>
             <li onclick="window.location.href='/teams/'">
