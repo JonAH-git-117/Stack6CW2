@@ -100,7 +100,7 @@
             <h3>Summary</h3>
             <div style="display:flex; gap:20px; flex-wrap:wrap; margin-top:15px;">
                 {# Blue card — total number of teams in the database #}
-                <div style="background:#1e3a8a; color:white; padding:20px 30px; border-radius:10px; text-align:center;">
+                <div style="background:#0A3D93; color:white; padding:20px 30px; border-radius:10px; text-align:center;">
                     <h2 style="margin:0;">{{ total_teams }}</h2>
                     <p style="margin:0;">Total Teams</p>
                 </div>
@@ -115,7 +115,7 @@
                     <p style="margin:0;">Departments</p>
                 </div>
                 {# Red card — teams with no manager assigned #}
-                <div style="background:#e74c3c; color:white; padding:20px 30px; border-radius:10px; text-align:center;">
+                <div style="background:#cc0000; color:white; padding:20px 30px; border-radius:10px; text-align:center;">
                     {# .count calls the QuerySet count on teams_without_manager #}
                     <h2 style="margin:0;">{{ teams_without_manager.count }}</h2>
                     <p style="margin:0;">No Manager</p>
@@ -152,7 +152,7 @@
         {# {% if %} checks if the QuerySet is non-empty #}
         {% if teams_without_manager %}
         <div class="card">
-            <h3 style="color:#e74c3c;">Teams Without a Manager</h3>
+            <h3 style="color:#cc0000;">Teams Without a Manager</h3>
             <div class="table-header">
                 <div>Team Name</div>
                 <div>Department</div>
