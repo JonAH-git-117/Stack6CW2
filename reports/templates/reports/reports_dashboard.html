@@ -12,181 +12,192 @@
 
 <body>
 
-{# Top Navigation Bar #}
-<div class="topbar">
-    <div class="logo">
-        {# Fixed: added style attribute to match other pages #}
-        <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo" style="height:75px; width:auto; border:3px">
-        <p>Engineering Team Directory</p>
-    </div>
-    <div class="top-actions">
-        <input class="top-search" placeholder="Search directory...">
-        <a href="/accounts/update-profile/" class="profile-btn">View Public Profile</a>
-        <div class="user-circle">
-            {{ request.user.username|slice:":2"|upper }}
+    {# Top Navigation Bar #}
+    <div class="topbar">
+        <div class="logo">
+            {# Fixed: added style attribute to match other pages #}
+            <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo" style="height:75px; width:auto; border:3px">
+            <p>Engineering Team Directory</p>
+        </div>
+        <div class="top-actions">
+            <input class="top-search" placeholder="Search directory...">
+            <a href="/accounts/profile/{{ request.user.username }}/" class="profile-btn">View Public Profile</a>
+            <div class="user-circle">
+                {{ request.user.username|slice:":2"|upper }}
+            </div>
         </div>
     </div>
-</div>
 
-<div class="layout">
+    <div class="layout">
 
-    {# Sidebar Navigation #}
-    <div class="sidebar">
-        <ul class="nav">
-            <li onclick="window.location.href='/'">
-                <span class="icon">D</span>Dashboard
-            </li>
-            <li onclick="window.location.href='/teams/'">
-                <span class="icon">T</span>Teams
-            </li>
-            <li>
-                <span class="icon">O</span>Organisations
-            </li>
-            <li>
-                <span class="icon">M</span>Messages
-            </li>
-            <li onclick="window.location.href='/teams/schedule-meeting/'">
-                <span class="icon">S</span>Schedule
-            </li>
-            {# active class highlights the current page in the sidebar #}
-            <li class="active" onclick="window.location.href='/reports/'">
-                <span class="icon">R</span>Reports
-            </li>
-            {# Added Visualisation link as it is a menu item per the spec #}
-            <li onclick="window.location.href='/visualisation/'">
-                <span class="icon">V</span>Visualisation
-            </li>
-            {# Added Profile link to match other pages #}
-            <li onclick="window.location.href='/accounts/update-profile/'">
-                <span class="icon">P</span>Profile
-            </li>
-        </ul>
+        {# Sidebar Navigation #}
+        <div class="sidebar">
+            <ul class="nav">
+                <li onclick="window.location.href='/'">
+                    <span class="icon">D</span>Dashboard
+                </li>
+                <li onclick="window.location.href='/teams/'">
+                    <span class="icon">T</span>Teams
+                </li>
+                <li>
+                    <span class="icon">O</span>Organisations
+                </li>
+                <li>
+                    <span class="icon">M</span>Messages
+                </li>
+                <li onclick="window.location.href='/teams/schedule-meeting/'">
+                    <span class="icon">S</span>Schedule
+                </li>
+                {# active class highlights the current page in the sidebar #}
+                <li class="active" onclick="window.location.href='/reports/'">
+                    <span class="icon">R</span>Reports
+                </li>
+                {# Added Visualisation link as it is a menu item per the spec #}
+                <li onclick="window.location.href='/visualisation/'">
+                    <span class="icon">V</span>Visualisation
+                </li>
+                {# Profile page — links to the logged-in user's profile page #}
+                <li onclick="window.location.href='/accounts/profile/{{ request.user.username }}/'">
+                    <span class="icon">P</span>Profile
+                </li>
+            </ul>
 
-        {# Only show admin links to staff users #}
-        {% if request.user.is_staff %}
-        <p class="admin-label">ADMIN</p>
-        <ul class="nav">
-            <li><span class="icon">AD</span>Admin Dashboard</li>
-            <li><span class="icon">TM</span>Team Management</li>
-            <li><span class="icon">UA</span>User Access</li>
-        </ul>
-        {% endif %}
+            {# Only show admin links to staff users #}
+            {% if request.user.is_staff %}
+            <p class="admin-label">ADMIN</p>
+            <ul class="nav">
+                {# Admin Dashboard links to the Django admin custom dashboard page #}
+                <li onclick="window.location.href='/admin/teams/team/admin-dashboard/'"><span
+                        class="icon">AD</span>Admin Dashboard</li>
+                {# Team Management links to the custom team management page #}
+                <li onclick="window.location.href='/teams/admin/team-management/'"><span class="icon">TM</span>Team
+                    Management</li>
+                {# User Access links to the custom user access management page #}
+                <li onclick="window.location.href='/teams/admin/user-access/'"><span class="icon">UA</span>User Access
+                </li>
+            </ul>
+            {% endif %}
+        </div>
+
+        {# Main Content Area #}
+        <div class="content">
+
+            <h1>Reports Dashboard</h1>
+            <p class="subtitle">Generate and download reports for Sky Engineering teams</p>
+
+            {# Summary Stat Cards #}
+            {# Each card displays a key metric passed in from the view context #}
+            {# {{ total_teams }}, {{ active_teams }} etc are Django template variables #}
+            <div class="card">
+                <h3>Summary</h3>
+                <div style="display:flex; gap:20px; flex-wrap:wrap; margin-top:15px;">
+                    {# Blue card — total number of teams in the database #}
+                    <div
+                        style="background:#1e3a8a; color:white; padding:20px 30px; border-radius:10px; text-align:center;">
+                        <h2 style="margin:0;">{{ total_teams }}</h2>
+                        <p style="margin:0;">Total Teams</p>
+                    </div>
+                    {# Green card — teams with status='active' #}
+                    <div
+                        style="background:#2ecc71; color:white; padding:20px 30px; border-radius:10px; text-align:center;">
+                        <h2 style="margin:0;">{{ active_teams }}</h2>
+                        <p style="margin:0;">Active Teams</p>
+                    </div>
+                    {# Orange card — total number of departments #}
+                    <div
+                        style="background:#f39c12; color:white; padding:20px 30px; border-radius:10px; text-align:center;">
+                        <h2 style="margin:0;">{{ total_departments }}</h2>
+                        <p style="margin:0;">Departments</p>
+                    </div>
+                    {# Red card — teams with no manager assigned #}
+                    <div
+                        style="background:#e74c3c; color:white; padding:20px 30px; border-radius:10px; text-align:center;">
+                        {# .count calls the QuerySet count on teams_without_manager #}
+                        <h2 style="margin:0;">{{ teams_without_manager.count }}</h2>
+                        <p style="margin:0;">No Manager</p>
+                    </div>
+                </div>
+            </div>
+
+            {# Department Summary Table #}
+            {# dept_summary is a QuerySet annotated with team_count in the view #}
+            <div class="card">
+                <h3>Department Summary</h3>
+                <div class="table-header">
+                    <div>Department</div>
+                    <div>Organisation</div>
+                    <div>Team Count</div>
+                    <div>Dept Head</div>
+                </div>
+                {# Loop through each department and display its data #}
+                {% for dept in dept_summary %}
+                <div class="table-row">
+                    <div>{{ dept.department_name }}</div>
+                    {# Access the related organisation via dot notation #}
+                    <div>{{ dept.organisation.organisation_name }}</div>
+                    {# team_count is added by annotate() in the view #}
+                    <div>{{ dept.team_count }}</div>
+                    {# default filter shows 'Not Assigned' if dept_head is None #}
+                    <div>{{ dept.dept_head|default:"Not Assigned" }}</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {# Teams Without a Manager #}
+            {# Only show this section if there are teams without a manager #}
+            {# {% if %} checks if the QuerySet is non-empty #}
+            {% if teams_without_manager %}
+            <div class="card">
+                <h3 style="color:#e74c3c;">⚠️ Teams Without a Manager</h3>
+                <div class="table-header">
+                    <div>Team Name</div>
+                    <div>Department</div>
+                    <div>Status</div>
+                </div>
+                {# Loop through each team without a manager #}
+                {% for team in teams_without_manager %}
+                <div class="table-row">
+                    <div>{{ team.name }}</div>
+                    {# Access related department name via dot notation #}
+                    <div>{{ team.department.department_name }}</div>
+                    <div>
+                        {# status-pill class styles the badge — active/disabled #}
+                        {# {{ team.status }} adds the status as a CSS class #}
+                        {# get_status_display returns the human readable label #}
+                        <span class="status-pill {{ team.status }}">
+                            {{ team.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {# Download Buttons #}
+            {# {% url %} tag generates the URL from the name defined in urls.py #}
+            {# This is better than hardcoding paths — if URLs change the links #}
+            {# still work as long as the name stays the same #}
+            <div class="card">
+                <h3>Download Report</h3>
+                <div class="buttons">
+                    {# Links to generate_pdf view which returns a PDF FileResponse #}
+                    <a href="{% url 'generate_pdf' %}" class="btn-primary" style="text-decoration:none;">
+                        ⬇ Download PDF Report
+                    </a>
+                    {# Links to generate_excel view which returns an xlsx HttpResponse #}
+                    <a href="{% url 'generate_excel' %}" class="btn-outline" style="text-decoration:none;">
+                        ⬇ Download Excel Report
+                    </a>
+                </div>
+            </div>
+
+        </div>
     </div>
 
-    {# Main Content Area #}
-    <div class="content">
-
-        <h1>Reports Dashboard</h1>
-        <p class="subtitle">Generate and download reports for Sky Engineering teams</p>
-
-        {# Summary Stat Cards #}
-        {# Each card displays a key metric passed in from the view context #}
-        {# {{ total_teams }}, {{ active_teams }} etc are Django template variables #}
-        <div class="card">
-            <h3>Summary</h3>
-            <div style="display:flex; gap:20px; flex-wrap:wrap; margin-top:15px;">
-                {# Blue card — total number of teams in the database #}
-                <div style="background:#1e3a8a; color:white; padding:20px 30px; border-radius:10px; text-align:center;">
-                    <h2 style="margin:0;">{{ total_teams }}</h2>
-                    <p style="margin:0;">Total Teams</p>
-                </div>
-                {# Green card — teams with status='active' #}
-                <div style="background:#2ecc71; color:white; padding:20px 30px; border-radius:10px; text-align:center;">
-                    <h2 style="margin:0;">{{ active_teams }}</h2>
-                    <p style="margin:0;">Active Teams</p>
-                </div>
-                {# Orange card — total number of departments #}
-                <div style="background:#f39c12; color:white; padding:20px 30px; border-radius:10px; text-align:center;">
-                    <h2 style="margin:0;">{{ total_departments }}</h2>
-                    <p style="margin:0;">Departments</p>
-                </div>
-                {# Red card — teams with no manager assigned #}
-                <div style="background:#e74c3c; color:white; padding:20px 30px; border-radius:10px; text-align:center;">
-                    {# .count calls the QuerySet count on teams_without_manager #}
-                    <h2 style="margin:0;">{{ teams_without_manager.count }}</h2>
-                    <p style="margin:0;">No Manager</p>
-                </div>
-            </div>
-        </div>
-
-        {# Department Summary Table #}
-        {# dept_summary is a QuerySet annotated with team_count in the view #}
-        <div class="card">
-            <h3>Department Summary</h3>
-            <div class="table-header">
-                <div>Department</div>
-                <div>Organisation</div>
-                <div>Team Count</div>
-                <div>Dept Head</div>
-            </div>
-            {# Loop through each department and display its data #}
-            {% for dept in dept_summary %}
-            <div class="table-row">
-                <div>{{ dept.department_name }}</div>
-                {# Access the related organisation via dot notation #}
-                <div>{{ dept.organisation.organisation_name }}</div>
-                {# team_count is added by annotate() in the view #}
-                <div>{{ dept.team_count }}</div>
-                {# default filter shows 'Not Assigned' if dept_head is None #}
-                <div>{{ dept.dept_head|default:"Not Assigned" }}</div>
-            </div>
-            {% endfor %}
-        </div>
-
-        {# Teams Without a Manager #}
-        {# Only show this section if there are teams without a manager #}
-        {# {% if %} checks if the QuerySet is non-empty #}
-        {% if teams_without_manager %}
-        <div class="card">
-            <h3 style="color:#e74c3c;">⚠️ Teams Without a Manager</h3>
-            <div class="table-header">
-                <div>Team Name</div>
-                <div>Department</div>
-                <div>Status</div>
-            </div>
-            {# Loop through each team without a manager #}
-            {% for team in teams_without_manager %}
-            <div class="table-row">
-                <div>{{ team.name }}</div>
-                {# Access related department name via dot notation #}
-                <div>{{ team.department.department_name }}</div>
-                <div>
-                    {# status-pill class styles the badge — active/disabled #}
-                    {# {{ team.status }} adds the status as a CSS class #}
-                    {# get_status_display returns the human readable label #}
-                    <span class="status-pill {{ team.status }}">
-                        {{ team.get_status_display }}
-                    </span>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
-        {# Download Buttons #}
-        {# {% url %} tag generates the URL from the name defined in urls.py #}
-        {# This is better than hardcoding paths — if URLs change the links #}
-        {# still work as long as the name stays the same #}
-        <div class="card">
-            <h3>Download Report</h3>
-            <div class="buttons">
-                {# Links to generate_pdf view which returns a PDF FileResponse #}
-                <a href="{% url 'generate_pdf' %}" class="btn-primary" style="text-decoration:none;">
-                    ⬇ Download PDF Report
-                </a>
-                {# Links to generate_excel view which returns an xlsx HttpResponse #}
-                <a href="{% url 'generate_excel' %}" class="btn-outline" style="text-decoration:none;">
-                    ⬇ Download Excel Report
-                </a>
-            </div>
-        </div>
-
-    </div>
-</div>
-
-<footer>
-    © 2026 LOGOSKY • Privacy • Terms • Contact
-</footer>
+    <footer>
+        © 2026 LOGOSKY • Privacy • Terms • Contact
+    </footer>
 
 </body>
+
 </html>

@@ -22,7 +22,7 @@ urlpatterns = [
     path('change-password/done/', auth_views.PasswordChangeDoneView.as_view(
         template_name='accounts/change_password_done.html'
     ), name='password_change_done'),
-    # URL path for viewing a user's public profile and yses dynamic username in the URL 
+    # URL path for viewing a user's public profile and uses dynamic username in the URL 
     path('profile/<str:username>/', views.profile_view, name='profile_view'),
 
     # Password Reset Flow 

@@ -1,365 +1,373 @@
- 
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team Profile</title>
-<link rel="stylesheet" href="{% static 'teams/style.css' %}?v=201">
-<link rel="stylesheet" href="{% static 'teams/team_detail.css' %}?v=201">
+    <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=201">
+    <link rel="stylesheet" href="{% static 'teams/team_detail.css' %}?v=201">
+
 <body>
 
-<div class="topbar">
+    <div class="topbar">
 
-    <div class="logo">
-<img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo" style="height:75px; width:auto; border:3px">
-        <p>Engineering Team Directory</p>
-    </div>
-    <div class="top-actions">
-        <input class="top-search" placeholder="Search directory...">
-<a href="/accounts/profile/{{ request.user.username }}/" class="profile-btn">View Public Profile</a>
-    <div class="user-circle">
-        {{ request.user.username|slice:":2"|upper }}
+        <div class="logo">
+            <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo" style="height:75px; width:auto; border:3px">
+            <p>Engineering Team Directory</p>
+        </div>
+        <div class="top-actions">
+            <input class="top-search" placeholder="Search directory...">
+            <a href="/accounts/profile/{{ request.user.username }}/" class="profile-btn">View Public Profile</a>
+            <div class="user-circle">
+                {{ request.user.username|slice:":2"|upper }}
+            </div>
         </div>
     </div>
-</div>
 
-<div class="layout">
+    <div class="layout">
 
-    <div class="sidebar">
-        <ul class="nav">
-            <li>
-                <span class="icon">D</span>Dashboard
-            </li>
-            <li class="active" onclick="window.location.href='/teams/'">
-                <span class="icon">T</span>Teams
-            </li>
-            <li>
-                <span class="icon">O</span>Organisations
-            </li>
-            <li>
-                <span class="icon">M</span>Messages
-            </li>
-            <li onclick="window.location.href='/teams/schedule-meeting/'">
-                <span class="icon">S</span>Schedule
-            </li>
-            <li onclick="window.location.href='/reports/'">
-                <span class="icon">R</span>Reports
-            </li>
-            <li onclick="window.location.href='/visualisation/'">
-                <span class="icon">V</span>Visualisation
-            </li>
-            <li onclick="window.location.href='/accounts/profile/{{ request.user.username }}/'">
-                <span class="icon">P</span>Profile
-            </li>
-        </ul>
+        <div class="sidebar">
+            <ul class="nav">
+                <li>
+                    <span class="icon">D</span>Dashboard
+                </li>
+                <li class="active" onclick="window.location.href='/teams/'">
+                    <span class="icon">T</span>Teams
+                </li>
+                <li>
+                    <span class="icon">O</span>Organisations
+                </li>
+                <li>
+                    <span class="icon">M</span>Messages
+                </li>
+                <li onclick="window.location.href='/teams/schedule-meeting/'">
+                    <span class="icon">S</span>Schedule
+                </li>
+                <li onclick="window.location.href='/reports/'">
+                    <span class="icon">R</span>Reports
+                </li>
+                <li onclick="window.location.href='/visualisation/'">
+                    <span class="icon">V</span>Visualisation
+                </li>
+                <li onclick="window.location.href='/accounts/profile/{{ request.user.username }}/'">
+                    <span class="icon">P</span>Profile
+                </li>
+            </ul>
 
-{% if request.user.is_staff %}
+            <!-- Admin section only shown to staff users -->
+            {% if request.user.is_staff %}
+            <p class="admin-label">ADMIN</p>
+            <ul class="nav">
+                <!-- Admin Dashboard links to the Django admin custom dashboard page -->
+                <li onclick="window.location.href='/admin/teams/team/admin-dashboard/'"><span
+                        class="icon">AD</span>Admin Dashboard</li>
+                <!-- Team Management links to the custom team management page -->
+                <li onclick="window.location.href='/teams/admin/team-management/'"><span class="icon">TM</span>Team
+                    Management</li>
+                <!-- User Access links to the custom user access management page -->
+                <li onclick="window.location.href='/teams/admin/user-access/'"><span class="icon">UA</span>User Access
+                </li>
+            </ul>
+            {% endif %}
+        </div>
 
-<p class="admin-label">ADMIN</p>
+        <div class="content">
+            <div class="page-header">
+                <div>
+                    <h1 class="main-title">Team Profile</h1>
+                </div>
 
-<ul class="nav">
-    <li><span class="icon">AD</span>Admin Dashboard</li>
-    <li><span class="icon">TM</span>Team Management</li>
-    <li><span class="icon">UA</span>User Access</li>
-</ul>
-
-{% endif %}
-    </div>
-
-    <div class="content">
-        <div class="page-header">
-    <div>
-        <h1 class="main-title">Team Profile</h1>
-    </div>
-
-            <div class="team-switch">
-                <label for="teamSwitch">Switch Team</label>
-                <select id="teamSwitch" onchange="switchTeam(this.value)">
-                    {% for t in teams %}
-                        <option value="/teams/team/{{ t.id }}/" {% if t.id == team.id %}selected{% endif %}>
+                <div class="team-switch">
+                    <label for="teamSwitch">Switch Team</label>
+                    <select id="teamSwitch" onchange="switchTeam(this.value)">
+                        {% for t in teams %}
+                        <option value="/teams/team/{{ t.id }}/" {% if t.id==team.id %}selected{% endif %}>
                             {{ t.name }}
                         </option>
-                    {% endfor %}
-                </select>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
-        </div>
 
-        <div class="hero-card">
-            <div class="hero-left">
-                <h2>{{ team.name }}</h2>
-                <p class="hero-subtitle">
-                    {% if team.manager %}
+            <div class="hero-card">
+                <div class="hero-left">
+                    <h2>{{ team.name }}</h2>
+                    <p class="hero-subtitle">
+                        {% if team.manager %}
                         {{ team.manager.username }} • Team Manager
-                    {% else %}
+                        {% else %}
                         Team Manager not assigned
-                    {% endif %}
-                </p>
-
-                <div class="hero-actions">
-                    {% if team.manager %}
-                        <a href="mailto:{{ team.manager.username }}@logosky.com" class="hero-btn email-btn">Email Team</a>
-                    {% else %}
-                        <span class="hero-btn disabled-btn">Email Team</span>
-                    {% endif %}
-
-                    <a href="/teams/schedule-meeting/" class="hero-btn schedule-btn">Schedule Meeting</a>
-
-                    <a href="/organisations/" class="hero-btn org-btn">View Organisation</a>
-                    <a href="/teams/" class="hero-btn back-btn">Back to Directory</a>
-                </div>
-            </div>
-
-            <div class="hero-right">
-                <div class="mini-stat">
-                    <span class="mini-label">Department</span>
-                    <span class="mini-value">{{ team.department }}</span>
-                </div>
-
-                <div class="mini-stat">
-                    <span class="mini-label">Status</span>
-                    <span class="status-pill {% if team.status|lower == 'disabled' %}disabled{% else %}active{% endif %}">
-                        {{ team.status }}
-                    </span>
-                </div>
-
-                <div class="mini-stat">
-    <span class="mini-label">Members</span>
-    <span class="mini-value">{{ member_count }}</span>
-</div>
-            </div>
-        </div>
-
-        <div class="tabs">
-            <button class="tab-button active" onclick="openTab(event, 'overviewTab')">Overview</button>
-            <button class="tab-button" onclick="openTab(event, 'membersTab')">Members</button>
-            <button class="tab-button" onclick="openTab(event, 'repositoriesTab')">Repositories</button>
-            <button class="tab-button" onclick="openTab(event, 'dependenciesTab')">Dependencies</button>
-        </div>
-
-        <div id="overviewTab" class="tab-content active-tab">
-            <div class="grid-two">
-                <div class="card">
-                    <h3>About the Team</h3>
-                    <p class="overview-text">
-                        The {{ team.name }} team is responsible for delivering reliable engineering solutions
-                        across LOGOSKY. The team supports scalable services, collaborates with related teams,
-                        and contributes to core platform delivery and product improvement.
+                        {% endif %}
                     </p>
 
-                    <div class="info-grid">
-                        <div class="info-box">
-                            <span class="info-title">Department</span>
-                            <span class="info-value">{{ team.department }}</span>
+                    <div class="hero-actions">
+                        {% if team.manager %}
+                        <a href="mailto:{{ team.manager.username }}@logosky.com" class="hero-btn email-btn">Email
+                            Team</a>
+                        {% else %}
+                        <span class="hero-btn disabled-btn">Email Team</span>
+                        {% endif %}
+
+                        <a href="/teams/schedule-meeting/" class="hero-btn schedule-btn">Schedule Meeting</a>
+
+                        <a href="/organisations/" class="hero-btn org-btn">View Organisation</a>
+                        <a href="/teams/" class="hero-btn back-btn">Back to Directory</a>
+                    </div>
+                </div>
+
+                <div class="hero-right">
+                    <div class="mini-stat">
+                        <span class="mini-label">Department</span>
+                        <span class="mini-value">{{ team.department }}</span>
+                    </div>
+
+                    <div class="mini-stat">
+                        <span class="mini-label">Status</span>
+                        <span
+                            class="status-pill {% if team.status|lower == 'disabled' %}disabled{% else %}active{% endif %}">
+                            {{ team.status }}
+                        </span>
+                    </div>
+
+                    <div class="mini-stat">
+                        <span class="mini-label">Members</span>
+                        <span class="mini-value">{{ member_count }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab-button active" onclick="openTab(event, 'overviewTab')">Overview</button>
+                <button class="tab-button" onclick="openTab(event, 'membersTab')">Members</button>
+                <button class="tab-button" onclick="openTab(event, 'repositoriesTab')">Repositories</button>
+                <button class="tab-button" onclick="openTab(event, 'dependenciesTab')">Dependencies</button>
+            </div>
+
+            <div id="overviewTab" class="tab-content active-tab">
+                <div class="grid-two">
+                    <div class="card">
+                        <h3>About the Team</h3>
+                        <p class="overview-text">
+                            The {{ team.name }} team is responsible for delivering reliable engineering solutions
+                            across LOGOSKY. The team supports scalable services, collaborates with related teams,
+                            and contributes to core platform delivery and product improvement.
+                        </p>
+
+                        <div class="info-grid">
+                            <div class="info-box">
+                                <span class="info-title">Department</span>
+                                <span class="info-value">{{ team.department }}</span>
+                            </div>
+
+                            <div class="info-box">
+                                <span class="info-title">Location</span>
+                                <span class="info-value">London, UK</span>
+                            </div>
+
+                            <div class="info-box">
+                                <span class="info-title">Projects</span>
+                                <span class="info-value">4 Active</span>
+                            </div>
+
+                            <div class="info-box">
+                                <span class="info-title">Repositories</span>
+                                <span class="info-value">3 Core Repos</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Manager and Contact</h3>
+
+                        <div class="contact-box">
+                            <p class="contact-title">Manager</p>
+                            {% if team.manager %}
+                            <p>{{ team.manager.username }}</p>
+                            <p>{{ team.manager.username }}@logosky.com</p>
+                            {% else %}
+                            <p class="muted-text">No manager assigned</p>
+                            {% endif %}
                         </div>
 
-                        <div class="info-box">
-                            <span class="info-title">Location</span>
-                            <span class="info-value">London, UK</span>
-                        </div>
-
-                        <div class="info-box">
-                            <span class="info-title">Projects</span>
-                            <span class="info-value">4 Active</span>
-                        </div>
-
-                        <div class="info-box">
-                            <span class="info-title">Repositories</span>
-                            <span class="info-value">3 Core Repos</span>
+                        <div class="contact-box">
+                            <p class="contact-title">Contact Channels</p>
+                            <ul class="detail-list">
+                                <li>Teams: {{ team.name }} Channel</li>
+                                <li>Slack: #{{ team.name|lower|cut:" " }}-team</li>
+                                <li>Shared Email: {{ team.name|lower|cut:" " }}@logosky.com</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
 
-                <div class="card">
-                    <h3>Manager and Contact</h3>
-
-                    <div class="contact-box">
-                        <p class="contact-title">Manager</p>
-                        {% if team.manager %}
-                            <p>{{ team.manager.username }}</p>
-                            <p>{{ team.manager.username }}@logosky.com</p>
-                        {% else %}
-                            <p class="muted-text">No manager assigned</p>
-                        {% endif %}
+                <div class="grid-two">
+                    <div class="card">
+                        <h3>Skills</h3>
+                        <div class="skills-list">
+                            {% for skill in skills %}
+                            <span class="skill">{{ skill }}</span>
+                            {% empty %}
+                            <span class="muted-text">No skills listed</span>
+                            {% endfor %}
+                        </div>
                     </div>
 
-                    <div class="contact-box">
-                        <p class="contact-title">Contact Channels</p>
+                    <div class="card">
+                        <h3>Quick Links</h3>
                         <ul class="detail-list">
-                            <li>Teams: {{ team.name }} Channel</li>
-                            <li>Slack: #{{ team.name|lower|cut:" " }}-team</li>
-                            <li>Shared Email: {{ team.name|lower|cut:" " }}@logosky.com</li>
+                            <li>GitHub Organisation</li>
+                            <li>Team Documentation</li>
+                            <li>Team Calendar</li>
                         </ul>
                     </div>
                 </div>
             </div>
 
-            <div class="grid-two">
+            <div id="membersTab" class="tab-content">
                 <div class="card">
-                    <h3>Skills</h3>
-                    <div class="skills-list">
-                        {% for skill in skills %}
-                            <span class="skill">{{ skill }}</span>
+                    <h3>Team Members</h3>
+
+                    <table class="members-table">
+                        <tr>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Email</th>
+                        </tr>
+
+                        {% for member in team.members.all %}
+                        <tr>
+                            <td>{{ member.username }}</td>
+                            <td>Team Member</td>
+                            <td>{{ member.email }}</td>
+                        </tr>
                         {% empty %}
-                            <span class="muted-text">No skills listed</span>
+                        <tr>
+                            <td colspan="3">No members in this team</td>
+                        </tr>
                         {% endfor %}
-                    </div>
+                    </table>
                 </div>
+            </div>
 
+            <div id="repositoriesTab" class="tab-content">
                 <div class="card">
-                    <h3>Quick Links</h3>
-                    <ul class="detail-list">
-                        <li>GitHub Organisation</li>
-                        <li>Team Documentation</li>
-                        <li>Team Calendar</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+                    <h3>Repositories</h3>
 
-        <div id="membersTab" class="tab-content">
-            <div class="card">
-                <h3>Team Members</h3>
-
-               <table class="members-table">
-    <tr>
-        <th>Name</th>
-        <th>Role</th>
-        <th>Email</th>
-    </tr>
-
-    {% for member in team.members.all %}
-<tr>
-    <td>{{ member.username }}</td>
-    <td>Team Member</td>
-    <td>{{ member.email }}</td>
-</tr>
-{% empty %}
-<tr>
-    <td colspan="3">No members in this team</td>
-</tr>
-{% endfor %}
-                </table>
-            </div>
-        </div>
-
-        <div id="repositoriesTab" class="tab-content">
-            <div class="card">
-                <h3>Repositories</h3>
-
-                <div class="repo-wrapper">
-                    <div class="repo-box">
-                        <h4>Backend API Service</h4>
-                        <p>Core service powering backend operations and authentication.</p>
-                        <div class="repo-tags">
-                            <span>Python</span>
-                            <span>Django</span>
-                            <span>REST</span>
+                    <div class="repo-wrapper">
+                        <div class="repo-box">
+                            <h4>Backend API Service</h4>
+                            <p>Core service powering backend operations and authentication.</p>
+                            <div class="repo-tags">
+                                <span>Python</span>
+                                <span>Django</span>
+                                <span>REST</span>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="repo-box">
-                        <h4>Monitoring Infrastructure</h4>
-                        <p>Service monitoring, logging and system health checks.</p>
-                        <div class="repo-tags">
-                            <span>Docker</span>
-                            <span>CI/CD</span>
-                            <span>Monitoring</span>
+                        <div class="repo-box">
+                            <h4>Monitoring Infrastructure</h4>
+                            <p>Service monitoring, logging and system health checks.</p>
+                            <div class="repo-tags">
+                                <span>Docker</span>
+                                <span>CI/CD</span>
+                                <span>Monitoring</span>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="repo-box">
-                        <h4>Data Processing Engine</h4>
-                        <p>Handles analytics pipelines and internal reporting workflows.</p>
-                        <div class="repo-tags">
-                            <span>Python</span>
-                            <span>Data</span>
-                            <span>Pipelines</span>
+                        <div class="repo-box">
+                            <h4>Data Processing Engine</h4>
+                            <p>Handles analytics pipelines and internal reporting workflows.</p>
+                            <div class="repo-tags">
+                                <span>Python</span>
+                                <span>Data</span>
+                                <span>Pipelines</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div id="dependenciesTab" class="tab-content">
-            <div class="grid-two">
-                <div class="card">
-                    <h3>Upstream Teams</h3>
-                    <ul class="detail-list">
-                        {% for item in upstream %}
+            <div id="dependenciesTab" class="tab-content">
+                <div class="grid-two">
+                    <div class="card">
+                        <h3>Upstream Teams</h3>
+                        <ul class="detail-list">
+                            {% for item in upstream %}
                             <li>{{ item }}</li>
-                        {% empty %}
+                            {% empty %}
                             <li>No upstream dependencies</li>
-                        {% endfor %}
-                    </ul>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3>Downstream Teams</h3>
+                        <ul class="detail-list">
+                            {% for item in downstream %}
+                            <li>{{ item }}</li>
+                            {% empty %}
+                            <li>No downstream dependencies</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </div>
 
                 <div class="card">
-                    <h3>Downstream Teams</h3>
-                    <ul class="detail-list">
-                        {% for item in downstream %}
-                            <li>{{ item }}</li>
-                        {% empty %}
-                            <li>No downstream dependencies</li>
+                    <h3>Dependency Summary</h3>
+                    <table class="members-table">
+                        <tr>
+                            <th>Team Name</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                        </tr>
+
+                        {% for item in upstream %}
+                        <tr>
+                            <td>{{ item }}</td>
+                            <td>Upstream</td>
+                            <td>Active</td>
+                        </tr>
                         {% endfor %}
-                    </ul>
+
+                        {% for item in downstream %}
+                        <tr>
+                            <td>{{ item }}</td>
+                            <td>Downstream</td>
+                            <td>Active</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
                 </div>
             </div>
 
-            <div class="card">
-                <h3>Dependency Summary</h3>
-                <table class="members-table">
-                    <tr>
-                        <th>Team Name</th>
-                        <th>Type</th>
-                        <th>Status</th>
-                    </tr>
-
-                    {% for item in upstream %}
-                    <tr>
-                        <td>{{ item }}</td>
-                        <td>Upstream</td>
-                        <td>Active</td>
-                    </tr>
-                    {% endfor %}
-
-                    {% for item in downstream %}
-                    <tr>
-                        <td>{{ item }}</td>
-                        <td>Downstream</td>
-                        <td>Active</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
         </div>
-
     </div>
-</div>
 
-<footer>
-    © 2026 LOGOSKY • Privacy • Terms • Contact
-</footer>
+    <footer>
+        © 2026 LOGOSKY • Privacy • Terms • Contact
+    </footer>
 
-<script>
-function switchTeam(url){
-    if(url){
-        window.location.href = url;
-    }
-}
+    <script>
+        function switchTeam(url) {
+            if (url) {
+                window.location.href = url;
+            }
+        }
 
-function openTab(evt, tabId){
-    const contents = document.querySelectorAll(".tab-content");
-    const buttons = document.querySelectorAll(".tab-button");
+        function openTab(evt, tabId) {
+            const contents = document.querySelectorAll(".tab-content");
+            const buttons = document.querySelectorAll(".tab-button");
 
-    contents.forEach(content => content.classList.remove("active-tab"));
-    buttons.forEach(button => button.classList.remove("active"));
+            contents.forEach(content => content.classList.remove("active-tab"));
+            buttons.forEach(button => button.classList.remove("active"));
 
-    document.getElementById(tabId).classList.add("active-tab");
-    evt.currentTarget.classList.add("active");
-}
-</script>
+            document.getElementById(tabId).classList.add("active-tab");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
 
 </body>
+
 </html>

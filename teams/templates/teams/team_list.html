@@ -1,194 +1,231 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teams Directory</title>
-<link rel="stylesheet" href="{% static 'teams/style.css' %}?v=201"></head>
-
+    <!-- Load the shared site stylesheet from the teams static folder -->
+    <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=201">
+</head>
 
 <body>
 
-<div class="topbar">
-
-    <div class="logo">
-    <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo"style="height:75px; width:auto; border:3px">
-        <p>Engineering Team Directory</p>
-    </div>
-    <div class="top-actions">
-        <input class="top-search" placeholder="Search directory...">
-        <a href="/accounts/profile/{{ request.user.username }}/" class="profile-btn">View Public Profile</a>
-        <div class="user-circle">
-            {{ request.user.username|slice:":2"|upper }}
+    <!-- Top navigation bar with logo, search and profile -->
+    <div class="topbar">
+        <div class="logo">
+            <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo" style="height:75px; width:auto;">
+            <p>Engineering Team Directory</p>
+        </div>
+        <div class="top-actions">
+            <input class="top-search" placeholder="Search directory...">
+            <!-- View Public Profile links to the logged-in user's profile page -->
+            <a href="/accounts/profile/{{ request.user.username }}/" class="profile-btn">View Public Profile</a>
+            <!-- User circle shows the first two characters of the username in uppercase -->
+            <div class="user-circle">
+                {{ request.user.username|slice:":2"|upper }}
+            </div>
         </div>
     </div>
 
-</div>
+    <div class="layout">
 
-<div class="layout">
+        <!-- Sidebar navigation — consistent across all pages -->
+        <div class="sidebar">
+            <ul class="nav">
+                <!-- Dashboard link — no page built yet -->
+                <li>
+                    <span class="icon">D</span>Dashboard
+                </li>
+                <!-- Teams directory — active page -->
+                <li class="active" onclick="window.location.href='/teams/'">
+                    <span class="icon">T</span>Teams
+                </li>
+                <!-- Organisations — no page built yet -->
+                <li>
+                    <span class="icon">O</span>Organisations
+                </li>
+                <!-- Messages — no page built yet -->
+                <li>
+                    <span class="icon">M</span>Messages
+                </li>
+                <!-- Schedule meeting page -->
+                <li onclick="window.location.href='/teams/schedule-meeting/'">
+                    <span class="icon">S</span>Schedule
+                </li>
+                <!-- Reports dashboard -->
+                <li onclick="window.location.href='/reports/'">
+                    <span class="icon">R</span>Reports
+                </li>
+                <!-- Data visualisation page -->
+                <li onclick="window.location.href='/visualisation/'">
+                    <span class="icon">V</span>Visualisation
+                </li>
+                <!-- Profile page — links to the logged-in user's profile -->
+                <li onclick="window.location.href='/accounts/profile/{{ request.user.username }}/'">
+                    <span class="icon">P</span>Profile
+                </li>
+            </ul>
 
-    <div class="sidebar">
-        <ul class="nav">
-            <li>
-                <span class="icon">D</span>Dashboard
-            </li>
-            <li class="active" onclick="window.location.href='/teams/'">
-                <span class="icon">T</span>Teams
-            </li>
-            <li>
-                <span class="icon">O</span>Organisations
-            </li>
-            <li>
-                <span class="icon">M</span>Messages
-            </li>
-            <li onclick="window.location.href='/teams/schedule-meeting/'">
-                <span class="icon">S</span>Schedule
-            </li>
-            <li onclick="window.location.href='/reports/'">
-                <span class="icon">R</span>Reports
-            </li>
-            <li onclick="window.location.href='/visualisation/'">
-                <span class="icon">V</span>Visualisation
-            </li>
-            <li onclick="window.location.href='/accounts/profile/{{ request.user.username }}/'">
-                <span class="icon">P</span>Profile
-            </li>
-        </ul>
-
-       {% if request.user.is_staff %}
-
-<p class="admin-label">ADMIN</p>
-
-<ul class="nav">
-    <li><span class="icon">AD</span>Admin Dashboard</li>
-    <li><span class="icon">TM</span>Team Management</li>
-    <li><span class="icon">UA</span>User Access</li>
-</ul>
-
-{% endif %}
-    </div>
-
-    <div class="content">
-
-        <h1>Teams — Directory</h1>
-        <p class="subtitle">Search teams, departments, and managers quickly</p>
-
-        <div class="card">
-            <h3>Search and Filters</h3>
-
-            <form method="GET">
-                <div class="filters">
-                    <input type="text" name="keyword" value="{{ keyword }}" placeholder="Type keywords">
-
-                    <select name="department">
-                        <option value="">All Departments</option>
-                        <option value="Engineering" {% if selected_department == "Engineering" %}selected{% endif %}>Engineering</option>
-                        <option value="Operations" {% if selected_department == "Operations" %}selected{% endif %}>Operations</option>
-                        <option value="Data" {% if selected_department == "Data" %}selected{% endif %}>Data</option>
-                    </select>
-
-                    <select name="manager">
-                        <option value="">All Managers</option>
-                        <option value="alex" {% if selected_manager == "alex" %}selected{% endif %}>alex</option>
-                        <option value="sara" {% if selected_manager == "sara" %}selected{% endif %}>sara</option>
-                        <option value="john" {% if selected_manager == "john" %}selected{% endif %}>john</option>
-                        <option value="michael" {% if selected_manager == "michael" %}selected{% endif %}>michael</option>
-                        <option value="emma" {% if selected_manager == "emma" %}selected{% endif %}>emma</option>
-                    </select>
-
-                    <select name="status">
-                        <option value="">All Status</option>
-                        <option value="active" {% if selected_status == "active" %}selected{% endif %}>Active</option>
-                        <option value="disabled" {% if selected_status == "disabled" %}selected{% endif %}>Disabled</option>
-                    </select>
-                </div>
-
-                <div class="buttons">
-                    <button class="btn-primary" type="submit">Search</button>
-                    <a href="/teams/" class="btn-outline">Clear</a>
-                </div>
-            </form>
+            <!-- Admin section only shown to staff users -->
+            {% if request.user.is_staff %}
+            <p class="admin-label">ADMIN</p>
+            <ul class="nav">
+                <!-- Admin Dashboard links to the Django admin custom dashboard page -->
+                <li onclick="window.location.href='/admin/teams/team/admin-dashboard/'">
+                    <span class="icon">AD</span>Admin Dashboard
+                </li>
+                <!-- Team Management links to the custom team management page -->
+                <li onclick="window.location.href='/teams/admin/team-management/'">
+                    <span class="icon">TM</span>Team Management
+                </li>
+                <!-- User Access links to the custom user access management page -->
+                <li onclick="window.location.href='/teams/admin/user-access/'">
+                    <span class="icon">UA</span>User Access
+                </li>
+            </ul>
+            {% endif %}
         </div>
 
-        <div class="card">
-            <h3>Results</h3>
+        <div class="content">
 
-            <div class="table-header">
-                <div>TEAM NAME</div>
-                <div>DEPARTMENT</div>
-                <div>MANAGER</div>
-                <div>STATUS</div>
-                <div>ACTIONS</div>
+            <h1>Teams — Directory</h1>
+            <p class="subtitle">Search teams, departments, and managers quickly</p>
+
+            <div class="card">
+                <h3>Search and Filters</h3>
+
+                <form method="GET">
+                    <div class="filters">
+                        <!-- Keyword search input — pre-filled from GET parameter -->
+                        <input type="text" name="keyword" value="{{ keyword }}" placeholder="Type keywords">
+
+                        <!-- Department filter dropdown -->
+                        <select name="department">
+                            <option value="">All Departments</option>
+                            <option value="Engineering" {% if selected_department=="Engineering" %}selected{% endif %}>
+                                Engineering</option>
+                            <option value="Operations" {% if selected_department=="Operations" %}selected{% endif %}>
+                                Operations</option>
+                            <option value="Data" {% if selected_department=="Data" %}selected{% endif %}>Data</option>
+                        </select>
+
+                        <!-- Manager filter dropdown -->
+                        <select name="manager">
+                            <option value="">All Managers</option>
+                            <option value="alex" {% if selected_manager=="alex" %}selected{% endif %}>alex</option>
+                            <option value="sara" {% if selected_manager=="sara" %}selected{% endif %}>sara</option>
+                            <option value="john" {% if selected_manager=="john" %}selected{% endif %}>john</option>
+                            <option value="michael" {% if selected_manager=="michael" %}selected{% endif %}>michael
+                            </option>
+                            <option value="emma" {% if selected_manager=="emma" %}selected{% endif %}>emma</option>
+                        </select>
+
+                        <!-- Status filter dropdown -->
+                        <select name="status">
+                            <option value="">All Status</option>
+                            <option value="active" {% if selected_status=="active" %}selected{% endif %}>Active</option>
+                            <option value="disabled" {% if selected_status=="disabled" %}selected{% endif %}>Disabled
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="buttons">
+                        <button class="btn-primary" type="submit">Search</button>
+                        <!-- Clear resets all filters by navigating to the base teams URL -->
+                        <a href="/teams/" class="btn-outline">Clear</a>
+                    </div>
+                </form>
             </div>
 
-            {% for team in teams %}
-            <div class="table-row">
+            <div class="card">
+                <h3>Results</h3>
 
-                <div class="team-name">
-                    <div class="team-title">{{ team.name }}</div>
+                <div class="table-header">
+                    <div>TEAM NAME</div>
+                    <div>DEPARTMENT</div>
+                    <div>MANAGER</div>
+                    <div>STATUS</div>
+                    <div>ACTIONS</div>
+                </div>
 
-                    <div class="team-members-preview">
-                        {% for member in team.members.all %}
+                <!-- Loop through all teams passed from the view -->
+                {% for team in teams %}
+                <div class="table-row">
+
+                    <div class="team-name">
+                        <div class="team-title">{{ team.name }}</div>
+                        <!-- Display all team members, comma separated -->
+                        <div class="team-members-preview">
+                            {% for member in team.members.all %}
                             {{ member.username }}{% if not forloop.last %}, {% endif %}
-                        {% empty %}
+                            {% empty %}
                             No members
-                        {% endfor %}
+                            {% endfor %}
+                        </div>
                     </div>
-                </div>
 
-                <div class="department-cell">
-                    {{ team.department }}
-                </div>
+                    <div class="department-cell">
+                        {{ team.department }}
+                    </div>
 
-                <div class="manager-cell">
-                    {% if team.manager %}
+                    <div class="manager-cell">
+                        <!-- Show manager username or muted text if no manager assigned -->
+                        {% if team.manager %}
                         {{ team.manager.username }}
-                    {% else %}
+                        {% else %}
                         <span class="muted-text">Not assigned</span>
-                    {% endif %}
-                </div>
+                        {% endif %}
+                    </div>
 
-                <div class="status-cell">
-                    <span class="status-pill {% if team.status|lower == 'disabled' %}disabled{% else %}active{% endif %}">
-                        {{ team.status }}
-                    </span>
-                </div>
+                    <div class="status-cell">
+                        <!-- Status pill — styled differently for active vs disabled -->
+                        <span
+                            class="status-pill {% if team.status|lower == 'disabled' %}disabled{% else %}active{% endif %}">
+                            {{ team.status }}
+                        </span>
+                    </div>
 
-                <div class="actions">
-                    <a href="{% url 'team_detail' team.id %}" class="action-btn primary-action">
-                        View Team
-                    </a>
+                    <div class="actions">
+                        <!-- View Team button links to the team detail page -->
+                        <a href="{% url 'team_detail' team.id %}" class="action-btn primary-action">
+                            View Team
+                        </a>
 
-                    {% if team.manager %}
+                        <!-- Email Team button — disabled if no manager assigned -->
+                        {% if team.manager %}
                         <a href="mailto:{{ team.manager.username }}@logosky.com" class="action-btn secondary-action">
                             Email Team
                         </a>
-                    {% else %}
+                        {% else %}
                         <span class="action-btn disabled-action">Email Team</span>
-                    {% endif %}
+                        {% endif %}
 
-                    {% if team.status|lower == 'disabled' %}
+                        <!-- Schedule button — disabled if team is disabled -->
+                        {% if team.status|lower == 'disabled' %}
                         <span class="action-btn disabled-action">Schedule</span>
-                    {% else %}
+                        {% else %}
                         <a href="{% url 'schedule_meeting' %}" class="action-btn secondary-action">
                             Schedule
                         </a>
-                    {% endif %}
+                        {% endif %}
+                    </div>
+
                 </div>
-
-            </div>
-            {% empty %}
+                {% empty %}
+                <!-- Shown when no teams match the current filters -->
                 <p class="empty-state">No teams found. Try adjusting your filters.</p>
-            {% endfor %}
+                {% endfor %}
+            </div>
+
         </div>
-
     </div>
-</div>
 
-<footer>
-    © 2026 LOGOSKY • Privacy • Terms • Contact
-</footer>
+    <footer>
+        © 2026 LOGOSKY • Privacy • Terms • Contact
+    </footer>
 
 </body>
+
 </html>

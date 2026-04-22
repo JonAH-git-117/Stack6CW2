@@ -10,121 +10,128 @@
 
 <body>
 
-{# Top Navigation Bar #}
-<div class="topbar">
-    <div class="logo">
-        <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo" style="height:75px; width:auto; border:3px">
-        <p>Engineering Team Directory</p>
-    </div>
-    <div class="top-actions">
-        <input class="top-search" placeholder="Search directory...">
-        {# Link to this user's own profile view page #}
-        <a href="/accounts/profile/{{ request.user.username }}/" class="profile-btn">View Public Profile</a>
-        <div class="user-circle">
-            {{ request.user.username|slice:":2"|upper }}
+    {# Top Navigation Bar #}
+    <div class="topbar">
+        <div class="logo">
+            <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo" style="height:75px; width:auto; border:3px">
+            <p>Engineering Team Directory</p>
         </div>
-    </div>
-</div>
-
-<div class="layout">
-
-    {# Sidebar Navigation #}
-    <div class="sidebar">
-        <ul class="nav">
-            <li onclick="window.location.href='/'">
-                <span class="icon">D</span>Dashboard
-            </li>
-            <li onclick="window.location.href='/teams/'">
-                <span class="icon">T</span>Teams
-            </li>
-            <li>
-                <span class="icon">O</span>Organisations
-            </li>
-            <li>
-                <span class="icon">M</span>Messages
-            </li>
-            <li onclick="window.location.href='/teams/schedule-meeting/'">
-                <span class="icon">S</span>Schedule
-            </li>
-            <li onclick="window.location.href='/reports/'">
-                <span class="icon">R</span>Reports
-            </li>
-            <li onclick="window.location.href='/visualisation/'">
-                <span class="icon">V</span>Visualisation
-            </li>
-            {# active class highlights the current page in the sidebar #}
-            <li class="active" onclick="window.location.href='/accounts/profile/{{ request.user.username }}/'">
-                <span class="icon">P</span>Profile
-            </li>
-        </ul>
-
-        {# Only show admin links to staff users #}
-        {% if request.user.is_staff %}
-        <p class="admin-label">ADMIN</p>
-        <ul class="nav">
-            <li><span class="icon">AD</span>Admin Dashboard</li>
-            <li><span class="icon">TM</span>Team Management</li>
-            <li><span class="icon">UA</span>User Access</li>
-        </ul>
-        {% endif %}
-    </div>
-
-    {# Main Content Area #}
-    <div class="content">
-
-        <h1>Public Profile</h1>
-        <p class="subtitle">Viewing profile for {{ profile.user.username }}</p>
-
-        {# Profile Details Card — follows lecture pattern from django4 slides #}
-        <div class="card">
-            <h3>Account Details</h3>
-
-            {# Display user fields from Django's built-in User model #}
-            <p><strong>Username:</strong> {{ profile.user.username }}</p>
-            <p><strong>First Name:</strong> {{ profile.user.first_name|default:"Not provided" }}</p>
-            <p><strong>Last Name:</strong> {{ profile.user.last_name|default:"Not provided" }}</p>
-            <p><strong>Email:</strong> {{ profile.user.email }}</p>
-        </div>
-
-        {# Profile Details Card — displays fields from our custom Profile model #}
-        <div class="card">
-            <h3>Profile Details</h3>
-
-            {# profile.bio, profile.website etc come from our Profile model #}
-            <p><strong>Bio:</strong> {{ profile.bio|default:"No bio provided" }}</p>
-            <p><strong>Location:</strong> {{ profile.location|default:"Not provided" }}</p>
-            <p><strong>Website:</strong>
-                {% if profile.website %}
-                    {# Render as a clickable link if website is provided #}
-                    <a href="{{ profile.website }}">{{ profile.website }}</a>
-                {% else %}
-                    Not provided
-                {% endif %}
-            </p>
-            {# profile.team is a ForeignKey to the Team model in the teams app #}
-            <p><strong>Team:</strong> {{ profile.team|default:"Not assigned" }}</p>
-        </div>
-
-        {# Action buttons #}
-        <div class="card">
-            <div class="buttons">
-                {# Link to the update profile page so user can edit their details #}
-                <a href="{% url 'update_profile' %}" class="btn-primary" style="text-decoration:none;">
-                    Edit Profile
-                </a>
-                {# Link to change password page #}
-                <a href="{% url 'change_password' %}" class="btn-outline" style="text-decoration:none;">
-                    Change Password
-                </a>
+        <div class="top-actions">
+            <input class="top-search" placeholder="Search directory...">
+            {# Link to this user's own profile view page #}
+            <a href="/accounts/profile/{{ request.user.username }}/" class="profile-btn">View Public Profile</a>
+            <div class="user-circle">
+                {{ request.user.username|slice:":2"|upper }}
             </div>
         </div>
-
     </div>
-</div>
 
-<footer>
-    © 2026 LOGOSKY • Privacy • Terms • Contact
-</footer>
+    <div class="layout">
+
+        {# Sidebar Navigation #}
+        <div class="sidebar">
+            <ul class="nav">
+                <li onclick="window.location.href='/'">
+                    <span class="icon">D</span>Dashboard
+                </li>
+                <li onclick="window.location.href='/teams/'">
+                    <span class="icon">T</span>Teams
+                </li>
+                <li>
+                    <span class="icon">O</span>Organisations
+                </li>
+                <li>
+                    <span class="icon">M</span>Messages
+                </li>
+                <li onclick="window.location.href='/teams/schedule-meeting/'">
+                    <span class="icon">S</span>Schedule
+                </li>
+                <li onclick="window.location.href='/reports/'">
+                    <span class="icon">R</span>Reports
+                </li>
+                <li onclick="window.location.href='/visualisation/'">
+                    <span class="icon">V</span>Visualisation
+                </li>
+                {# active class highlights the current page in the sidebar #}
+                <li class="active" onclick="window.location.href='/accounts/profile/{{ request.user.username }}/'">
+                    <span class="icon">P</span>Profile
+                </li>
+            </ul>
+
+            {# Only show admin links to staff users #}
+            {% if request.user.is_staff %}
+            <p class="admin-label">ADMIN</p>
+            <ul class="nav">
+                {# Admin Dashboard links to the Django admin custom dashboard page #}
+                <li onclick="window.location.href='/admin/teams/team/admin-dashboard/'"><span
+                        class="icon">AD</span>Admin Dashboard</li>
+                {# Team Management links to the custom team management page #}
+                <li onclick="window.location.href='/teams/admin/team-management/'"><span class="icon">TM</span>Team
+                    Management</li>
+                {# User Access links to the custom user access management page #}
+                <li onclick="window.location.href='/teams/admin/user-access/'"><span class="icon">UA</span>User Access
+                </li>
+            </ul>
+            {% endif %}
+        </div>
+
+        {# Main Content Area #}
+        <div class="content">
+
+            <h1>Public Profile</h1>
+            <p class="subtitle">Viewing profile for {{ profile.user.username }}</p>
+
+            {# Profile Details Card — follows lecture pattern from django4 slides #}
+            <div class="card">
+                <h3>Account Details</h3>
+
+                {# Display user fields from Django's built-in User model #}
+                <p><strong>Username:</strong> {{ profile.user.username }}</p>
+                <p><strong>First Name:</strong> {{ profile.user.first_name|default:"Not provided" }}</p>
+                <p><strong>Last Name:</strong> {{ profile.user.last_name|default:"Not provided" }}</p>
+                <p><strong>Email:</strong> {{ profile.user.email }}</p>
+            </div>
+
+            {# Profile Details Card — displays fields from our custom Profile model #}
+            <div class="card">
+                <h3>Profile Details</h3>
+
+                {# profile.bio, profile.website etc come from our Profile model #}
+                <p><strong>Bio:</strong> {{ profile.bio|default:"No bio provided" }}</p>
+                <p><strong>Location:</strong> {{ profile.location|default:"Not provided" }}</p>
+                <p><strong>Website:</strong>
+                    {% if profile.website %}
+                    {# Render as a clickable link if website is provided #}
+                    <a href="{{ profile.website }}">{{ profile.website }}</a>
+                    {% else %}
+                    Not provided
+                    {% endif %}
+                </p>
+                {# profile.team is a ForeignKey to the Team model in the teams app #}
+                <p><strong>Team:</strong> {{ profile.team|default:"Not assigned" }}</p>
+            </div>
+
+            {# Action buttons #}
+            <div class="card">
+                <div class="buttons">
+                    {# Link to the update profile page so user can edit their details #}
+                    <a href="{% url 'update_profile' %}" class="btn-primary" style="text-decoration:none;">
+                        Edit Profile
+                    </a>
+                    {# Link to change password page #}
+                    <a href="{% url 'change_password' %}" class="btn-outline" style="text-decoration:none;">
+                        Change Password
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        © 2026 LOGOSKY • Privacy • Terms • Contact
+    </footer>
 
 </body>
+
 </html>
