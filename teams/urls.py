@@ -8,6 +8,8 @@ urlpatterns = [
     path('team/<int:id>/', views.team_detail, name='team_detail'),
     # Schedule meeting page — allows users to schedule a meeting
     path('schedule-meeting/', views.schedule_meeting, name='schedule_meeting'),
+    # Dashboard page — displays the main dashboard
+    path('dashboard/', views.dashboard, name='dashboard'),
     # Admin — Team Management page (staff only)
     path('admin/team-management/', views.team_management, name='team_management'),
     # Admin — User Access Management page (staff only)

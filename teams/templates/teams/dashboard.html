@@ -1,0 +1,161 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard</title>
+
+<link rel="stylesheet" href="{% static 'teams/style.css' %}?v=202"></head>
+<link rel="stylesheet" href="{% static 'teams/dashboard.css' %}">
+</head>
+
+<body>
+
+<div class="topbar">
+    <div class="logo">
+        <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo">
+        <p>Engineering Team Directory</p>
+    </div>
+
+    <div class="top-actions">
+        <input class="top-search" placeholder="Search directory...">
+        <a href="/accounts/profile/{{ request.user.username }}/" class="profile-btn">View Public Profile</a>
+        <div class="user-menu">
+    <div class="user-circle" onclick="toggleMenu()">
+        {{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}
+    </div>
+
+    <div class="dropdown-menu" id="dropdownMenu">
+        {% if request.user.is_authenticated %}
+            <a href="/accounts/profile/{{ request.user.username }}/">Profile</a>
+            <a href="/accounts/update-profile/">Update Profile</a>
+            <a href="/accounts/change-password/">Change Password</a>
+            <a href="/accounts/logout/">Logout</a>
+        {% else %}
+            <a href="/accounts/login/">Login</a>
+            <a href="/accounts/signup/">Sign Up</a>
+        {% endif %}
+    </div>
+</div>
+    </div>
+</div>
+
+<div class="layout">
+
+    <div class="sidebar">
+        <ul class="nav">
+            <li class="active" onclick="window.location.href='/teams/dashboard/'">
+                <span class="icon">D</span>Dashboard
+            </li>
+
+            <li onclick="window.location.href='/teams/'">
+                <span class="icon">T</span>Teams
+            </li>
+
+            <li>
+                <span class="icon">O</span>Organisations
+            </li>
+
+            <li>
+                <span class="icon">M</span>Messages
+            </li>
+
+            <li onclick="window.location.href='/teams/schedule-meeting/'">
+                <span class="icon">S</span>Schedule
+            </li>
+
+            <li onclick="window.location.href='/reports/'">
+                <span class="icon">R</span>Reports
+            </li>
+
+            <li onclick="window.location.href='/visualisation/'">
+                <span class="icon">V</span>Visualisation
+            </li>
+
+            <li onclick="window.location.href='/accounts/profile/{{ request.user.username }}/'">
+                <span class="icon">P</span>Profile
+            </li>
+        </ul>
+    </div>
+
+    <div class="content">
+
+        <h1 class="main-title">Dashboard</h1>
+
+        <div class="dashboard-grid">
+
+            <!-- LEFT -->
+            <div class="card">
+                <h3>Quick Team Search</h3>
+
+                <input type="text" placeholder="Search team / department / manager" class="search-input">
+
+                <button class="btn-primary" onclick="window.location.href='/teams/'">
+                    Go to Teams
+                </button>
+
+                <div class="recent-section">
+                    <h4>Recently Viewed</h4>
+
+                    {% if recent_teams %}
+                        <ul>
+                            {% for team in recent_teams %}
+                                <li>
+                                    <a href="{% url 'team_detail' team.id %}">
+                                        {{ team.name }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="muted-text">No recent teams yet</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- RIGHT -->
+            <div class="card summary-card">
+                <h3>Upcoming Meetings</h3>
+
+                {% if upcoming_meetings %}
+                    <ul class="meeting-list">
+                        {% for meeting in upcoming_meetings %}
+                            <li>
+                                <span class="meeting-name">{{ meeting.title }}</span>
+                                <span class="meeting-time">{{ meeting.scheduled_at|date:"d M H:i" }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="muted-text">No meetings scheduled</p>
+                {% endif %}
+
+                <a href="/teams/schedule-meeting/" class="link-btn">
+                    Open Schedule →
+                </a>
+            </div>
+
+        </div>
+
+        <footer>
+            © 2026 LOGOSKY • Privacy • Terms • Contact
+        </footer>
+
+    </div>
+
+</div>
+<script>
+function toggleMenu() {
+    document.getElementById("dropdownMenu").classList.toggle("show");
+}
+
+window.onclick = function(e) {
+    if (!e.target.closest('.user-menu')) {
+        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+            menu.classList.remove("show");
+        });
+    }
+}
+</script>
+</body>
+</html>

@@ -12,11 +12,29 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 # Q objects allow complex database queries using OR conditions
 from django.db.models import Q
+# timezone is used to get the current datetime for filtering upcoming meetings
+from django.utils import timezone
 # Import models from the teams app
-from .models import Team, Department, AuditLog
+from .models import Team, Department, AuditLog, Meeting
+
+
+# Dashboard view — displays upcoming meetings for the logged-in user
+@login_required
+def dashboard(request):
+    # Filter meetings scheduled from now onwards and order by soonest first
+    # scheduled_at__gte means "scheduled at greater than or equal to now"
+    upcoming_meetings = Meeting.objects.filter(
+        scheduled_at__gte=timezone.now()
+    ).order_by('scheduled_at')[:5]
+
+    context = {
+        'upcoming_meetings': upcoming_meetings,
+    }
+    return render(request, 'teams/dashboard.html', context)
 
 
 # Restrict this view to logged-in users only
+# as shown in the django4 lecture slides
 @login_required
 def team_list(request):
     # Retrieve search/filter parameters from the GET request
@@ -80,27 +98,21 @@ def team_detail(request, id):
     if team.name == "Backend Engineering":
         upstream = ["Infrastructure", "Authentication"]
         downstream = ["Frontend Engineering", "Mobile Apps"]
-
     elif team.name == "Frontend Engineering":
         upstream = ["Backend Engineering"]
         downstream = ["UI Users"]
-
     elif team.name == "Data Engineering":
         upstream = ["Backend Engineering", "External Data"]
         downstream = ["Analytics Platform"]
-
     elif team.name == "DevOps":
         upstream = ["Backend Engineering", "Infrastructure"]
         downstream = ["All Engineering Teams"]
-
     elif team.name == "Support Team":
         upstream = ["All Engineering Teams"]
         downstream = ["End Users"]
-
     elif team.name == "Security Team":
         upstream = ["DevOps", "Backend Engineering"]
         downstream = ["All Engineering Teams"]
-
     else:
         upstream = []
         downstream = []
@@ -109,22 +121,16 @@ def team_detail(request, id):
     # These represent the key skills associated with each team
     if team.name == "Backend Engineering":
         skills = ["Python", "Django", "REST APIs", "Docker"]
-
     elif team.name == "Frontend Engineering":
         skills = ["HTML", "CSS", "JavaScript", "UI Design"]
-
     elif team.name == "Data Engineering":
         skills = ["Python", "SQL", "Data Analysis", "Machine Learning"]
-
     elif team.name == "DevOps":
         skills = ["CI/CD", "Docker", "Kubernetes", "Cloud Infrastructure"]
-
     elif team.name == "Support Team":
         skills = ["Troubleshooting", "Customer Support", "System Monitoring", "Communication"]
-
     elif team.name == "Security Team":
         skills = ["Cybersecurity", "Pen Testing", "Risk Analysis", "Encryption"]
-
     else:
         skills = []
 

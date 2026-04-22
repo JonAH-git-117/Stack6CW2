@@ -4,7 +4,18 @@ body{
     background: #f5f6fa;
     color: #222;
 }
+.profile-btn {
+    text-decoration: none !important;
+    color: white; 
+}
 
+.profile-btn,
+.profile-btn:link,
+.profile-btn:visited,
+.profile-btn:hover,
+.profile-btn:active {
+    text-decoration: none !important;
+}
 .topbar{
     display:flex;
     justify-content:space-between;
@@ -52,7 +63,7 @@ background:#162d6a;
 }
 
 .user-circle{
-background:#1e3a8a;
+background:#162d6a;
 color:white;
 width:36px;
 height:36px;
@@ -325,6 +336,60 @@ footer{
 .layout {
     display: flex;
     align-items: flex-start;
+}
+
+.user-menu {
+    position: relative;
+}
+
+.user-circle {
+    width: 40px;
+    height: 40px;
+    background: #0A3D93;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    border: 1px solid #e5e7eb;
+    width: 190px;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 999;
+}
+
+.dropdown-menu a {
+    padding: 12px 15px;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+}
+
+.dropdown-menu a:hover {
+    background: #f3f4f6;
+}
+
+.dropdown-menu.show {
+    display: flex;
+}
+.logo p {
+    font-size: 16px;
+    font-weight: 500;
+    color: #0A3D93; 
+    margin: 0;
 }
 @media (max-width: 1200px){
     .table-header,

@@ -8,11 +8,11 @@
     <title>Team Profile</title>
     <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=201">
     <link rel="stylesheet" href="{% static 'teams/team_detail.css' %}?v=201">
+</head>
 
 <body>
 
     <div class="topbar">
-
         <div class="logo">
             <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo" style="height:75px; width:auto; border:3px">
             <p>Engineering Team Directory</p>
@@ -20,8 +20,22 @@
         <div class="top-actions">
             <input class="top-search" placeholder="Search directory...">
             <a href="/accounts/profile/{{ request.user.username }}/" class="profile-btn">View Public Profile</a>
-            <div class="user-circle">
-                {{ request.user.username|slice:":2"|upper }}
+            <!-- User menu dropdown — shows profile/logout options when clicked -->
+            <div class="user-menu">
+                <div class="user-circle" onclick="toggleMenu()">
+                    {{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}
+                </div>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    {% if request.user.is_authenticated %}
+                        <a href="/accounts/profile/{{ request.user.username }}/">Profile</a>
+                        <a href="/accounts/update-profile/">Update Profile</a>
+                        <a href="/accounts/change-password/">Change Password</a>
+                        <a href="/accounts/logout/">Logout</a>
+                    {% else %}
+                        <a href="/accounts/login/">Login</a>
+                        <a href="/accounts/signup/">Sign Up</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
@@ -61,14 +75,11 @@
             <p class="admin-label">ADMIN</p>
             <ul class="nav">
                 <!-- Admin Dashboard links to the Django admin custom dashboard page -->
-                <li onclick="window.location.href='/admin/teams/team/admin-dashboard/'"><span
-                        class="icon">AD</span>Admin Dashboard</li>
+                <li onclick="window.location.href='/admin/teams/team/admin-dashboard/'"><span class="icon">AD</span>Admin Dashboard</li>
                 <!-- Team Management links to the custom team management page -->
-                <li onclick="window.location.href='/teams/admin/team-management/'"><span class="icon">TM</span>Team
-                    Management</li>
+                <li onclick="window.location.href='/teams/admin/team-management/'"><span class="icon">TM</span>Team Management</li>
                 <!-- User Access links to the custom user access management page -->
-                <li onclick="window.location.href='/teams/admin/user-access/'"><span class="icon">UA</span>User Access
-                </li>
+                <li onclick="window.location.href='/teams/admin/user-access/'"><span class="icon">UA</span>User Access</li>
             </ul>
             {% endif %}
         </div>
@@ -104,14 +115,12 @@
 
                     <div class="hero-actions">
                         {% if team.manager %}
-                        <a href="mailto:{{ team.manager.username }}@logosky.com" class="hero-btn email-btn">Email
-                            Team</a>
+                        <a href="mailto:{{ team.manager.username }}@logosky.com" class="hero-btn email-btn">Email Team</a>
                         {% else %}
                         <span class="hero-btn disabled-btn">Email Team</span>
                         {% endif %}
 
                         <a href="/teams/schedule-meeting/" class="hero-btn schedule-btn">Schedule Meeting</a>
-
                         <a href="/organisations/" class="hero-btn org-btn">View Organisation</a>
                         <a href="/teams/" class="hero-btn back-btn">Back to Directory</a>
                     </div>
@@ -125,8 +134,7 @@
 
                     <div class="mini-stat">
                         <span class="mini-label">Status</span>
-                        <span
-                            class="status-pill {% if team.status|lower == 'disabled' %}disabled{% else %}active{% endif %}">
+                        <span class="status-pill {% if team.status|lower == 'disabled' %}disabled{% else %}active{% endif %}">
                             {{ team.status }}
                         </span>
                     </div>
@@ -160,17 +168,14 @@
                                 <span class="info-title">Department</span>
                                 <span class="info-value">{{ team.department }}</span>
                             </div>
-
                             <div class="info-box">
                                 <span class="info-title">Location</span>
                                 <span class="info-value">London, UK</span>
                             </div>
-
                             <div class="info-box">
                                 <span class="info-title">Projects</span>
                                 <span class="info-value">4 Active</span>
                             </div>
-
                             <div class="info-box">
                                 <span class="info-title">Repositories</span>
                                 <span class="info-value">3 Core Repos</span>
@@ -180,7 +185,6 @@
 
                     <div class="card">
                         <h3>Manager and Contact</h3>
-
                         <div class="contact-box">
                             <p class="contact-title">Manager</p>
                             {% if team.manager %}
@@ -190,7 +194,6 @@
                             <p class="muted-text">No manager assigned</p>
                             {% endif %}
                         </div>
-
                         <div class="contact-box">
                             <p class="contact-title">Contact Channels</p>
                             <ul class="detail-list">
@@ -213,7 +216,6 @@
                             {% endfor %}
                         </div>
                     </div>
-
                     <div class="card">
                         <h3>Quick Links</h3>
                         <ul class="detail-list">
@@ -228,14 +230,12 @@
             <div id="membersTab" class="tab-content">
                 <div class="card">
                     <h3>Team Members</h3>
-
                     <table class="members-table">
                         <tr>
                             <th>Name</th>
                             <th>Role</th>
                             <th>Email</th>
                         </tr>
-
                         {% for member in team.members.all %}
                         <tr>
                             <td>{{ member.username }}</td>
@@ -254,7 +254,6 @@
             <div id="repositoriesTab" class="tab-content">
                 <div class="card">
                     <h3>Repositories</h3>
-
                     <div class="repo-wrapper">
                         <div class="repo-box">
                             <h4>Backend API Service</h4>
@@ -265,7 +264,6 @@
                                 <span>REST</span>
                             </div>
                         </div>
-
                         <div class="repo-box">
                             <h4>Monitoring Infrastructure</h4>
                             <p>Service monitoring, logging and system health checks.</p>
@@ -275,7 +273,6 @@
                                 <span>Monitoring</span>
                             </div>
                         </div>
-
                         <div class="repo-box">
                             <h4>Data Processing Engine</h4>
                             <p>Handles analytics pipelines and internal reporting workflows.</p>
@@ -301,7 +298,6 @@
                             {% endfor %}
                         </ul>
                     </div>
-
                     <div class="card">
                         <h3>Downstream Teams</h3>
                         <ul class="detail-list">
@@ -322,7 +318,6 @@
                             <th>Type</th>
                             <th>Status</th>
                         </tr>
-
                         {% for item in upstream %}
                         <tr>
                             <td>{{ item }}</td>
@@ -330,7 +325,6 @@
                             <td>Active</td>
                         </tr>
                         {% endfor %}
-
                         {% for item in downstream %}
                         <tr>
                             <td>{{ item }}</td>
@@ -365,6 +359,19 @@
 
             document.getElementById(tabId).classList.add("active-tab");
             evt.currentTarget.classList.add("active");
+        }
+
+        <!-- Toggle menu script — closes dropdown when clicking outside -->
+        function toggleMenu() {
+            document.getElementById("dropdownMenu").classList.toggle("show");
+        }
+
+        window.onclick = function(e) {
+            if (!e.target.closest('.user-menu')) {
+                document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                    menu.classList.remove("show");
+                });
+            }
         }
     </script>
 
