@@ -9,6 +9,28 @@
     <!-- Load the shared site stylesheet from the teams static folder -->
     <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=202">
     <style>
+       
+.info-box {
+    background: #eef4ff;
+    border: 1px solid #c7d2fe;
+    color: #1e3a8a;
+
+    padding: 14px 18px;
+    border-radius: 10px;
+
+    font-size: 14px;
+    margin-bottom: 20px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.info-box::before {
+    padding-left: 4px;
+    font-size: 16px;
+}
+
 
         table {
     border-collapse: separate;
@@ -303,10 +325,16 @@ style="border: 1px solid #0A3D93;
 
             <!-- Users list table — shows all users matching the current filters -->
             <div style="margin-top:20px;">
-                <h3>Users List</h3>
+                <!-- Instruction box (moved above table for better UX) -->
+<div class="info-box">
+Select a user from the table below to view details and manage their access
+</div>
+
+<h3>Users List</h3>
                 <table style="width:100%;border-collapse:collapse;">
                     <thead>
-<tr style="background:#1e3a8a;color:white;text-align:left;border-radius:10px;">                            <th style="padding:10px;">Name</th>
+<tr style="background:#1e3a8a;color:white;text-align:left;border-radius:10px;">  
+     <th style="padding:10px;">Name</th>
                             <th style="padding:10px;">Username</th>
                             <th style="padding:10px;">Email</th>
                             <th style="padding:10px;">Status</th>
@@ -441,10 +469,7 @@ style="border: 1px solid #0A3D93;
                 </div>
             </div>
             {% else %}
-            <!-- Placeholder shown when no user has been selected yet -->
-            <div class="form-section" id="user-detail" style="color:#6b7280;text-align:center;">
-                <p>Select a user from the table above to view details and manage their access.</p>
-            </div>
+           
             {% endif %}
 
         </div>
