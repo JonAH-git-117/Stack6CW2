@@ -54,6 +54,183 @@
             View Public Profile
         </a>
 
+        <div class="content">
+            <h1>Team Management</h1>
+            <p class="subtitle">Create, edit and delete teams</p>
+
+            {% if messages %}
+            <div style="margin-bottom:15px;">
+                {% for message in messages %}
+                <div class="{% if message.tags == 'error' %}msg-error{% else %}msg-success{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="background:#f0f4ff;border:1px solid #c7d2fe;border-radius:8px;padding:12px 16px;margin-bottom:20px;color:#3730a3;font-size:13px;">
+                Examples: team saved / validation error / deletion confirmation
+            </div>
+            {% endif %}
+
+            <div class="form-section">
+                <h3 style="margin-top:0;">Search / Filter Teams</h3>
+                <form method="GET">
+                    <div class="form-row">
+                        <div class="field">
+                            <label>Search (team / department / manager)</label>
+                            <input type="text" name="q" value="{{ query }}" placeholder="Type keywords">
+                        </div>
+                        <div class="field">
+                            <label>Department</label>
+                            <select name="department">
+                                <option value="">All</option>
+                                {% for dept in departments %}
+                                <option value="{{ dept.id }}" {% if department_filter == dept.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ dept.department_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Status</label>
+                            <select name="status">
+                                <option value="">All</option>
+                                <option value="active" {% if status_filter == "active" %}selected{% endif %}>Active</option>
+                                <option value="disabled" {% if status_filter == "disabled" %}selected{% endif %}>Disabled</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Search</button>
+                    <a href="{% url 'team_management' %}" class="btn btn-secondary" style="margin-left:8px;">Clear</a>
+                    <a href="{% url 'team_management' %}#create-form" class="btn btn-primary" style="margin-left:8px;">Add New Team</a>
+                </form>
+            </div>
+
+            <div style="margin-top:20px;">
+                <h3>Teams List</h3>
+                <table style="width:100%;border-collapse:collapse;">
+                    <thead>
+                        <tr style="background:#1e3a8a;color:white;text-align:left;">
+                            <th style="padding:10px;">Team</th>
+                            <th style="padding:10px;">Department</th>
+                            <th style="padding:10px;">Manager</th>
+                            <th style="padding:10px;">Status</th>
+                            <th style="padding:10px;">Select</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for team in teams %}
+                        <tr style="border-bottom:1px solid #e5e7eb;" {% if selected_team.id == team.id %}class="selected-highlight"{% endif %}>
+                            <td style="padding:10px;">{{ team.name }}</td>
+                            <td style="padding:10px;">{{ team.department.department_name|default:"—" }}</td>
+                            <td style="padding:10px;">
+                                {% if team.manager %}
+                                    {{ team.manager.get_full_name|default:team.manager.username }}
+                                {% else %}
+                                    Not assigned
+                                {% endif %}
+                            </td>
+                            <td style="padding:10px;">
+                                <span class="{% if team.status == 'active' %}status-active{% else %}status-disabled{% endif %}">
+                                    {{ team.status|capfirst }}
+                                </span>
+                            </td>
+                            <td style="padding:10px;">
+                                <a href="?selected_team={{ team.id }}&q={{ query }}&department={{ department_filter }}&status={{ status_filter }}#create-form"
+                                    class="btn btn-sm btn-primary">Select</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" style="padding:15px;text-align:center;color:#6b7280;">No teams found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="form-section" id="create-form">
+                <h3 style="margin-top:0;">
+                    {% if selected_team %}Edit Team: {{ selected_team.name }}{% else %}Create New Team{% endif %}
+                </h3>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="save">
+                    {% if selected_team %}
+                    <input type="hidden" name="team_id" value="{{ selected_team.id }}">
+                    {% endif %}
+
+                    <div class="form-row">
+                        <div class="field">
+                            <label>Team Name</label>
+                            <input type="text" name="name" value="{{ selected_team.name|default:'' }}" placeholder="Team name" required>
+                        </div>
+                        <div class="field">
+                            <label>Department</label>
+                            <select name="department">
+                                <option value="">— Select Department —</option>
+                                {% for dept in departments %}
+                                <option value="{{ dept.id }}" {% if selected_team.department.id == dept.id %}selected{% endif %}>
+                                    {{ dept.department_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Status</label>
+                            <select name="status">
+                                <option value="active" {% if selected_team.status == "active" %}selected{% endif %}>Active</option>
+                                <option value="disabled" {% if selected_team.status == "disabled" %}selected{% endif %}>Disabled</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="field">
+                            <label>Manager</label>
+                            <select name="manager">
+                                <option value="">— No Manager —</option>
+                                {% for mgr in managers %}
+                                <option value="{{ mgr.id }}" {% if selected_team.manager.id == mgr.id %}selected{% endif %}>
+                                    {{ mgr.get_full_name|default:mgr.username }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="field" style="flex:2;">
+                            <label>Description</label>
+                            <textarea name="description" placeholder="Team description">{{ selected_team.description|default:'' }}</textarea>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:10px;display:flex;gap:10px;align-items:center;">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <a href="{% url 'team_management' %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+
+                {% if selected_team %}
+                <form method="POST" style="margin-top:10px;" onsubmit="return confirm('Are you sure you want to delete {{ selected_team.name }}?');">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="team_id" value="{{ selected_team.id }}">
+                    <button type="submit" class="btn btn-danger">Delete Team</button>
+                </form>
+                {% endif %}
+            </div>
+
+            <div class="form-section" style="margin-top:20px;">
+                <h3 style="margin-top:0;">Audit Trail</h3>
+                {% if audit_entries %}
+                <ul class="audit-list">
+                    {% for entry in audit_entries %}
+                    <li>{{ entry.timestamp|date:"d/m/Y H:i" }} — {{ entry.user.username|default:"System" }} — {{ entry.details }}</li>
+                    {% endfor %}
+                </ul>
         <div class="user-menu">
             <div class="user-circle" onclick="toggleMenu()">
                 {% if request.user.first_name %}
