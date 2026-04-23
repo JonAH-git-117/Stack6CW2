@@ -6,8 +6,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team Profile</title>
-    <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=201">
-    <link rel="stylesheet" href="{% static 'teams/team_detail.css' %}?v=201">
+    <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=202">
+    <link rel="stylesheet" href="{% static 'teams/team_detail.css' %}?v=202">
 </head>
 
 <body>
@@ -20,20 +20,19 @@
         <div class="top-actions">
             <input class="top-search" placeholder="Search directory...">
             <a href="/accounts/profile/{{ request.user.username }}/" class="profile-btn">View Public Profile</a>
-            <!-- User menu dropdown — shows profile/logout options when clicked -->
             <div class="user-menu">
                 <div class="user-circle" onclick="toggleMenu()">
                     {{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}
                 </div>
                 <div class="dropdown-menu" id="dropdownMenu">
                     {% if request.user.is_authenticated %}
-                        <a href="/accounts/profile/{{ request.user.username }}/">Profile</a>
-                        <a href="/accounts/update-profile/">Update Profile</a>
-                        <a href="/accounts/change-password/">Change Password</a>
-                        <a href="/accounts/logout/">Logout</a>
+                    <a href="/accounts/profile/{{ request.user.username }}/">Profile</a>
+                    <a href="/accounts/update-profile/">Update Profile</a>
+                    <a href="/accounts/change-password/">Change Password</a>
+                    <a href="/accounts/logout/">Logout</a>
                     {% else %}
-                        <a href="/accounts/login/">Login</a>
-                        <a href="/accounts/signup/">Sign Up</a>
+                    <a href="/accounts/login/">Login</a>
+                    <a href="/accounts/signup/">Sign Up</a>
                     {% endif %}
                 </div>
             </div>
@@ -70,16 +69,15 @@
                 </li>
             </ul>
 
-            <!-- Admin section only shown to staff users -->
             {% if request.user.is_staff %}
             <p class="admin-label">ADMIN</p>
             <ul class="nav">
-                <!-- Admin Dashboard links to the Django admin custom dashboard page -->
-                <li onclick="window.location.href='/admin/teams/team/admin-dashboard/'"><span class="icon">AD</span>Admin Dashboard</li>
-                <!-- Team Management links to the custom team management page -->
-                <li onclick="window.location.href='/teams/admin/team-management/'"><span class="icon">TM</span>Team Management</li>
-                <!-- User Access links to the custom user access management page -->
-                <li onclick="window.location.href='/teams/admin/user-access/'"><span class="icon">UA</span>User Access</li>
+                <li onclick="window.location.href='/admin/teams/team/admin-dashboard/'"><span
+                        class="icon">AD</span>Admin Dashboard</li>
+                <li onclick="window.location.href='/teams/admin/team-management/'"><span class="icon">TM</span>Team
+                    Management</li>
+                <li onclick="window.location.href='/teams/admin/user-access/'"><span class="icon">UA</span>User Access
+                </li>
             </ul>
             {% endif %}
         </div>
@@ -94,7 +92,7 @@
                     <label for="teamSwitch">Switch Team</label>
                     <select id="teamSwitch" onchange="switchTeam(this.value)">
                         {% for t in teams %}
-                        <option value="/teams/team/{{ t.id }}/" {% if t.id==team.id %}selected{% endif %}>
+                        <option value="/teams/team/{{ t.id }}/" {% if t.id == team.id %}selected{% endif %}>
                             {{ t.name }}
                         </option>
                         {% endfor %}
@@ -115,7 +113,7 @@
 
                     <div class="hero-actions">
                         {% if team.manager %}
-                        <a href="mailto:{{ team.manager.username }}@logosky.com" class="hero-btn email-btn">Email Team</a>
+                        <a href="mailto:{{ team.manager.email }}" class="hero-btn email-btn">Email Team</a>
                         {% else %}
                         <span class="hero-btn disabled-btn">Email Team</span>
                         {% endif %}
@@ -134,7 +132,8 @@
 
                     <div class="mini-stat">
                         <span class="mini-label">Status</span>
-                        <span class="status-pill {% if team.status|lower == 'disabled' %}disabled{% else %}active{% endif %}">
+                        <span
+                            class="status-pill {% if team.status|lower == 'disabled' %}disabled{% else %}active{% endif %}">
                             {{ team.status }}
                         </span>
                     </div>
@@ -158,9 +157,7 @@
                     <div class="card">
                         <h3>About the Team</h3>
                         <p class="overview-text">
-                            The {{ team.name }} team is responsible for delivering reliable engineering solutions
-                            across LOGOSKY. The team supports scalable services, collaborates with related teams,
-                            and contributes to core platform delivery and product improvement.
+                            {{ team.description }}
                         </p>
 
                         <div class="info-grid">
@@ -170,15 +167,15 @@
                             </div>
                             <div class="info-box">
                                 <span class="info-title">Location</span>
-                                <span class="info-value">London, UK</span>
+                                <span class="info-value">{{ team.location|default:"Not Set" }}</span>
                             </div>
                             <div class="info-box">
                                 <span class="info-title">Projects</span>
-                                <span class="info-value">4 Active</span>
+                                <span class="info-value">{{ team.projects.count }} Active</span>
                             </div>
                             <div class="info-box">
                                 <span class="info-title">Repositories</span>
-                                <span class="info-value">3 Core Repos</span>
+                                <span class="info-value">{{ team.repositories.count }}</span>
                             </div>
                         </div>
                     </div>
@@ -189,7 +186,7 @@
                             <p class="contact-title">Manager</p>
                             {% if team.manager %}
                             <p>{{ team.manager.username }}</p>
-                            <p>{{ team.manager.username }}@logosky.com</p>
+                            <p>{{ team.manager.email }}</p>
                             {% else %}
                             <p class="muted-text">No manager assigned</p>
                             {% endif %}
@@ -197,9 +194,14 @@
                         <div class="contact-box">
                             <p class="contact-title">Contact Channels</p>
                             <ul class="detail-list">
-                                <li>Teams: {{ team.name }} Channel</li>
-                                <li>Slack: #{{ team.name|lower|cut:" " }}-team</li>
-                                <li>Shared Email: {{ team.name|lower|cut:" " }}@logosky.com</li>
+                                {% for channel in team.contact_channels.all %}
+                                <li>
+                                    <strong>{{ channel.get_channel_type_display }}:</strong>
+                                    <a href="{{ channel.channel_value }}" target="_blank">Open Link</a>
+                                </li>
+                                {% empty %}
+                                <li>No contact channels listed.</li>
+                                {% endfor %}
                             </ul>
                         </div>
                     </div>
@@ -209,8 +211,8 @@
                     <div class="card">
                         <h3>Skills</h3>
                         <div class="skills-list">
-                            {% for skill in skills %}
-                            <span class="skill">{{ skill }}</span>
+                            {% for skill in team.skills.all %}
+                            <span class="skill">{{ skill.name }}</span>
                             {% empty %}
                             <span class="muted-text">No skills listed</span>
                             {% endfor %}
@@ -255,33 +257,19 @@
                 <div class="card">
                     <h3>Repositories</h3>
                     <div class="repo-wrapper">
+                        {% for repo in team.repositories.all %}
                         <div class="repo-box">
-                            <h4>Backend API Service</h4>
-                            <p>Core service powering backend operations and authentication.</p>
+                            <h4>{{ repo.name }}</h4>
+                            <p>{{ repo.description|default:"No description provided." }}</p>
                             <div class="repo-tags">
-                                <span>Python</span>
-                                <span>Django</span>
-                                <span>REST</span>
+                                <a href="{{ repo.url }}" target="_blank">View Repository</a>
                             </div>
                         </div>
+                        {% empty %}
                         <div class="repo-box">
-                            <h4>Monitoring Infrastructure</h4>
-                            <p>Service monitoring, logging and system health checks.</p>
-                            <div class="repo-tags">
-                                <span>Docker</span>
-                                <span>CI/CD</span>
-                                <span>Monitoring</span>
-                            </div>
+                            <p>No repositories found for this team.</p>
                         </div>
-                        <div class="repo-box">
-                            <h4>Data Processing Engine</h4>
-                            <p>Handles analytics pipelines and internal reporting workflows.</p>
-                            <div class="repo-tags">
-                                <span>Python</span>
-                                <span>Data</span>
-                                <span>Pipelines</span>
-                            </div>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -291,8 +279,8 @@
                     <div class="card">
                         <h3>Upstream Teams</h3>
                         <ul class="detail-list">
-                            {% for item in upstream %}
-                            <li>{{ item }}</li>
+                            {% for dep in team.dependencies.all %}
+                            <li>{{ dep.depends_on.name }}</li>
                             {% empty %}
                             <li>No upstream dependencies</li>
                             {% endfor %}
@@ -301,8 +289,8 @@
                     <div class="card">
                         <h3>Downstream Teams</h3>
                         <ul class="detail-list">
-                            {% for item in downstream %}
-                            <li>{{ item }}</li>
+                            {% for dep in team.dependent_teams.all %}
+                            <li>{{ dep.team.name }}</li>
                             {% empty %}
                             <li>No downstream dependencies</li>
                             {% endfor %}
@@ -318,16 +306,16 @@
                             <th>Type</th>
                             <th>Status</th>
                         </tr>
-                        {% for item in upstream %}
+                        {% for dep in team.dependencies.all %}
                         <tr>
-                            <td>{{ item }}</td>
+                            <td>{{ dep.depends_on.name }}</td>
                             <td>Upstream</td>
                             <td>Active</td>
                         </tr>
                         {% endfor %}
-                        {% for item in downstream %}
+                        {% for dep in team.dependent_teams.all %}
                         <tr>
-                            <td>{{ item }}</td>
+                            <td>{{ dep.team.name }}</td>
                             <td>Downstream</td>
                             <td>Active</td>
                         </tr>
@@ -361,12 +349,11 @@
             evt.currentTarget.classList.add("active");
         }
 
-        <!-- Toggle menu script — closes dropdown when clicking outside -->
         function toggleMenu() {
             document.getElementById("dropdownMenu").classList.toggle("show");
         }
 
-        window.onclick = function(e) {
+        window.onclick = function (e) {
             if (!e.target.closest('.user-menu')) {
                 document.querySelectorAll('.dropdown-menu').forEach(menu => {
                     menu.classList.remove("show");

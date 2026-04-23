@@ -77,6 +77,7 @@ class ContactChannel(models.Model):
         ("slack", "Slack"),
         ("teams", "Microsoft Teams"),
         ("email", "Email"),
+        ("jira", "Jira Board"),
         ("other", "Other"),
     ]
 

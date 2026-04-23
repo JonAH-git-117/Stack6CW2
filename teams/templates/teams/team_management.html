@@ -245,7 +245,13 @@
                         <tr style="border-bottom:1px solid #e5e7eb;" {% if selected_team.id == team.id %}class="selected-highlight"{% endif %}>
                             <td style="padding:10px;">{{ team.name }}</td>
                             <td style="padding:10px;">{{ team.department.department_name|default:"—" }}</td>
-                            <td style="padding:10px;">{{ team.manager.get_full_name|default:team.manager.username|default:"Not assigned" }}</td>
+                            <td style="padding:10px;">
+                                {% if team.manager %}
+                                    {{ team.manager.get_full_name|default:team.manager.username }}
+                                {% else %}
+                                    Not assigned
+                                {% endif %}
+                            </td>
                             <td style="padding:10px;">
                                 <span class="{% if team.status == 'active' %}status-active{% else %}status-disabled{% endif %}">
                                     {{ team.status|capfirst }}
