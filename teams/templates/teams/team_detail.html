@@ -221,9 +221,16 @@
                     <div class="card">
                         <h3>Quick Links</h3>
                         <ul class="detail-list">
-                            <li>GitHub Organisation</li>
-                            <li>Team Documentation</li>
-                            <li>Team Calendar</li>
+                            {% for repo in team.repositories.all %}
+                            <li><strong>Repository:</strong> <a href="{{ repo.url }}" target="_blank">{{ repo.name }}</a></li>
+                            {% endfor %}
+                            {% for channel in team.contact_channels.all %}
+                            <li><strong>{{ channel.get_channel_type_display }}:</strong> <a href="{{ channel.channel_value }}" target="_blank">Open Link</a></li>
+                            {% endfor %}
+                            {% if not team.repositories.exists and not team.contact_channels.exists %}
+                            <li class="muted-text">No links available</li>
+                            {% endif %}
+                            <li><strong>Schedule:</strong> <a href="/teams/schedule-meeting/">Team Calendar</a></li>
                         </ul>
                     </div>
                 </div>

@@ -34,33 +34,27 @@ class TeamModelAdmin(admin.ModelAdmin):
 
     def report(self, request):
         """
-        Generates an HTML report of teams and departments.
-        Uses render_to_string to build the report template context.
-        WeasyPrint PDF generation temporarily disabled.
+        Renders the admin teams report page using the existing report.html template.
+        Uses TemplateResponse consistent with the admin_dashboard view above.
+        WeasyPrint PDF generation temporarily disabled — HTML rendered instead.
         """
-        html = render_to_string('admin/teams/report.html', {
-            # All teams with related department, organisation and manager data
-            'teams': Team.objects.select_related(
+        context = dict(
+            self.admin_site.each_context(request),
+            teams=Team.objects.select_related(
                 'department',
                 'department__organisation',
                 'manager'
             ).prefetch_related('members'),
-
-            # Departments annotated with their team count
-            'departments': Department.objects.annotate(
+            departments=Department.objects.annotate(
                 team_count=Count('teams')
             ).select_related('organisation'),
-
-            # Teams that have no manager assigned
-            'teams_without_manager': Team.objects.filter(
+            teams_without_manager=Team.objects.filter(
                 manager__isnull=True
             ).select_related('department'),
-
-            'total_teams': Team.objects.count(),
-            'total_departments': Department.objects.count(),
-        })
-
-        return HttpResponse("PDF generation temporarily disabled")
+            total_teams=Team.objects.count(),
+            total_departments=Department.objects.count(),
+        )
+        return TemplateResponse(request, 'admin/teams/report.html', context)
 
     def admin_dashboard(self, request):
         """

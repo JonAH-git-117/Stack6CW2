@@ -68,7 +68,8 @@ def team_list(request):
 
     # Retrieve all departments and managers for the filter dropdowns
     departments = Department.objects.all()
-    managers = User.objects.all()
+    # Only show users who are actually managing at least one team
+    managers = User.objects.filter(managed_teams__isnull=False).distinct()
 
     # Pass all data to the template via context dictionary
     context = {

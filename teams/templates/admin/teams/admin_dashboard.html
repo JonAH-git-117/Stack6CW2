@@ -10,6 +10,9 @@
 <h3>Admin Quick Links</h3>
 <p><a href="{% url 'admin:teams_team_changelist' %}">Team Management</a></p>
 <p><a href="{% url 'admin:auth_user_changelist' %}">User Access Management</a></p>
+<p><a href="/visualisation/">Data Visualisation</a></p>
+<p><a href="/reports/">Reports</a></p>
+<p><a href="{% url 'admin:teams_report' %}">Generate Team Report</a></p>
 
 <h3>Summary</h3>
 <div style="display:flex; gap:30px; margin:20px 0;">
@@ -27,5 +30,5 @@
 {% endfor %}
 </ul>
 
-<p><a href="#">View full audit log</a></p>
+<p><a href="{% url 'admin:teams_auditlog_changelist' %}">View full audit log</a></p>
 {% endblock %}
