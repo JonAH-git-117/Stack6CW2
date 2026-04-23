@@ -83,69 +83,24 @@ def team_list(request):
 
     return render(request, 'teams/team_list.html', context)
 
-
 # Restrict this view to logged-in users only
 @login_required
 def team_detail(request, id):
     # Retrieve the team by ID or return a 404 if not found
+    # This 'team' object now contains everything: its skills, its links, and its members.
     team = get_object_or_404(Team, id=id)
 
-    # Count the number of members in this team using the ManyToManyField
+    # Count the number of members in this team
     member_count = team.members.count()
 
-    # Hardcoded upstream dependencies per team name
-    # These represent which teams this team depends on
-    if team.name == "Backend Engineering":
-        upstream = ["Infrastructure", "Authentication"]
-        downstream = ["Frontend Engineering", "Mobile Apps"]
-    elif team.name == "Frontend Engineering":
-        upstream = ["Backend Engineering"]
-        downstream = ["UI Users"]
-    elif team.name == "Data Engineering":
-        upstream = ["Backend Engineering", "External Data"]
-        downstream = ["Analytics Platform"]
-    elif team.name == "DevOps":
-        upstream = ["Backend Engineering", "Infrastructure"]
-        downstream = ["All Engineering Teams"]
-    elif team.name == "Support Team":
-        upstream = ["All Engineering Teams"]
-        downstream = ["End Users"]
-    elif team.name == "Security Team":
-        upstream = ["DevOps", "Backend Engineering"]
-        downstream = ["All Engineering Teams"]
-    else:
-        upstream = []
-        downstream = []
-
-    # Hardcoded skills per team name
-    # These represent the key skills associated with each team
-    if team.name == "Backend Engineering":
-        skills = ["Python", "Django", "REST APIs", "Docker"]
-    elif team.name == "Frontend Engineering":
-        skills = ["HTML", "CSS", "JavaScript", "UI Design"]
-    elif team.name == "Data Engineering":
-        skills = ["Python", "SQL", "Data Analysis", "Machine Learning"]
-    elif team.name == "DevOps":
-        skills = ["CI/CD", "Docker", "Kubernetes", "Cloud Infrastructure"]
-    elif team.name == "Support Team":
-        skills = ["Troubleshooting", "Customer Support", "System Monitoring", "Communication"]
-    elif team.name == "Security Team":
-        skills = ["Cybersecurity", "Pen Testing", "Risk Analysis", "Encryption"]
-    else:
-        skills = []
-
-    # Pass team data, dependencies, skills and member count to the template
+    # Pass everything to the template
     context = {
         'team': team,
-        'upstream': upstream,
-        'downstream': downstream,
-        'skills': skills,
-        'teams': Team.objects.all(),
+        'teams': Team.objects.all(), # Used for the "Switch Team" dropdown
         'member_count': member_count,
     }
 
     return render(request, 'teams/team_detail.html', context)
-
 
 # Restrict this view to logged-in users only
 @login_required
