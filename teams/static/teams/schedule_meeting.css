@@ -1,0 +1,127 @@
+.calendar-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+.profile-btn {
+    text-decoration: none !important;
+    color: white; 
+}
+
+.btn-apply {
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-apply:hover {
+    background: #0A3D93;
+    color: white;
+}
+
+
+.calendar {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.calendar th {
+    background: #f3f4f6;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+}
+
+.calendar td {
+    height: 85px;
+    vertical-align: top;
+    border: 1px solid #e5e7eb;
+    padding: 8px;
+}
+
+.weekend {
+    background: #faf4d6;
+}
+
+.day {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.meeting {
+    background: #0A3D93;
+    color: white;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.delete-btn {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.delete-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.meeting-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.meeting-form input,
+.meeting-form select,
+.meeting-form textarea {
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+textarea {
+    height: 90px;
+    resize: none;
+}
+
+.two-col {
+    display: flex;
+    gap: 25px;
+}
+
+.two-col div {
+    flex: 1;
+}
+
+.calendar-card {
+    max-width: 1000px;
+}
+
+.form-card {
+    max-width: 1000px;
+}
+
+.calendar-controls select {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    background: white;
+    font-size: 14px;
+    cursor: pointer;
+    min-width: 100px;
+    appearance: auto;
+    -webkit-appearance: auto;
+}

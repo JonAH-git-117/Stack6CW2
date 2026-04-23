@@ -1,0 +1,393 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Management — Admin</title>
+
+<link rel="stylesheet" href="{% static 'teams/style.css' %}?v=202">
+
+<style>
+
+/* reuse card */
+.form-section{
+    margin-top:20px;
+}
+
+/* grid form */
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:40px;
+    margin-top:15px;
+        border-radius:10px;
+}
+
+/* Form grid — two columns for compact layout */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+/* Inputs and selects inside the form grid */
+.form-grid input,
+.form-grid select,
+.form-grid textarea {
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    width: 100%;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+/* Textarea styling */
+.form-grid textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Full width field spans both columns */
+.full {
+    grid-column: 1 / -1;
+}
+
+/* Highlight selected row in teams table */
+.selected-row {
+    border: 2px solid #0A3D93;
+}
+
+/* Success/error message styling */
+.messages {
+    margin-bottom: 15px;
+}
+
+.messages li {
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    list-style: none;
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #6ee7b7;
+}
+
+.messages li.error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
+
+/* Audit trail list */
+.audit-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.audit-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 13px;
+    color: #555;
+}
+</style>
+</head>
+
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="logo">
+        <img src="{% static 'teams/sky-logo.png' %}" style="height:75px;">
+        <p>Engineering Team Directory</p>
+    </div>
+
+    <div class="top-actions">
+        <input class="top-search" placeholder="Search directory...">
+
+        <a href="/accounts/profile/{{ request.user.username }}/" class="profile-btn">
+            View Public Profile
+        </a>
+
+        <div class="user-menu">
+            <div class="user-circle" onclick="toggleMenu()">
+                {% if request.user.first_name %}
+                    {{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}
+                {% else %}
+                    {{ request.user.username|slice:":2"|upper }}
+                {% endif %}
+            </div>
+
+            <div class="dropdown-menu" id="dropdownMenu">
+                <a href="/accounts/profile/{{ request.user.username }}/">Profile</a>
+                <a href="/accounts/update-profile/">Update Profile</a>
+                <a href="/accounts/change-password/">Change Password</a>
+                <a href="/accounts/logout/">Logout</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <ul class="nav">
+        <li onclick="window.location.href='/teams/dashboard/'"><span class="icon">D</span>Dashboard</li>
+        <li onclick="window.location.href='/teams/'"><span class="icon">T</span>Teams</li>
+        <li><span class="icon">O</span>Organisations</li>
+        <li><span class="icon">M</span>Messages</li>
+        <li onclick="window.location.href='/teams/schedule-meeting/'"><span class="icon">S</span>Schedule</li>
+        <li onclick="window.location.href='/reports/'"><span class="icon">R</span>Reports</li>
+        <li onclick="window.location.href='/visualisation/'"><span class="icon">V</span>Visualisation</li>
+        <li onclick="window.location.href='/accounts/profile/{{ request.user.username }}/'"><span class="icon">P</span>Profile</li>
+    </ul>
+
+    {% if request.user.is_staff %}
+    <p class="admin-label">ADMIN</p>
+    <ul class="nav">
+        <li onclick="window.location.href='/admin/teams/team/admin-dashboard/'"><span class="icon">AD</span>Admin Dashboard</li>
+        <li class="active"><span class="icon">TM</span>Team Management</li>
+        <li onclick="window.location.href='/teams/admin/user-access/'"><span class="icon">UA</span>User Access</li>
+    </ul>
+    {% endif %}
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="content">
+
+    <h1>Team Management</h1>
+    <p class="subtitle">Create, edit and manage teams</p>
+
+    <!-- Success/error messages from Django messages framework -->
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <!-- SEARCH AND FILTER CARD -->
+    <div class="card">
+        <h3>Search and Filters</h3>
+
+        <form method="GET">
+            <div class="filters">
+                <!-- Keyword search — searches team name, manager and department -->
+                <input type="text" name="q" value="{{ query }}" placeholder="Type keywords">
+
+                <!-- Department filter dropdown — populated from DB -->
+                <select name="department">
+                    <option value="">All Departments</option>
+                    {% for dept in departments %}
+                    <option value="{{ dept.id }}"
+                        {% if department_filter == dept.id|stringformat:"s" %}selected{% endif %}>
+                        {{ dept.department_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <!-- Status filter dropdown -->
+                <select name="status">
+                    <option value="">All Status</option>
+                    <option value="active" {% if status_filter == "active" %}selected{% endif %}>Active</option>
+                    <option value="disabled" {% if status_filter == "disabled" %}selected{% endif %}>Disabled</option>
+                </select>
+            </div>
+
+            <div class="buttons">
+                <button class="btn-primary">Search</button>
+                <a href="{% url 'team_management' %}" class="btn-outline">Clear</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- TEAMS TABLE CARD -->
+    <div class="card">
+        <h3>Teams List</h3>
+
+        <div class="table-header">
+            <div>TEAM</div>
+            <div>DEPARTMENT</div>
+            <div>MANAGER</div>
+            <div>STATUS</div>
+            <div>ACTIONS</div>
+        </div>
+
+        {% for team in teams %}
+        <!-- Highlight the currently selected team row -->
+        <div class="table-row {% if selected_team.id == team.id %}selected-row{% endif %}">
+
+            <div>
+                <div class="team-title">{{ team.name }}</div>
+            </div>
+
+            <div>{{ team.department.department_name|default:"—" }}</div>
+
+            <div>
+                {% if team.manager %}
+                    {{ team.manager.username }}
+                {% else %}
+                    <span class="muted-text">Not assigned</span>
+                {% endif %}
+            </div>
+
+            <div class="status-cell">
+                <span class="status-pill {% if team.status == 'disabled' %}disabled{% else %}active{% endif %}">
+                    {{ team.status }}
+                </span>
+            </div>
+
+            <div class="actions">
+                <!-- Selecting a team loads it into the edit form below -->
+                <a href="?selected_team={{ team.id }}" class="action-btn primary-action">Select</a>
+            </div>
+
+        </div>
+        {% empty %}
+        <p class="empty-state">No teams found</p>
+        {% endfor %}
+    </div>
+
+    <!-- CREATE / EDIT FORM CARD -->
+    <div class="card">
+
+        <h3>
+            {% if selected_team %}
+                Edit: {{ selected_team.name }}
+            {% else %}
+                Create New Team
+            {% endif %}
+        </h3>
+
+        <!--
+            POST form — submits to team_management view.
+            The hidden team_id field tells the view whether to create or update.
+            The action button value ('save' or 'delete') tells the view which action to perform.
+            csrf_token is required for all POST forms in Django.
+        -->
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- Hidden field — only present when editing an existing team -->
+            {% if selected_team %}
+            <input type="hidden" name="team_id" value="{{ selected_team.id }}">
+            {% endif %}
+
+            <div class="form-grid">
+
+                <!-- Team name field — pre-filled when editing -->
+                <input type="text" name="name" placeholder="Team name"
+                    value="{{ selected_team.name|default:'' }}" required>
+
+                <!-- Department dropdown — populated from DB, pre-selected when editing -->
+                <select name="department">
+                    <option value="">Select Department</option>
+                    {% for dept in departments %}
+                    <option value="{{ dept.id }}"
+                        {% if selected_team.department.id == dept.id %}selected{% endif %}>
+                        {{ dept.department_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <!-- Manager dropdown — populated from active users, pre-selected when editing -->
+                <select name="manager">
+                    <option value="">No Manager</option>
+                    {% for mgr in managers %}
+                    <option value="{{ mgr.id }}"
+                        {% if selected_team.manager.id == mgr.id %}selected{% endif %}>
+                        {{ mgr.username }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <!-- Status dropdown — pre-selected when editing -->
+                <select name="status">
+                    <option value="active" {% if selected_team.status == "active" %}selected{% endif %}>Active</option>
+                    <option value="disabled" {% if selected_team.status == "disabled" %}selected{% endif %}>Disabled</option>
+                </select>
+
+                <!-- Description field — full width, pre-filled when editing -->
+                <textarea name="description" class="full"
+                    placeholder="Team description">{{ selected_team.description|default:'' }}</textarea>
+
+            </div>
+
+            <div class="buttons">
+                <!--
+                    name="action" value="save" — tells the view to create or update the team.
+                    This is required — without it request.POST.get('action') returns None
+                    and the view silently does nothing.
+                -->
+                <button class="btn-primary" name="action" value="save">
+                    {% if selected_team %}Update Team{% else %}Create Team{% endif %}
+                </button>
+
+                <a href="{% url 'team_management' %}" class="btn-outline">Cancel</a>
+
+                <!--
+                    Delete button — only shown when editing an existing team.
+                    Confirmation dialog prevents accidental deletion.
+                    name="action" value="delete" tells the view to delete the team.
+                -->
+                {% if selected_team %}
+                <button class="btn-outline" name="action" value="delete"
+                    onclick="return confirm('Are you sure you want to delete {{ selected_team.name }}? This cannot be undone.')"
+                    style="color:#cc0000; border-color:#cc0000;">
+                    Delete Team
+                </button>
+                {% endif %}
+            </div>
+
+        </form>
+    </div>
+
+    <!-- AUDIT TRAIL CARD -->
+    <div class="card">
+        <h3>Recent Audit Trail</h3>
+        <ul class="audit-list">
+            {% for entry in audit_entries %}
+            <li>
+                <!-- Each entry shows user, action, model and timestamp -->
+                <strong>{{ entry.user }}</strong> —
+                {{ entry.action }} on {{ entry.model_name }}
+                <span style="color:#999; font-size:12px;">{{ entry.timestamp }}</span>
+                {% if entry.details %}<br><span style="color:#666;">{{ entry.details }}</span>{% endif %}
+            </li>
+            {% empty %}
+            <li>No audit entries yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+</div>
+</div>
+
+<footer>
+    © 2026 LOGOSKY • Privacy • Terms • Contact
+</footer>
+
+<script>
+    // Toggle user dropdown menu open/closed
+    function toggleMenu() {
+        document.getElementById("dropdownMenu").classList.toggle("show");
+    }
+
+    // Close dropdown when clicking anywhere outside the user menu
+    window.onclick = function (e) {
+        if (!e.target.closest('.user-menu')) {
+            document.querySelectorAll('.dropdown-menu').forEach(m => {
+                m.classList.remove("show");
+            });
+        }
+    }
+</script>
+
+</body>
+</html>

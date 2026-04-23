@@ -1,0 +1,459 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Access Management — Admin</title>
+    <!-- Load the shared site stylesheet from the teams static folder -->
+    <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=202">
+    <style>
+
+        table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+thead tr th:first-child {
+    border-top-left-radius: 10px;
+}
+
+thead tr th:last-child {
+    border-top-right-radius: 10px;
+}
+        /* Card-style container for form sections */
+        .form-section {
+            background: #f8f9ff;
+            border: 1px solid #dde3f0;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        /* Base button styles */
+       .btn {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: none;   
+    display: inline-block;   
+}
+
+        .btn-primary {
+            background: #1e3a8a;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-success {
+            background: #059669;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 12px;
+        }
+
+        /* Group of action buttons displayed in a row */
+        .action-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        /* Audit trail list styling */
+        .audit-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .audit-list li {
+            padding: 6px 0;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 13px;
+            color: #4b5563;
+        }
+
+        /* Highlights the selected user row in the table */
+        .selected-highlight {
+            background: #eff6ff !important;
+        }
+
+        /* Grid layout for the selected user detail panel */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .detail-item label {
+            font-size: 12px;
+            color: #6b7280;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .detail-item span {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        /* Message alert styles — used instead of inline Django conditional styles */
+        .msg-success {
+            background: #d1fae5;
+            border: 1px solid #6ee7b7;
+            color: #065f46;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .msg-error {
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        /* Status badge styles — green for active, red for disabled */
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .status-disabled {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        /* Admin badge styles — blue for admin, grey for standard */
+        .role-admin {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .role-standard {
+            background: #f3f4f6;
+            color: #6b7280;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top navigation bar with logo, search and profile -->
+    <div class="topbar">
+        <div class="logo">
+            <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo" style="height:75px; width:auto;">
+            <p>Engineering Team Directory</p>
+        </div>
+        <div class="top-actions">
+            <input class="top-search" placeholder="Search directory...">
+            <!-- View Public Profile links to the logged-in user's profile page -->
+            <a href="/accounts/profile/{{ request.user.username }}/" class="profile-btn">View Public Profile</a>
+            <!-- User circle shows the first two characters of the username in uppercase -->
+            <div class="user-circle">{{ request.user.username|slice:":2"|upper }}</div>
+        </div>
+    </div>
+
+    <div class="layout">
+
+        <!-- Sidebar navigation — consistent across all pages -->
+        <div class="sidebar">
+            <ul class="nav">
+                <li onclick="window.location.href='/teams/dashboard/'"><span class="icon">D</span>Dashboard</li>
+                <li onclick="window.location.href='/teams/'"><span class="icon">T</span>Teams</li>
+                <li><span class="icon">O</span>Organisations</li>
+                <li><span class="icon">M</span>Messages</li>
+                <li onclick="window.location.href='/teams/schedule-meeting/'"><span class="icon">S</span>Schedule</li>
+                <li onclick="window.location.href='/reports/'"><span class="icon">R</span>Reports</li>
+                <li onclick="window.location.href='/visualisation/'"><span class="icon">V</span>Visualisation</li>
+                <li onclick="window.location.href='/accounts/profile/{{ request.user.username }}/'"><span
+                        class="icon">P</span>Profile</li>
+            </ul>
+            <!-- Admin section only shown to staff users -->
+            {% if request.user.is_staff %}
+            <p class="admin-label">ADMIN</p>
+            <ul class="nav">
+                <li onclick="window.location.href='/admin/teams/team/admin-dashboard/'"><span
+                        class="icon">AD</span>Admin Dashboard</li>
+                <li onclick="window.location.href='/teams/admin/team-management/'"><span class="icon">TM</span>Team
+                    Management</li>
+                <!-- User Access Management is the active page -->
+                <li class="active"><span class="icon">UA</span>User Access</li>
+            </ul>
+            {% endif %}
+        </div>
+
+        <div class="content">
+            <h1>User Access Management</h1>
+            <p class="subtitle">Manage user accounts, roles and permissions</p>
+
+            <!-- System message area — displays success or error messages after actions -->
+            {% if messages %}
+            <div style="margin-bottom:15px;">
+                {% for message in messages %}
+                <!-- Use CSS class instead of inline Django conditional to avoid linter warnings -->
+                <div class="{% if message.tags == 'error' %}msg-error{% else %}msg-success{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <!-- Placeholder message shown when no action has been performed yet -->
+            <div
+                style="background:#f0f4ff;border:1px solid #c7d2fe;border-radius:8px;padding:12px 16px;margin-bottom:20px;color:#3730a3;font-size:13px;">
+                Examples: user disabled / user enabled / password reset / role changed
+            </div>
+            {% endif %}
+
+            <!-- Search and filter form — submits via GET to keep results in the URL -->
+            <div class="form-section">
+                <h3 style="margin-top:0;">Search and Filters</h3>
+                <form method="GET">
+               <div style="display:flex;gap:25px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px;">
+<div style="flex:1.6;min-width:220px;max-width:500px;margin-right:10px;">
+                                    <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px;">Search (name /
+                                username / email)</label>
+                            <!-- query value pre-filled from GET parameter -->
+                            <input type="text" name="q" value="{{ query }}" placeholder="Search"
+    style="width:100%;padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
+                        </div>
+                        <div style="flex:0.5;min-width:120px;max-width:160px;margin-left:10px;">
+                            <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px;">Status</label>
+                            <select name="status"
+                                style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;">
+                                <option value="">All</option>
+                                <option value="active" {% if status_filter == "active" %}selected{% endif %}>Active
+                                </option>
+                                <option value="disabled" {% if status_filter == "disabled" %}selected{% endif %}>Disabled
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                   <button type="submit"
+style="
+background: #0A3D93;
+color: white;
+border: none;
+padding: 12px 22px;
+border-radius: 10px;
+font-size: 13px;
+font-weight: 600;
+cursor: pointer;
+"
+>
+Search
+</button>
+
+                    <!-- Clear resets all filters by navigating to the base URL -->
+                    <a href="{% url 'user_access_management' %}"
+style="border: 1px solid #0A3D93;
+    color: #0A3D93;
+    padding: 12px 22px;
+    border-radius: 10px;
+    background: white;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+"
+          >
+   Clear
+</a>
+                </form>
+            </div>
+
+            <!-- Users list table — shows all users matching the current filters -->
+            <div style="margin-top:20px;">
+                <h3>Users List</h3>
+                <table style="width:100%;border-collapse:collapse;">
+                    <thead>
+<tr style="background:#1e3a8a;color:white;text-align:left;border-radius:10px;">                            <th style="padding:10px;">Name</th>
+                            <th style="padding:10px;">Username</th>
+                            <th style="padding:10px;">Email</th>
+                            <th style="padding:10px;">Status</th>
+                            <th style="padding:10px;">Admin?</th>
+                            <th style="padding:10px;">Select</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Loop through all users passed from the view -->
+                        {% for u in users %}
+                        <!-- Highlight the row if this user is currently selected -->
+                        <tr style="border-bottom:1px solid #e5e7eb;" {% if selected_user.id == u.id %}class="selected-highlight"{% endif %}>
+                            <td style="padding:10px;">{{ u.get_full_name|default:u.username }}</td>
+                            <td style="padding:10px;">{{ u.username }}</td>
+                            <td style="padding:10px;">{{ u.email|default:"—" }}</td>
+                            <td style="padding:10px;">
+                                <!-- Status badge — uses CSS class instead of inline Django conditional -->
+                                <span class="{% if u.is_active %}status-active{% else %}status-disabled{% endif %}">
+                                    {% if u.is_active %}Active{% else %}Disabled{% endif %}
+                                </span>
+                            </td>
+                            <td style="padding:10px;">
+                                <!-- Admin badge — uses CSS class instead of inline Django conditional -->
+                                <span class="{% if u.is_staff %}role-admin{% else %}role-standard{% endif %}">
+                                    {% if u.is_staff %}Yes{% else %}No{% endif %}
+                                </span>
+                            </td>
+                            <td style="padding:10px;">
+                                <!-- Select button passes the user ID as a GET parameter to show the detail panel -->
+                                <a href="?selected_user={{ u.id }}&q={{ query }}&status={{ status_filter }}#user-detail"
+                                   class="btn btn-primary">Select</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <!-- Shown when no users match the current filters -->
+                        <tr>
+                            <td colspan="6" style="padding:15px;text-align:center;color:#6b7280;">No users found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Selected user detail panel — only shown when a user has been selected -->
+            {% if selected_user %}
+            <div class="form-section" id="user-detail">
+                <h3 style="margin-top:0;">Selected User: {{ selected_user.get_full_name|default:selected_user.username
+                    }}</h3>
+
+                <!-- User details grid — displays key account information -->
+                <div class="detail-grid">
+                    <div class="detail-item"><label>Name</label><span>{{ selected_user.get_full_name|default:"—"
+                            }}</span></div>
+                    <div class="detail-item"><label>Username</label><span>{{ selected_user.username }}</span></div>
+                    <div class="detail-item"><label>Email</label><span>{{ selected_user.email|default:"—" }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Status</label>
+                        <span class="{% if selected_user.is_active %}status-active{% else %}status-disabled{% endif %}">
+                            {% if selected_user.is_active %}Active{% else %}Disabled{% endif %}
+                        </span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Role</label>
+                        <span class="{% if selected_user.is_staff %}role-admin{% else %}role-standard{% endif %}">
+                            {% if selected_user.is_staff %}Admin{% else %}Standard{% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Action buttons — each submits its own POST form to avoid conflicts -->
+                <div class="action-group">
+
+                    <!-- Activate or Disable button depending on current account status -->
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="user_id" value="{{ selected_user.id }}">
+                        {% if selected_user.is_active %}
+                        <!-- Show Disable button if user is currently active -->
+                        <input type="hidden" name="action" value="disable">
+                        <button type="submit" class="btn btn-danger"
+                            onclick="return confirm('Disable {{ selected_user.username }}?')">Disable</button>
+                        {% else %}
+                        <!-- Show Activate button if user is currently disabled -->
+                        <input type="hidden" name="action" value="activate">
+                        <button type="submit" class="btn btn-success">Activate</button>
+                        {% endif %}
+                    </form>
+
+                    <!-- Grant or Revoke Admin button depending on current role -->
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="user_id" value="{{ selected_user.id }}">
+                        {% if selected_user.is_staff %}
+                        <!-- Show Revoke Admin button if user currently has admin rights -->
+                        <input type="hidden" name="action" value="revoke_admin">
+                        <button type="submit" class="btn btn-warning"
+                            onclick="return confirm('Revoke admin rights from {{ selected_user.username }}?')">Revoke
+                            Admin</button>
+                        {% else %}
+                        <!-- Show Grant Admin button if user does not have admin rights -->
+                        <input type="hidden" name="action" value="grant_admin">
+                        <button type="submit" class="btn btn-primary">Grant Admin</button>
+                        {% endif %}
+                    </form>
+
+                    <!-- Reset password — triggers Django's built-in password reset email -->
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="user_id" value="{{ selected_user.id }}">
+                        <input type="hidden" name="action" value="reset_password">
+                        <button type="submit" class="btn btn-secondary"
+                            onclick="return confirm('Send password reset email to {{ selected_user.email }}?')">Reset
+                            Password</button>
+                    </form>
+                </div>
+
+                <!-- Account history — shows recent audit log entries -->
+                <div style="margin-top:20px;">
+                    <h4 style="margin-bottom:10px;">Account History</h4>
+                    {% if audit_entries %}
+                    <ul class="audit-list">
+                        <!-- Loop through audit entries passed from the view -->
+                        {% for entry in audit_entries %}
+                        <li>{{ entry.timestamp|date:"d/m/Y H:i" }} — {{ entry.user.username|default:"System" }} — {{
+                            entry.details }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p style="color:#6b7280;font-size:13px;">No history yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <!-- Placeholder shown when no user has been selected yet -->
+            <div class="form-section" id="user-detail" style="color:#6b7280;text-align:center;">
+                <p>Select a user from the table above to view details and manage their access.</p>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <footer>
+        © 2026 LOGOSKY • Privacy • Terms • Contact
+    </footer>
+
+</body>
+
+</html> 

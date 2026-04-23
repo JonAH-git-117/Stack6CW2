@@ -1,0 +1,493 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Meeting Scheduler</title>
+    <!-- Main shared stylesheet — consistent across all pages -->
+    <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=202">
+    <!-- Schedule-specific styles for calendar, form and week navigation -->
+    <link rel="stylesheet" href="{% static 'teams/schedule_meeting.css' %}?v=9">
+</head>
+
+<body>
+
+    <!-- Top navigation bar — consistent across all pages -->
+    <div class="topbar">
+        <div class="logo">
+            <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo" style="height:75px; width:auto; border:3px">
+            <p>Engineering Team Directory</p>
+        </div>
+        <div class="top-actions">
+            <input class="top-search" placeholder="Search directory...">
+            <a href="/accounts/profile/{{ request.user.username }}/" class="profile-btn">View Public Profile</a>
+            <!-- User menu dropdown — shows profile/logout options when clicked -->
+            <div class="user-menu">
+                <div class="user-circle" onclick="toggleMenu()">
+                    <!-- Display initials — first letter of first and last name -->
+                    {% if request.user.first_name %}
+                    {{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}
+                    {% else %}
+                    {{ request.user.username|slice:":2"|upper }}
+                    {% endif %}
+                </div>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    {% if request.user.is_authenticated %}
+                    <a href="/accounts/profile/{{ request.user.username }}/">Profile</a>
+                    <a href="/accounts/update-profile/">Update Profile</a>
+                    <a href="/accounts/change-password/">Change Password</a>
+                    <a href="/accounts/logout/">Logout</a>
+                    {% else %}
+                    <a href="/accounts/login/">Login</a>
+                    <a href="/accounts/signup/">Sign Up</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="layout">
+
+        <!-- Sidebar navigation — consistent across all pages -->
+        <div class="sidebar">
+            <ul class="nav">
+                <li onclick="window.location.href='/teams/dashboard/'"><span class="icon">D</span>Dashboard</li>
+                <li onclick="window.location.href='/teams/'"><span class="icon">T</span>Teams</li>
+                <li><span class="icon">O</span>Organisations</li>
+                <li><span class="icon">M</span>Messages</li>
+                <!-- Schedule is the active page -->
+                <li class="active"><span class="icon">S</span>Schedule</li>
+                <li onclick="window.location.href='/reports/'"><span class="icon">R</span>Reports</li>
+                <li onclick="window.location.href='/visualisation/'"><span class="icon">V</span>Visualisation</li>
+                <li onclick="window.location.href='/accounts/profile/{{ request.user.username }}/'"><span
+                        class="icon">P</span>Profile</li>
+            </ul>
+
+            <!-- Admin section only shown to staff users -->
+            {% if request.user.is_staff %}
+            <p class="admin-label">ADMIN</p>
+            <ul class="nav">
+                <li onclick="window.location.href='/admin/teams/team/admin-dashboard/'"><span
+                        class="icon">AD</span>Admin Dashboard</li>
+                <li onclick="window.location.href='/teams/admin/team-management/'"><span class="icon">TM</span>Team
+                    Management</li>
+                <li onclick="window.location.href='/teams/admin/user-access/'"><span class="icon">UA</span>User Access
+                </li>
+            </ul>
+            {% endif %}
+        </div>
+
+        <div class="content">
+
+            <h1>Meeting Scheduler</h1>
+
+            <!-- CALENDAR CARD
+                 Displays a monthly or weekly view of meetings.
+                 Meetings are loaded from the DB via meetings_json passed by the view.
+                 Monthly view shows all weeks; weekly view shows one week at a time
+                 with prev/next arrows to navigate between weeks in the selected month. -->
+            <div class="card calendar-card">
+                <div class="calendar-controls">
+                    <!-- viewMode dropdown — onchange triggers immediate re-render -->
+                    <select id="viewMode" onchange="onViewModeChange()">
+                        <option value="month">Monthly</option>
+                        <option value="week">Weekly</option>
+                    </select>
+                    <!-- Month and year dropdowns — populated by JavaScript on page load -->
+                    <select id="month"></select>
+                    <select id="year"></select>
+                    <!-- Apply button — re-renders calendar for selected month/year -->
+                    <button onclick="renderCalendar()" class="btn-apply">Apply</button>
+                </div>
+
+                <!-- Week navigation — only visible in weekly view
+                     Shows the current week label and prev/next buttons -->
+                <div id="weekNav" style="display:none; align-items:center; gap:15px; margin-bottom:10px;">
+                    <button onclick="prevWeek()" class="btn-apply">&laquo; Prev</button>
+                    <span id="weekLabel" style="font-weight:600; font-size:14px;"></span>
+                    <button onclick="nextWeek()" class="btn-apply">Next &raquo;</button>
+                </div>
+
+                <table class="calendar">
+                    <thead>
+                        <tr>
+                            <th>Mon</th>
+                            <th>Tue</th>
+                            <th>Wed</th>
+                            <th>Thu</th>
+                            <th>Fri</th>
+                            <th class="weekend">Sat</th>
+                            <th class="weekend">Sun</th>
+                        </tr>
+                    </thead>
+                    <!-- Calendar body is populated by JavaScript renderCalendar() -->
+                    <tbody id="calendarBody"></tbody>
+                </table>
+            </div>
+
+            <!-- UPCOMING MEETINGS CARD
+                 Pulls from DB via Django context — capped at 10 in the view.
+                 Shows title, date/time, platform, team and organiser for each meeting.
+                 Uses get_platform_display to show human-readable platform name. -->
+            <div class="card">
+                <h3>Upcoming Meetings</h3>
+                {% if upcoming_meetings %}
+                <table class="members-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Date &amp; Time</th>
+                            <th>Platform</th>
+                            <th>Team</th>
+                            <th>Organiser</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Loop through upcoming meetings passed from the view -->
+                        {% for meeting in upcoming_meetings %}
+                        <tr>
+                            <td>{{ meeting.title }}</td>
+                            <!-- date filter formats the datetime to "24 Apr 2026, 11:30" -->
+                            <td>{{ meeting.scheduled_at|date:"d M Y, H:i" }}</td>
+                            <!-- get_platform_display returns the human-readable choice label -->
+                            <td>{{ meeting.get_platform_display }}</td>
+                            <!-- default filter shows "—" if no team is assigned -->
+                            <td>{{ meeting.team.name|default:"—" }}</td>
+                            <!-- default filter falls back to username if full name is empty -->
+                            <td>{{ meeting.organiser.get_full_name|default:meeting.organiser.username }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="muted-text">No upcoming meetings scheduled.</p>
+                {% endif %}
+            </div>
+
+            <!-- SCHEDULE MEETING FORM
+                 POST form — submits to the schedule_meeting view in teams/views.py.
+                 The view creates a Meeting object and saves attendees via ManyToMany.
+                 csrf_token is required for all POST forms in Django. -->
+            <div class="card form-card" id="scheduleForm">
+                <h3>Schedule a Meeting</h3>
+
+                <!-- Django messages framework — shows success/error after form submission -->
+                {% if messages %}
+                {% for message in messages %}
+                <div style="padding:10px 15px; margin-bottom:15px; background:#d1fae5; color:#065f46; border-radius:8px; border:1px solid #6ee7b7;">
+                    {{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
+
+                <form method="POST" class="meeting-form">
+                    {% csrf_token %}
+
+                    <label>Meeting Title</label>
+                    <input name="title" type="text" required>
+
+                    <!-- Team dropdown — populated from DB via teams context variable.
+                         Selecting a team filters the participants list via JavaScript. -->
+                    <label>Team</label>
+                    <select name="team" id="teamSelect">
+                        <option value="">-- Select Team (optional) --</option>
+                        {% for team in teams %}
+                        <option value="{{ team.id }}">{{ team.name }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <label>Date</label>
+                    <input id="date" name="date" type="date" required>
+
+                    <div class="two-col">
+                        <div>
+                            <label>Start Time</label>
+                            <!-- Combined with date in the view using parse_datetime() -->
+                            <input name="time" type="time" required>
+                        </div>
+                        <div>
+                            <label>Platform</label>
+                            <!-- Platform choices come from Meeting.PLATFORM_CHOICES in models.py -->
+                            <select name="platform">
+                                {% for value, label in platforms %}
+                                <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Participants multi-select.
+                         When a team is selected, JavaScript filters this list to show
+                         only that team's members (from team_members_json).
+                         When no team is selected, all active users are shown (from all_users_json).
+                         Saved to Meeting.attendees ManyToMany field in the view. -->
+                    <label>Participants</label>
+                    <select name="attendees" id="attendeesSelect" multiple size="6">
+                        {% for user in users %}
+                        <option value="{{ user.id }}">
+                            {{ user.get_full_name|default:user.username }} ({{ user.email }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <small>Hold Ctrl / Cmd to select multiple. Select a team above to filter participants.</small>
+
+                    <label>Agenda</label>
+                    <textarea name="agenda"></textarea>
+
+                    <div class="buttons">
+                        <button type="submit" class="btn-primary">Save Meeting</button>
+                        <button type="reset" class="btn-outline">Clear</button>
+                        <a href="/teams/" class="btn-outline">Back to Team Directory</a>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>© 2026 LOGOSKY • Privacy • Terms • Contact</footer>
+
+    <!--
+        JSON data blocks — passed from schedule_meeting view in teams/views.py.
+        Using type="application/json" avoids JS linter errors with Django template tags.
+        Parsed in JavaScript using JSON.parse(element.textContent).
+    -->
+
+    <!-- All meetings from DB — used to display meetings on the calendar -->
+    <script id="meetings-data" type="application/json">{{ meetings_json|safe }}</script>
+
+    <!-- Team members lookup — maps team ID to list of members for participant filtering -->
+    <script id="team-members-data" type="application/json">{{ team_members_json|safe }}</script>
+
+    <!-- All active users — shown in participants when no team is selected -->
+    <script id="all-users-data" type="application/json">{{ all_users_json|safe }}</script>
+
+    <script>
+
+        // Parse all JSON data passed from the Django view
+        var meetings = JSON.parse(document.getElementById('meetings-data').textContent);
+        var teamMembers = JSON.parse(document.getElementById('team-members-data').textContent);
+        var allUsers = JSON.parse(document.getElementById('all-users-data').textContent);
+
+        // Calendar dropdown references
+        var monthSelect = document.getElementById("month");
+        var yearSelect = document.getElementById("year");
+
+        // Tracks the current week index (0 = first week) in weekly view
+        var currentWeekIndex = 0;
+
+        // Month names for dropdown and week label display
+        var monthNames = ["January", "February", "March", "April", "May", "June",
+                          "July", "August", "September", "October", "November", "December"];
+
+        // Populate month dropdown with month names
+        monthNames.forEach(function(m, i) {
+            var opt = document.createElement("option");
+            opt.value = i;
+            opt.text = m;
+            monthSelect.appendChild(opt);
+        });
+
+        // Populate year dropdown from 2024 to 2035
+        for (var y = 2024; y <= 2035; y++) {
+            var opt = document.createElement("option");
+            opt.value = y;
+            opt.text = y;
+            yearSelect.appendChild(opt);
+        }
+
+        // Set dropdowns to the current month and year on page load
+        monthSelect.value = new Date().getMonth();
+        yearSelect.value = new Date().getFullYear();
+
+        // buildWeeks — builds the full month grid as an array of week arrays.
+        // Each week contains 7 day numbers; 0 represents an empty cell.
+        // Example: [[0,0,1,2,3,4,5],[6,7,8,9,10,11,12],...]
+        function buildWeeks(month, year) {
+            var firstDay = new Date(year, month, 1).getDay();
+            var daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            // JS Sunday = 0, our grid starts Monday — convert to Mon=1...Sun=7
+            var startCol = firstDay === 0 ? 7 : firstDay;
+
+            var weeks = [];
+            var week = [];
+
+            // Fill empty cells before the 1st of the month
+            for (var e = 1; e < startCol; e++) {
+                week.push(0);
+            }
+
+            // Fill in each day of the month
+            for (var d = 1; d <= daysInMonth; d++) {
+                week.push(d);
+                // When a week row is full (7 days), push it and start a new one
+                if (week.length === 7) {
+                    weeks.push(week);
+                    week = [];
+                }
+            }
+
+            // Pad the final week with empty cells if needed
+            if (week.length > 0) {
+                while (week.length < 7) { week.push(0); }
+                weeks.push(week);
+            }
+
+            return weeks;
+        }
+
+        // renderWeekRow — creates a single table row for one week.
+        // Shows day numbers and any meetings from the DB on matching days.
+        function renderWeekRow(week, month, year) {
+            var calBody = document.getElementById("calendarBody");
+            var row = document.createElement("tr");
+
+            week.forEach(function(day, colIdx) {
+                var cell = document.createElement("td");
+
+                if (day > 0) {
+                    // Show the day number
+                    var dayDiv = document.createElement("div");
+                    dayDiv.className = "day";
+                    dayDiv.innerText = day;
+                    cell.appendChild(dayDiv);
+
+                    // Show any meetings on this day from the DB
+                    meetings.forEach(function(m) {
+                        if (m.day === day && m.month === month && m.year === year) {
+                            var mdiv = document.createElement("div");
+                            mdiv.className = "meeting";
+                            mdiv.innerHTML = '<span>' + m.title + '</span>';
+                            cell.appendChild(mdiv);
+                        }
+                    });
+                }
+
+                // Saturday = column 5, Sunday = column 6 (0-indexed)
+                if (colIdx === 5 || colIdx === 6) {
+                    cell.classList.add("weekend");
+                }
+
+                row.appendChild(cell);
+            });
+
+            calBody.appendChild(row);
+        }
+
+        // renderCalendar — main calendar render function.
+        // Called on page load, when Apply is clicked, and when view mode changes.
+        // Monthly view renders all weeks; weekly view renders one week at a time.
+        function renderCalendar() {
+            var month = Number(monthSelect.value);
+            var year = Number(yearSelect.value);
+            var viewMode = document.getElementById("viewMode").value;
+            var calBody = document.getElementById("calendarBody");
+            calBody.innerHTML = "";
+
+            var weeks = buildWeeks(month, year);
+
+            if (viewMode === 'month') {
+                // Monthly view — render every week row
+                weeks.forEach(function(week) {
+                    renderWeekRow(week, month, year);
+                });
+            } else {
+                // Weekly view — clamp currentWeekIndex to valid range
+                if (currentWeekIndex >= weeks.length) currentWeekIndex = weeks.length - 1;
+                if (currentWeekIndex < 0) currentWeekIndex = 0;
+
+                // Render only the current week row
+                renderWeekRow(weeks[currentWeekIndex], month, year);
+
+                // Update the week label above the calendar
+                updateWeekLabel(weeks, currentWeekIndex, month, year);
+            }
+        }
+
+        // updateWeekLabel — updates the "April 1 – 7, 2026 (Week 1 of 5)" label.
+        // Finds the first and last non-zero day in the current week array.
+        function updateWeekLabel(weeks, idx, month, year) {
+            var week = weeks[idx];
+            var firstDay = week.find(function(d) { return d > 0; });
+            var lastDay = week.slice().reverse().find(function(d) { return d > 0; });
+            var label = monthNames[month] + ' ' + firstDay + ' – ' + lastDay + ', ' + year +
+                        '  (Week ' + (idx + 1) + ' of ' + weeks.length + ')';
+            document.getElementById('weekLabel').textContent = label;
+        }
+
+        // onViewModeChange — called when Monthly/Weekly dropdown changes.
+        // Shows or hides the week navigation arrows and resets to week 1.
+        function onViewModeChange() {
+            var viewMode = document.getElementById("viewMode").value;
+            var weekNav = document.getElementById("weekNav");
+            // Show prev/next arrows only in weekly view
+            weekNav.style.display = (viewMode === 'week') ? 'flex' : 'none';
+            // Always start at the first week when switching to weekly view
+            currentWeekIndex = 0;
+            renderCalendar();
+        }
+
+        // prevWeek — moves to the previous week in the selected month.
+        // Stops at week 0 — cannot go before the first week of the month.
+        function prevWeek() {
+            if (currentWeekIndex > 0) {
+                currentWeekIndex--;
+                renderCalendar();
+            }
+        }
+
+        // nextWeek — moves to the next week in the selected month.
+        // Stops at the last week — cannot go beyond the last week of the month.
+        function nextWeek() {
+            var month = Number(monthSelect.value);
+            var year = Number(yearSelect.value);
+            var weeks = buildWeeks(month, year);
+            if (currentWeekIndex < weeks.length - 1) {
+                currentWeekIndex++;
+                renderCalendar();
+            }
+        }
+
+        // Initial calendar render on page load
+        renderCalendar();
+
+        // Team select event listener — filters participants dropdown.
+        // When a team is selected, only that team's members are shown.
+        // When no team is selected, all active users are shown.
+        // Uses team_members_json and all_users_json passed from the view.
+        document.getElementById('teamSelect').addEventListener('change', function() {
+            var teamId = this.value;
+            var attendeesSelect = document.getElementById('attendeesSelect');
+            attendeesSelect.innerHTML = '';
+
+            // Use team members if a valid team is selected, otherwise all users
+            var userList = (teamId && teamMembers[teamId]) ? teamMembers[teamId] : allUsers;
+
+            userList.forEach(function(user) {
+                var opt = document.createElement('option');
+                opt.value = user.id;
+                opt.text = user.name + (user.email ? ' (' + user.email + ')' : '');
+                attendeesSelect.appendChild(opt);
+            });
+        });
+
+        // toggleMenu — opens and closes the user dropdown menu
+        function toggleMenu() {
+            document.getElementById("dropdownMenu").classList.toggle("show");
+        }
+
+        // Close the dropdown menu when clicking anywhere outside the user menu
+        window.onclick = function(e) {
+            if (!e.target.closest('.user-menu')) {
+                document.querySelectorAll('.dropdown-menu').forEach(function(menu) {
+                    menu.classList.remove("show");
+                });
+            }
+        };
+
+    </script>
+
+</body>
+
+</html>

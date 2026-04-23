@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+<link rel="stylesheet" href="{% static 'teams/style.css' %}?v=202">
+<link rel="stylesheet" href="{% static 'teams/login.css' %}">
+</head>
+
+<body>
+
+<div class="topbar">
+    <div class="logo">
+    <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo"style="height:75px; width:auto; border:3px">
+        <p>Engineering Team Directory</p>
+    </div>
+</div>
+<div class="layout">
+
+    <div class="sidebar">
+      <ul class="nav">
+
+    <li class="active" onclick="location.href='/teams/'">
+        <div class="icon">T</div>
+        <span>Teams</span>
+    </li>
+
+    <li onclick="location.href='/accounts/logout/'">
+        <div class="icon">S</div>
+        <span>Sign Out</span>
+    </li>
+
+</ul>
+    </div>
+
+    <div class="content-center">
+
+        <div class="login-box">
+
+            <h1>Login</h1>
+            <p class="subtitle">Sign in to access your account</p>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="login-type">
+                    <p>Login Type</p>
+
+                    <label>
+                        <input type="radio" name="type" checked>
+                        Standard User
+                    </label>
+
+                    <label>
+                        <input type="radio" name="type">
+                        Admin
+                    </label>
+                </div>
+
+                <label>Username or Email</label>
+                <input type="text" name="username" placeholder="example@logosky.com">
+
+                <label>Password</label>
+                <input type="password" name="password">
+
+                <div class="buttons">
+                    <button type="submit" class="btn-primary">Log in</button>
+                    <a href="/" class="btn-outline">Cancel</a>
+                </div>
+            </form>
+
+            <a class="forgot" href="{% url 'password_reset' %}">
+                Forgot password?
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
