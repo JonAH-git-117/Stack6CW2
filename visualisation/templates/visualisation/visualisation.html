@@ -7,7 +7,7 @@
 <head>
     <title>Data Visualisation</title>
     {# Use the shared teams stylesheet to keep consistent styling across the app #}
-    <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=99">
+    <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=202">
     {# Bokeh's base JavaScript file — must be loaded before the chart scripts #}
     {# This file contains the core Bokeh rendering engine #}
     <script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.9.0.min.js" crossorigin="anonymous"></script>
@@ -24,24 +24,28 @@
     </div>
     <div class="top-actions">
         <input class="top-search" placeholder="Search directory...">
-        <a href="/accounts/update-profile/" class="profile-btn">View Public Profile</a>
+        <a href="/accounts/profile/{{ request.user.username }}/" class="profile-btn">View Public Profile</a>
+        {# User menu dropdown — shows profile/logout options when clicked #}
         <div class="user-menu">
-    <div class="user-circle" onclick="toggleMenu()">
-        {{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}
-    </div>
-
-    <div class="dropdown-menu" id="dropdownMenu">
-        {% if request.user.is_authenticated %}
-            <a href="/accounts/profile/{{ request.user.username }}/">Profile</a>
-            <a href="/accounts/update-profile/">Update Profile</a>
-            <a href="/accounts/change-password/">Change Password</a>
-            <a href="/accounts/logout/">Logout</a>
-        {% else %}
-            <a href="/accounts/login/">Login</a>
-            <a href="/accounts/signup/">Sign Up</a>
-        {% endif %}
-    </div>
-</div>
+            <div class="user-circle" onclick="toggleMenu()">
+                    {% if request.user.first_name %}
+                        {{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}
+                    {% else %}
+                        {{ request.user.username|slice:":2"|upper }}
+                    {% endif %}
+            </div>
+            <div class="dropdown-menu" id="dropdownMenu">
+                {% if request.user.is_authenticated %}
+                    <a href="/accounts/profile/{{ request.user.username }}/">Profile</a>
+                    <a href="/accounts/update-profile/">Update Profile</a>
+                    <a href="/accounts/change-password/">Change Password</a>
+                    <a href="/accounts/logout/">Logout</a>
+                {% else %}
+                    <a href="/accounts/login/">Login</a>
+                    <a href="/accounts/signup/">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 
@@ -50,9 +54,9 @@
     {# Sidebar Navigation #}
     <div class="sidebar">
         <ul class="nav">
-                  <li  onclick="window.location.href='/teams/dashboard/'">
-    <span class="icon">D</span>Dashboard
-</li>
+            <li onclick="window.location.href='/teams/dashboard/'">
+                <span class="icon">D</span>Dashboard
+            </li>
             <li onclick="window.location.href='/teams/'">
                 <span class="icon">T</span>Teams
             </li>
@@ -72,8 +76,8 @@
             <li class="active" onclick="window.location.href='/visualisation/'">
                 <span class="icon">V</span>Visualisation
             </li>
-            {# Added Profile link to match other pages #}
-            <li onclick="window.location.href='/accounts/update-profile/'">
+            {# Profile page — links to the logged-in user's profile page #}
+            <li onclick="window.location.href='/accounts/profile/{{ request.user.username }}/'">
                 <span class="icon">P</span>Profile
             </li>
         </ul>
@@ -82,9 +86,12 @@
         {% if request.user.is_staff %}
         <p class="admin-label">ADMIN</p>
         <ul class="nav">
-            <li><span class="icon">AD</span>Admin Dashboard</li>
-            <li><span class="icon">TM</span>Team Management</li>
-            <li><span class="icon">UA</span>User Access</li>
+            {# Admin Dashboard links to the Django admin custom dashboard page #}
+            <li onclick="window.location.href='/admin/teams/team/admin-dashboard/'"><span class="icon">AD</span>Admin Dashboard</li>
+            {# Team Management links to the custom team management page #}
+            <li onclick="window.location.href='/teams/admin/team-management/'"><span class="icon">TM</span>Team Management</li>
+            {# User Access links to the custom user access management page #}
+            <li onclick="window.location.href='/teams/admin/user-access/'"><span class="icon">UA</span>User Access</li>
         </ul>
         {% endif %}
     </div>
@@ -124,6 +131,8 @@
 {# |safe prevents Django from escaping the JavaScript #}
 {{ script1|safe }}
 {{ script2|safe }}
+
+{# Toggle menu script — closes dropdown when clicking outside #}
 <script>
 function toggleMenu() {
     document.getElementById("dropdownMenu").classList.toggle("show");
@@ -137,5 +146,7 @@ window.onclick = function(e) {
     }
 }
 </script>
+
 </body>
+
 </html>

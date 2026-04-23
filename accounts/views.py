@@ -1,6 +1,4 @@
-
-
-# Import render and redirect shortcuts
+# Import render, redirect and get_object_or_404 shortcuts
 from django.shortcuts import render, redirect, get_object_or_404
 # Import authentication functions - aliased to avoid naming conflicts
 # with our own login/logout view functions
@@ -15,9 +13,6 @@ from django.contrib import messages
 from .forms import CustomUserCreationForm, UserUpdateForm
 # Import Profile model to retrieve profile data for the view
 from .models import Profile
-
-from django.contrib.auth.decorators import login_required
-
 
 def signup(request):
     # Initialise an empty form for GET requests
@@ -36,8 +31,8 @@ def signup(request):
         'form': form,
     })
 
-
-def login_view(request):       # Initialise an empty authentication form for GET requests
+def login_view(request):
+    # Initialise an empty authentication form for GET requests
     form = AuthenticationForm()
     if request.method == 'POST':
         # Populate the form with the submitted POST data
@@ -63,7 +58,6 @@ def login_view(request):       # Initialise an empty authentication form for GET
         'form': form,
     })
 
-
 # Restrict this view to logged-in users only
 @login_required
 def logout(request):
@@ -71,7 +65,6 @@ def logout(request):
     auth_logout(request)
     # Redirect to home page after logout
     return redirect('home')
-
 
 # Restrict this view to logged-in users only
 # as shown in the django4 lecture slides
@@ -100,13 +93,15 @@ def update_profile(request):
         'user_form': user_form,
     })
 
-# Profile view page — read only display of user profile (profile_view)
+# Profile view page — read only display of user profile
+# Uses get_or_create to handle users who registered before
+# the Profile signal was added, preventing a DoesNotExist crash
 @login_required
 def profile_view(request, username):
-    # Retrieve the profile using the username from the URL
-    # as shown in the lecture slides
     from django.contrib.auth.models import User
+    # Retrieve the user by username or return 404 if not found
     user_obj = get_object_or_404(User, username=username)
+    # get_or_create returns the profile if it exists, or creates a blank one
     profile, created = Profile.objects.get_or_create(user=user_obj)
     # Render the profile template passing the profile as context
     return render(request, 'accounts/profile.html', {

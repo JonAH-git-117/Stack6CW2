@@ -1,27 +1,29 @@
-
-
-
-from django.contrib.auth.decorators import login_required
-from django.db.models import Count
-from django.shortcuts import render
-from django.http import HttpResponse
+import io
+import os
 
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment
 
-from teams.models import Department, Team
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.db.models import Count
+from django.http import FileResponse, HttpResponse
+from django.shortcuts import render
+from django.template.loader import render_to_string
+
+# from weasyprint import HTML, CSS
+
+from teams.models import Department, Organisation, Team
+
 
 
 @login_required
 def reports_dashboard(request):
-
     total_teams = Team.objects.count()
     total_departments = Department.objects.count()
-
     teams_without_manager = Team.objects.filter(
         manager__isnull=True
     ).select_related('department')
-
     active_teams = Team.objects.filter(status='active').count()
     disabled_teams = Team.objects.filter(status='disabled').count()
 
@@ -41,31 +43,58 @@ def reports_dashboard(request):
     return render(request, 'reports/reports_dashboard.html', context)
 
 
+#
+@login_required
+def generate_pdf(request):
+    return HttpResponse("PDF temporarily disabled (WeasyPrint not installed)")
+
+
+
 @login_required
 def generate_excel(request):
-
     workbook = openpyxl.Workbook()
-    sheet = workbook.active
-    sheet.title = "Teams"
 
-    header_font = Font(bold=True)
-    headers = ["Team", "Department", "Status"]
+    sheet1 = workbook.active
+    sheet1.title = 'All Teams'
+
+    header_font = Font(bold=True, color='FFFFFF')
+    header_fill = PatternFill('solid', fgColor='1e3a8a')
+    center = Alignment(horizontal='center')
+
+    headers = ['Team Name', 'Department', 'Organisation', 'Manager', 'Status', 'Members']
 
     for col, header in enumerate(headers, 1):
-        cell = sheet.cell(row=1, column=col, value=header)
+        cell = sheet1.cell(row=1, column=col, value=header)
         cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = center
 
-    teams = Team.objects.select_related('department')
+    teams = Team.objects.select_related(
+        'department',
+        'department__organisation',
+        'manager'
+    ).prefetch_related('members')
 
     for row, team in enumerate(teams, 2):
-        sheet.cell(row=row, column=1, value=team.name)
-        sheet.cell(row=row, column=2, value=team.department.department_name)
-        sheet.cell(row=row, column=3, value=team.get_status_display())
+        manager_name = (
+            team.manager.get_full_name() or team.manager.username
+            if team.manager else 'No Manager'
+        )
+
+        sheet1.cell(row=row, column=1, value=team.name)
+        sheet1.cell(row=row, column=2, value=team.department.department_name)
+        sheet1.cell(row=row, column=3, value=team.department.organisation.organisation_name)
+        sheet1.cell(row=row, column=4, value=manager_name)
+        sheet1.cell(row=row, column=5, value=team.get_status_display())
+        sheet1.cell(row=row, column=6, value=team.members.count())
+
+    for col in sheet1.columns:
+        sheet1.column_dimensions[col[0].column_letter].width = 22
 
     response = HttpResponse(
         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
-    response['Content-Disposition'] = 'attachment; filename="report.xlsx"'
+    response['Content-Disposition'] = 'attachment; filename="sky_teams_report.xlsx"'
 
     workbook.save(response)
     return response

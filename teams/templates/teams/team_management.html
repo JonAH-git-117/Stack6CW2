@@ -1,0 +1,363 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Management — Admin</title>
+    <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=202">
+    <style>
+        /* Card-style container for form sections */
+        .form-section {
+            background: #f8f9ff;
+            border: 1px solid #dde3f0;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        /* Flexbox row for grouping form fields side by side */
+        .form-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .form-row label {
+            display: block;
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .form-row input,
+        .form-row select,
+        .form-row textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        /* Each field takes equal space in the row */
+        .form-row .field {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .form-row textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        /* Base button styles */
+        .btn {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #1e3a8a;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 12px;
+        }
+
+        /* Highlights the selected team row in the table */
+        .selected-highlight {
+            background: #eff6ff !important;
+        }
+
+        /* Audit trail list styling */
+        .audit-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .audit-list li {
+            padding: 6px 0;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 13px;
+            color: #4b5563;
+        }
+
+        /* Message alert styles */
+        .msg-success {
+            background: #d1fae5;
+            border: 1px solid #6ee7b7;
+            color: #065f46;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .msg-error {
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        /* Status badge styles */
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .status-disabled {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="topbar">
+        <div class="logo">
+            <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo" style="height:75px; width:auto;">
+            <p>Engineering Team Directory</p>
+        </div>
+        <div class="top-actions">
+            <input class="top-search" placeholder="Search directory...">
+            <a href="/accounts/profile/{{ request.user.username }}/" class="profile-btn">View Public Profile</a>
+            <div class="user-circle">{{ request.user.username|slice:":2"|upper }}</div>
+        </div>
+    </div>
+
+    <div class="layout">
+
+        <div class="sidebar">
+            <ul class="nav">
+                <li onclick="window.location.href='/teams/dashboard/'"><span class="icon">D</span>Dashboard</li>
+                <li onclick="window.location.href='/teams/'"><span class="icon">T</span>Teams</li>
+                <li><span class="icon">O</span>Organisations</li>
+                <li><span class="icon">M</span>Messages</li>
+                <li onclick="window.location.href='/teams/schedule-meeting/'"><span class="icon">S</span>Schedule</li>
+                <li onclick="window.location.href='/reports/'"><span class="icon">R</span>Reports</li>
+                <li onclick="window.location.href='/visualisation/'"><span class="icon">V</span>Visualisation</li>
+                <li onclick="window.location.href='/accounts/profile/{{ request.user.username }}/'"><span class="icon">P</span>Profile</li>
+            </ul>
+            {% if request.user.is_staff %}
+            <p class="admin-label">ADMIN</p>
+            <ul class="nav">
+                <li onclick="window.location.href='/admin/teams/team/admin-dashboard/'"><span class="icon">AD</span>Admin Dashboard</li>
+                <li class="active"><span class="icon">TM</span>Team Management</li>
+                <li onclick="window.location.href='/teams/admin/user-access/'"><span class="icon">UA</span>User Access</li>
+            </ul>
+            {% endif %}
+        </div>
+
+        <div class="content">
+            <h1>Team Management</h1>
+            <p class="subtitle">Create, edit and delete teams</p>
+
+            {% if messages %}
+            <div style="margin-bottom:15px;">
+                {% for message in messages %}
+                <div class="{% if message.tags == 'error' %}msg-error{% else %}msg-success{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="background:#f0f4ff;border:1px solid #c7d2fe;border-radius:8px;padding:12px 16px;margin-bottom:20px;color:#3730a3;font-size:13px;">
+                Examples: team saved / validation error / deletion confirmation
+            </div>
+            {% endif %}
+
+            <div class="form-section">
+                <h3 style="margin-top:0;">Search / Filter Teams</h3>
+                <form method="GET">
+                    <div class="form-row">
+                        <div class="field">
+                            <label>Search (team / department / manager)</label>
+                            <input type="text" name="q" value="{{ query }}" placeholder="Type keywords">
+                        </div>
+                        <div class="field">
+                            <label>Department</label>
+                            <select name="department">
+                                <option value="">All</option>
+                                {% for dept in departments %}
+                                <option value="{{ dept.id }}" {% if department_filter == dept.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ dept.department_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Status</label>
+                            <select name="status">
+                                <option value="">All</option>
+                                <option value="active" {% if status_filter == "active" %}selected{% endif %}>Active</option>
+                                <option value="disabled" {% if status_filter == "disabled" %}selected{% endif %}>Disabled</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Search</button>
+                    <a href="{% url 'team_management' %}" class="btn btn-secondary" style="margin-left:8px;">Clear</a>
+                    <a href="{% url 'team_management' %}#create-form" class="btn btn-primary" style="margin-left:8px;">Add New Team</a>
+                </form>
+            </div>
+
+            <div style="margin-top:20px;">
+                <h3>Teams List</h3>
+                <table style="width:100%;border-collapse:collapse;">
+                    <thead>
+                        <tr style="background:#1e3a8a;color:white;text-align:left;">
+                            <th style="padding:10px;">Team</th>
+                            <th style="padding:10px;">Department</th>
+                            <th style="padding:10px;">Manager</th>
+                            <th style="padding:10px;">Status</th>
+                            <th style="padding:10px;">Select</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for team in teams %}
+                        <tr style="border-bottom:1px solid #e5e7eb;" {% if selected_team.id == team.id %}class="selected-highlight"{% endif %}>
+                            <td style="padding:10px;">{{ team.name }}</td>
+                            <td style="padding:10px;">{{ team.department.department_name|default:"—" }}</td>
+                            <td style="padding:10px;">{{ team.manager.get_full_name|default:team.manager.username|default:"Not assigned" }}</td>
+                            <td style="padding:10px;">
+                                <span class="{% if team.status == 'active' %}status-active{% else %}status-disabled{% endif %}">
+                                    {{ team.status|capfirst }}
+                                </span>
+                            </td>
+                            <td style="padding:10px;">
+                                <a href="?selected_team={{ team.id }}&q={{ query }}&department={{ department_filter }}&status={{ status_filter }}#create-form"
+                                    class="btn btn-sm btn-primary">Select</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" style="padding:15px;text-align:center;color:#6b7280;">No teams found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="form-section" id="create-form">
+                <h3 style="margin-top:0;">
+                    {% if selected_team %}Edit Team: {{ selected_team.name }}{% else %}Create New Team{% endif %}
+                </h3>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="save">
+                    {% if selected_team %}
+                    <input type="hidden" name="team_id" value="{{ selected_team.id }}">
+                    {% endif %}
+
+                    <div class="form-row">
+                        <div class="field">
+                            <label>Team Name</label>
+                            <input type="text" name="name" value="{{ selected_team.name|default:'' }}" placeholder="Team name" required>
+                        </div>
+                        <div class="field">
+                            <label>Department</label>
+                            <select name="department">
+                                <option value="">— Select Department —</option>
+                                {% for dept in departments %}
+                                <option value="{{ dept.id }}" {% if selected_team.department.id == dept.id %}selected{% endif %}>
+                                    {{ dept.department_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Status</label>
+                            <select name="status">
+                                <option value="active" {% if selected_team.status == "active" %}selected{% endif %}>Active</option>
+                                <option value="disabled" {% if selected_team.status == "disabled" %}selected{% endif %}>Disabled</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="field">
+                            <label>Manager</label>
+                            <select name="manager">
+                                <option value="">— No Manager —</option>
+                                {% for mgr in managers %}
+                                <option value="{{ mgr.id }}" {% if selected_team.manager.id == mgr.id %}selected{% endif %}>
+                                    {{ mgr.get_full_name|default:mgr.username }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="field" style="flex:2;">
+                            <label>Description</label>
+                            <textarea name="description" placeholder="Team description">{{ selected_team.description|default:'' }}</textarea>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:10px;display:flex;gap:10px;align-items:center;">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <a href="{% url 'team_management' %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+
+                {% if selected_team %}
+                <form method="POST" style="margin-top:10px;" onsubmit="return confirm('Are you sure you want to delete {{ selected_team.name }}?');">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="team_id" value="{{ selected_team.id }}">
+                    <button type="submit" class="btn btn-danger">Delete Team</button>
+                </form>
+                {% endif %}
+            </div>
+
+            <div class="form-section" style="margin-top:20px;">
+                <h3 style="margin-top:0;">Audit Trail</h3>
+                {% if audit_entries %}
+                <ul class="audit-list">
+                    {% for entry in audit_entries %}
+                    <li>{{ entry.timestamp|date:"d/m/Y H:i" }} — {{ entry.user.username|default:"System" }} — {{ entry.details }}</li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p style="color:#6b7280;font-size:13px;">No audit entries yet.</p>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        © 2026 LOGOSKY • Privacy • Terms • Contact
+    </footer>
+
+</body>
+</html>

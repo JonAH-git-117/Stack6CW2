@@ -1,0 +1,31 @@
+{% extends 'admin/base_site.html' %}
+
+{% block content %}
+<h2>Admin Overview</h2>
+
+<div class="system-message" style="margin-bottom:20px; color:#666;">
+    Admin alerts and permission warnings will appear here.
+</div>
+
+<h3>Admin Quick Links</h3>
+<p><a href="{% url 'admin:teams_team_changelist' %}">Team Management</a></p>
+<p><a href="{% url 'admin:auth_user_changelist' %}">User Access Management</a></p>
+
+<h3>Summary</h3>
+<div style="display:flex; gap:30px; margin:20px 0;">
+    <div><strong>Total Teams:</strong> {{ total_teams }}</div>
+    <div><strong>Total Users:</strong> {{ total_users }}</div>
+    <div><strong>Disabled Users:</strong> {{ disabled_users }}</div>
+</div>
+
+<h3>Recent Audit Trail</h3>
+<ul>
+{% for log in recent_audit %}
+    <li>{{ log }}</li>
+{% empty %}
+    <li>No audit entries yet.</li>
+{% endfor %}
+</ul>
+
+<p><a href="#">View full audit log</a></p>
+{% endblock %}
