@@ -9,6 +9,19 @@
     <!-- Load the shared site stylesheet from the teams static folder -->
     <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=202">
     <style>
+
+        table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+thead tr th:first-child {
+    border-top-left-radius: 10px;
+}
+
+thead tr th:last-child {
+    border-top-right-radius: 10px;
+}
         /* Card-style container for form sections */
         .form-section {
             background: #f8f9ff;
@@ -19,13 +32,15 @@
         }
 
         /* Base button styles */
-        .btn {
-            padding: 8px 18px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-        }
+       .btn {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: none;   
+    display: inline-block;   
+}
 
         .btn-primary {
             background: #1e3a8a;
@@ -231,15 +246,15 @@
             <div class="form-section">
                 <h3 style="margin-top:0;">Search and Filters</h3>
                 <form method="GET">
-                    <div style="display:flex;gap:15px;flex-wrap:wrap;margin-bottom:12px;">
-                        <div style="flex:2;min-width:200px;">
-                            <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px;">Search (name /
+               <div style="display:flex;gap:25px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px;">
+<div style="flex:1.6;min-width:220px;max-width:500px;margin-right:10px;">
+                                    <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px;">Search (name /
                                 username / email)</label>
                             <!-- query value pre-filled from GET parameter -->
-                            <input type="text" name="q" value="{{ query }}" placeholder="Type keywords"
-                                style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;">
+                            <input type="text" name="q" value="{{ query }}" placeholder="Search"
+    style="width:100%;padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
                         </div>
-                        <div style="flex:1;min-width:150px;">
+                        <div style="flex:0.5;min-width:120px;max-width:160px;margin-left:10px;">
                             <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px;">Status</label>
                             <select name="status"
                                 style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;">
@@ -251,10 +266,38 @@
                             </select>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Search</button>
+                   <button type="submit"
+style="
+background: #0A3D93;
+color: white;
+border: none;
+padding: 12px 22px;
+border-radius: 10px;
+font-size: 13px;
+font-weight: 600;
+cursor: pointer;
+"
+>
+Search
+</button>
+
                     <!-- Clear resets all filters by navigating to the base URL -->
-                    <a href="{% url 'user_access_management' %}" class="btn btn-secondary"
-                        style="margin-left:8px;">Clear</a>
+                    <a href="{% url 'user_access_management' %}"
+style="border: 1px solid #0A3D93;
+    color: #0A3D93;
+    padding: 12px 22px;
+    border-radius: 10px;
+    background: white;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+"
+          >
+   Clear
+</a>
                 </form>
             </div>
 
@@ -263,8 +306,7 @@
                 <h3>Users List</h3>
                 <table style="width:100%;border-collapse:collapse;">
                     <thead>
-                        <tr style="background:#1e3a8a;color:white;text-align:left;">
-                            <th style="padding:10px;">Name</th>
+<tr style="background:#1e3a8a;color:white;text-align:left;border-radius:10px;">                            <th style="padding:10px;">Name</th>
                             <th style="padding:10px;">Username</th>
                             <th style="padding:10px;">Email</th>
                             <th style="padding:10px;">Status</th>
@@ -295,7 +337,7 @@
                             <td style="padding:10px;">
                                 <!-- Select button passes the user ID as a GET parameter to show the detail panel -->
                                 <a href="?selected_user={{ u.id }}&q={{ query }}&status={{ status_filter }}#user-detail"
-                                    class="btn btn-sm btn-primary">Select</a>
+                                   class="btn btn-primary">Select</a>
                             </td>
                         </tr>
                         {% empty %}
@@ -311,11 +353,13 @@
             <!-- Selected user detail panel — only shown when a user has been selected -->
             {% if selected_user %}
             <div class="form-section" id="user-detail">
-                <h3 style="margin-top:0;">Selected User: {{ selected_user.get_full_name|default:selected_user.username }}</h3>
+                <h3 style="margin-top:0;">Selected User: {{ selected_user.get_full_name|default:selected_user.username
+                    }}</h3>
 
                 <!-- User details grid — displays key account information -->
                 <div class="detail-grid">
-                    <div class="detail-item"><label>Name</label><span>{{ selected_user.get_full_name|default:"—" }}</span></div>
+                    <div class="detail-item"><label>Name</label><span>{{ selected_user.get_full_name|default:"—"
+                            }}</span></div>
                     <div class="detail-item"><label>Username</label><span>{{ selected_user.username }}</span></div>
                     <div class="detail-item"><label>Email</label><span>{{ selected_user.email|default:"—" }}</span>
                     </div>
@@ -387,7 +431,8 @@
                     <ul class="audit-list">
                         <!-- Loop through audit entries passed from the view -->
                         {% for entry in audit_entries %}
-                        <li>{{ entry.timestamp|date:"d/m/Y H:i" }} — {{ entry.user.username|default:"System" }} — {{ entry.details }}</li>
+                        <li>{{ entry.timestamp|date:"d/m/Y H:i" }} — {{ entry.user.username|default:"System" }} — {{
+                            entry.details }}</li>
                         {% endfor %}
                     </ul>
                     {% else %}
@@ -411,4 +456,4 @@
 
 </body>
 
-</html>
+</html> exactly what I should change to remove the under Leen and also make the button a bit bigger
