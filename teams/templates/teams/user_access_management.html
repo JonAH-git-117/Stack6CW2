@@ -231,15 +231,15 @@
             <div class="form-section">
                 <h3 style="margin-top:0;">Search and Filters</h3>
                 <form method="GET">
-                    <div style="display:flex;gap:15px;flex-wrap:wrap;margin-bottom:12px;">
-                        <div style="flex:2;min-width:200px;">
-                            <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px;">Search (name /
+               <div style="display:flex;gap:25px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px;">
+<div style="flex:1.6;min-width:220px;max-width:500px;margin-right:10px;">
+                                    <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px;">Search (name /
                                 username / email)</label>
                             <!-- query value pre-filled from GET parameter -->
-                            <input type="text" name="q" value="{{ query }}" placeholder="Type keywords"
-                                style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;">
+                            <input type="text" name="q" value="{{ query }}" placeholder="Search"
+    style="width:100%;padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
                         </div>
-                        <div style="flex:1;min-width:150px;">
+                        <div style="flex:0.5;min-width:120px;max-width:160px;margin-left:10px;">
                             <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:4px;">Status</label>
                             <select name="status"
                                 style="width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;">
@@ -251,10 +251,38 @@
                             </select>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Search</button>
+                   <button type="submit"
+style="
+background: #0A3D93;
+color: white;
+border: none;
+padding: 12px 22px;
+border-radius: 10px;
+font-size: 13px;
+font-weight: 600;
+cursor: pointer;
+"
+>
+Search
+</button>
+
                     <!-- Clear resets all filters by navigating to the base URL -->
-                    <a href="{% url 'user_access_management' %}" class="btn btn-secondary"
-                        style="margin-left:8px;">Clear</a>
+                    <a href="{% url 'user_access_management' %}"
+style="border: 1px solid #0A3D93;
+    color: #0A3D93;
+    padding: 12px 22px;
+    border-radius: 10px;
+    background: white;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+"
+          >
+   Clear
+</a>
                 </form>
             </div>
 
@@ -295,7 +323,16 @@
                             <td style="padding:10px;">
                                 <!-- Select button passes the user ID as a GET parameter to show the detail panel -->
                                 <a href="?selected_user={{ u.id }}&q={{ query }}&status={{ status_filter }}#user-detail"
-                                    class="btn btn-sm btn-primary">Select</a>
+   class="btn btn-primary"
+   style="
+   text-decoration: none;
+   padding: 8px 16px;
+   border-radius: 8px;
+   font-size: 13px;
+   display: inline-block;
+   ">
+   Select
+</a>
                             </td>
                         </tr>
                         {% empty %}
