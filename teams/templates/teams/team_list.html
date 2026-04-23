@@ -26,9 +26,9 @@
             <div class="user-menu">
                 <div class="user-circle" onclick="toggleMenu()">
                     {% if request.user.first_name %}
-                        {{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}
+                    {{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}
                     {% else %}
-                        {{ request.user.username|slice:":2"|upper }}
+                    {{ request.user.username|slice:":2"|upper }}
                     {% endif %}
                 </div>
                 <div class="dropdown-menu" id="dropdownMenu">
@@ -53,8 +53,8 @@
             <ul class="nav">
                 <!-- Dashboard link — no page built yet -->
                 <li onclick="window.location.href='/teams/dashboard/'">
-                <span class="icon">D</span>Dashboard
-            </li>
+                    <span class="icon">D</span>Dashboard
+                </li>
                 <!-- Teams directory — active page -->
                 <li class="active" onclick="window.location.href='/teams/'">
                     <span class="icon">T</span>Teams
@@ -114,46 +114,36 @@
                 <h3>Search and Filters</h3>
 
                 <form method="GET">
-                    <div class="filters">
-                        <!-- Keyword search input — pre-filled from GET parameter -->
-                        <input type="text" name="keyword" value="{{ keyword }}" placeholder="Type keywords">
+                <div class="filters">
+                    <!-- Keyword search input — pre-filled from GET parameter -->
+                    <input type="text" name="keyword" value="{{ keyword }}" placeholder="Type keywords">
 
-                        <!-- Department filter dropdown -->
-                        <select name="department">
-                            <option value="">All Departments</option>
-                            <option value="Engineering" {% if selected_department == "Engineering" %}selected{% endif %}>
-                                Engineering</option>
-                            <option value="Operations" {% if selected_department == "Operations" %}selected{% endif %}>
-                                Operations</option>
-                            <option value="Data" {% if selected_department == "Data" %}selected{% endif %}>Data</option>
-                        </select>
+                    <!-- Department filter dropdown — populated dynamically from the database -->
+                    <select name="department">
+                        <option value="">All Departments</option>
+                        {% for dept in departments %}<option value="{{ dept.department_name }}" {% if selected_department == dept.department_name %}selected{% endif %}>{{ dept.department_name }}</option>{% endfor %}
+                    </select>
 
-                        <!-- Manager filter dropdown -->
-                        <select name="manager">
-                            <option value="">All Managers</option>
-                            <option value="alex" {% if selected_manager == "alex" %}selected{% endif %}>alex</option>
-                            <option value="sara" {% if selected_manager == "sara" %}selected{% endif %}>sara</option>
-                            <option value="john" {% if selected_manager == "john" %}selected{% endif %}>john</option>
-                            <option value="michael" {% if selected_manager == "michael" %}selected{% endif %}>michael
-                            </option>
-                            <option value="emma" {% if selected_manager == "emma" %}selected{% endif %}>emma</option>
-                        </select>
+                    <!-- Manager filter dropdown — populated dynamically from the database -->
+                    <select name="manager">
+                        <option value="">All Managers</option>
+                        {% for mgr in managers %}<option value="{{ mgr.username }}" {% if selected_manager == mgr.username %}selected{% endif %}>{{ mgr.get_full_name|default:mgr.username }}</option>{% endfor %}
+                    </select>
 
-                        <!-- Status filter dropdown -->
-                        <select name="status">
-                            <option value="">All Status</option>
-                            <option value="active" {% if selected_status == "active" %}selected{% endif %}>Active</option>
-                            <option value="disabled" {% if selected_status == "disabled" %}selected{% endif %}>Disabled
-                            </option>
-                        </select>
-                    </div>
+                    <!-- Status filter dropdown -->
+                    <select name="status">
+                        <option value="">All Status</option>
+                        <option value="active" {% if selected_status == "active" %}selected{% endif %}>Active</option>
+                        <option value="disabled" {% if selected_status == "disabled" %}selected{% endif %}>Disabled</option>
+                    </select>
+                </div>
 
-                    <div class="buttons">
-                        <button class="btn-primary" type="submit">Search</button>
-                        <!-- Clear resets all filters by navigating to the base teams URL -->
-                        <a href="/teams/" class="btn-outline">Clear</a>
-                    </div>
-                </form>
+                <div class="buttons">
+                    <button class="btn-primary" type="submit">Search</button>
+                    <!-- Clear resets all filters by navigating to the base teams URL -->
+                    <a href="/teams/" class="btn-outline">Clear</a>
+                </div>
+            </form>
             </div>
 
             <div class="card">

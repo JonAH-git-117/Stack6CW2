@@ -1,37 +1,78 @@
-This project focuses on developing a web application for internal teams 
-at Sky Broadband to see what teams others are in.
+# Sky Engineering Team Directory
+## 5COSC021W Coursework 2 — Group 6
 
-    The project aims to improve our communication and skills with Python and Django.
+A Django web application for Sky's Engineering Department to manage and view internal engineering teams, departments, dependencies and more.
 
-    The project also is aimed at improving upon our web development skills, as both 
-    HTML and CSS are being utilised to improve upon the look of the webpages.
+## Group Members
+- Jonathan Chamberlain
+- Sedra Elawi
+- Ishaq Choudhury
+- Munsar Mahamed
+- Ahmed Morshed
+- Uthman Ali
 
-    If you see ImportError: Couldn't import Django or a SecurityError in PowerShell:
+## Features
+- Team directory with search and filters (department, manager, status)
+- Team detail pages (members, repositories, skills, dependencies)
+- Reports dashboard with PDF (WeasyPrint) and Excel (openpyxl) export
+- Data visualisation with Bokeh charts
+- User accounts (register, login, profile, update profile, change password)
+- Admin dashboard with team management, user access and audit trail
+- Django admin report generation for teams
 
-        Switch Terminal: In VS Code, click the + dropdown in the terminal and select Command Prompt.
+## Setup Instructions
 
-        Activate: Run Scripts\activate. You should see (Scripts) appear at the start of your command line.
+### First Time Setup
 
-        Unblock PowerShell (Optional): If you must use PowerShell, run the following commands in the terminal: 
-        - "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process" 
-        - ".\Scripts\activate"
+1. Open the `Stack6CW2` folder in VS Code
 
-    Iniital Steps for project setup
+2. If using PowerShell, run this first:
 
-        Open the `Stack6Cw2` folder in VS Code.
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
 
-        Run this in the VS Code terminal: "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process"
+3. Create a virtual environment (first time only, see troubleshooting for command):
 
-        Only do this one time when working on this for the first time to create a virtual environment: "python -m venv venv"
+4. Activate the virtual environment (You should see `(venv)` appear in your terminal.):
 
-        Activate Environment: ".\venv\Scripts\activate"
+.\venv\Scripts\activate
 
-        (Confirm you see `(venv)` in green text in your terminal)
+5. Install all dependencies:
 
-        Install Django & Requirements: "pip install -r requirements.txt"
+pip install -r requirements.txt
 
-        Sync Database: "python manage.py migrate"
+6. Apply database migrations:
 
-        Run Server: "python manage.py runserver"
+python manage.py migrate
 
-        Stop Sever: It will display a message in the terminal saying to press Ctrl + C to quit it
+7. Create a superuser (admin account):
+
+python manage.py createsuperuser
+
+8. Run the development server:
+
+python manage.py runserver
+
+9. Open your browser and go to `http://127.0.0.1:8000/`
+
+### Returning to the Project
+
+1. Activate the virtual environment:
+
+.\venv\Scripts\activate
+
+2. Run the server:
+
+python manage.py runserver
+
+### Stopping the Server
+
+Press `Ctrl + C` in the terminal.
+
+## Troubleshooting
+
+- **ImportError: Couldn't import Django** — make sure your virtual environment 
+  is activated (`.\venv\Scripts\activate`)
+- **SecurityError in PowerShell** — run `Set-ExecutionPolicy -ExecutionPolicy 
+  RemoteSigned -Scope Process` before activating
+- **Command Prompt alternative** — click the `+` dropdown in the VS Code 
+  terminal and select Command Prompt, then run `Scripts\activate`
