@@ -94,7 +94,7 @@
                     <label for="teamSwitch">Switch Team</label>
                     <select id="teamSwitch" onchange="switchTeam(this.value)">
                         {% for t in teams %}
-                        <option value="/teams/team/{{ t.id }}/" {% if t.id==team.id %}selected{% endif %}>
+                        <option value="/teams/team/{{ t.id }}/" {% if t.id == team.id %}selected{% endif %}>
                             {{ t.name }}
                         </option>
                         {% endfor %}
