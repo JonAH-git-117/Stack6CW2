@@ -1,5 +1,3 @@
-
-
 # Standard library imports
 import io
 import os
@@ -13,7 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.http import FileResponse, HttpResponse
 from django.shortcuts import render
-
+from django.template.loader import render_to_string
 
 # Models
 from teams.models import Department, Organisation, Team
@@ -50,12 +48,38 @@ def reports_dashboard(request):
 @login_required
 def generate_pdf(request):
     """
-    Temporary safe fallback — avoids WeasyPrint crash
+    Generates a PDF report of all teams and departments using WeasyPrint.
+    Renders the report.html template to an HTML string using render_to_string,
+    then converts it to PDF using WeasyPrint's HTML class.
+    Returns the PDF as a file download response.
+    As per lecture pattern — render template to string, convert to PDF, return FileResponse.
     """
-    return HttpResponse(
-        "PDF generation is temporarily disabled due to system configuration.",
-        content_type="text/plain"
-    )
+    from weasyprint import HTML, CSS
+
+    # Build the context — same data as the reports dashboard
+    html_string = render_to_string('reports/report.html', {
+        'teams': Team.objects.select_related(
+            'department',
+            'department__organisation',
+            'manager'
+        ).prefetch_related('members'),
+        'departments': Department.objects.annotate(
+            team_count=Count('teams')
+        ).select_related('organisation'),
+        'teams_without_manager': Team.objects.filter(
+            manager__isnull=True
+        ).select_related('department'),
+        'total_teams': Team.objects.count(),
+        'total_departments': Department.objects.count(),
+    })
+
+    # Convert HTML string to PDF using WeasyPrint
+    html = HTML(string=html_string, base_url=request.build_absolute_uri())
+    pdf = html.write_pdf()
+
+    # Return PDF as a downloadable file response
+    buffer = io.BytesIO(pdf)
+    return FileResponse(buffer, as_attachment=True, filename='sky_teams_report.pdf')
 
 
 @login_required

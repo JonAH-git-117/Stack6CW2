@@ -113,3 +113,15 @@ textarea {
 .form-card {
     max-width: 1000px;
 }
+
+.calendar-controls select {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    background: white;
+    font-size: 14px;
+    cursor: pointer;
+    min-width: 100px;
+    appearance: auto;
+    -webkit-appearance: auto;
+}
