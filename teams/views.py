@@ -17,6 +17,8 @@ from django.utils import timezone
 # Import models from the teams app
 from .models import Team, Department, AuditLog, Meeting
 
+import json
+from django.core.serializers.json import DjangoJSONEncoder
 
 # Dashboard view — displays upcoming meetings for the logged-in user
 @login_required
@@ -106,9 +108,102 @@ def team_detail(request, id):
 # Restrict this view to logged-in users only
 @login_required
 def schedule_meeting(request):
-    # Render the schedule meeting template
-    return render(request, 'teams/schedule_meeting.html')
+    """
+    Handles the schedule meeting page.
+    GET — renders the form with users, teams, existing meetings and upcoming meetings from DB.
+    POST — saves the meeting to the Meeting model and redirects back to schedule page.
+    As per lecture pattern: check request.method, create model object, redirect on success.
+    """
+    User = get_user_model()
 
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        date = request.POST.get('date')
+        time = request.POST.get('time')
+        platform = request.POST.get('platform')
+        team_id = request.POST.get('team')
+        attendee_ids = request.POST.getlist('attendees')
+        agenda = request.POST.get('agenda', '')
+
+        # Combine date and time into a single datetime for scheduled_at
+        from django.utils.dateparse import parse_datetime
+        scheduled_at = parse_datetime(f"{date}T{time}")
+
+        # Get the selected team if provided, otherwise None
+        team = get_object_or_404(Team, id=team_id) if team_id else None
+
+        # Create the meeting with the logged-in user as organiser
+        # Following lecture pattern: create model object with QuerySet API
+        meeting = Meeting.objects.create(
+            title=title,
+            organiser=request.user,
+            platform=platform,
+            scheduled_at=scheduled_at,
+            message=agenda,
+            team=team,
+        )
+
+        # Add selected attendees to the ManyToMany attendees field
+        if attendee_ids:
+            meeting.attendees.set(attendee_ids)
+
+        messages.success(request, f"Meeting '{title}' scheduled successfully.")
+        return redirect('schedule_meeting')
+
+    # Build meetings JSON for the calendar — all meetings from DB
+    db_meetings = Meeting.objects.all().values('id', 'title', 'scheduled_at')
+    meetings_json = json.dumps([
+        {
+            'id': m['id'],
+            'title': m['title'],
+            'day': m['scheduled_at'].day,
+            'month': m['scheduled_at'].month - 1,  # JS months are 0-indexed
+            'year': m['scheduled_at'].year,
+        }
+        for m in db_meetings
+    ], cls=DjangoJSONEncoder)
+
+    # Build team members JSON for participant filtering
+    # Maps team ID to list of member dicts {id, name, email}
+    teams_with_members = {}
+    for team in Team.objects.prefetch_related('members').all():
+        teams_with_members[str(team.id)] = [
+            {
+                'id': m.id,
+                'name': m.get_full_name() or m.username,
+                'email': m.email or '',
+            }
+            for m in team.members.all()
+        ]
+    team_members_json = json.dumps(teams_with_members, cls=DjangoJSONEncoder)
+
+    # Build all users JSON for when no team is selected
+    all_users = User.objects.filter(is_active=True)
+    all_users_json = json.dumps([
+        {
+            'id': u.id,
+            'name': u.get_full_name() or u.username,
+            'email': u.email or '',
+        }
+        for u in all_users
+    ], cls=DjangoJSONEncoder)
+
+    # Upcoming meetings — from now onwards, ordered by soonest first
+    # Show next 10 upcoming meetings ordered by soonest first
+    upcoming_meetings = Meeting.objects.filter(
+        scheduled_at__gte=timezone.now()
+    ).select_related('team', 'organiser').order_by('scheduled_at')[:10]
+
+    context = {
+        'users': all_users,
+        'teams': Team.objects.all(),
+        'platforms': Meeting.PLATFORM_CHOICES,
+        'meetings_json': meetings_json,
+        'team_members_json': team_members_json,
+        'all_users_json': all_users_json,
+        'upcoming_meetings': upcoming_meetings,
+    }
+    return render(request, 'teams/schedule_meeting.html', context)
 
 # Restrict this view to staff/admin users only
 # Uses @staff_member_required instead of @login_required
