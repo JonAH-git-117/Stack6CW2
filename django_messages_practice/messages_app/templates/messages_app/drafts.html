@@ -13,8 +13,35 @@
 
 <div class="topbar">
     <div class="logo">
-        <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo" style="height:75px;">
+        <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo" style="height:75px; width:auto; border:3px">
         <p>Engineering Team Directory</p>
+    </div>
+
+    <div class="top-actions">
+        <input class="top-search" placeholder="Search directory...">
+        <a href="/accounts/profile/{{ request.user.username }}/" class="profile-btn">View Public Profile</a>
+
+        <div class="user-menu">
+            <div class="user-circle" onclick="toggleMenu()">
+                {% if request.user.first_name %}
+                    {{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}
+                {% else %}
+                    {{ request.user.username|slice:":2"|upper }}
+                {% endif %}
+            </div>
+
+            <div class="dropdown-menu" id="dropdownMenu">
+                {% if request.user.is_authenticated %}
+                    <a href="/accounts/profile/{{ request.user.username }}/">Profile</a>
+                    <a href="/accounts/update-profile/">Update Profile</a>
+                    <a href="/accounts/change-password/">Change Password</a>
+                    <a href="/accounts/logout/">Logout</a>
+                {% else %}
+                    <a href="/accounts/login/">Login</a>
+                    <a href="/accounts/signup/">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 
@@ -22,6 +49,7 @@
 
 <div class="sidebar">
     <ul class="nav">
+
         <li onclick="window.location.href='/teams/dashboard/'">
             <span class="icon">D</span>Dashboard
         </li>
@@ -30,8 +58,16 @@
             <span class="icon">T</span>Teams
         </li>
 
-        <li class="active" onclick="window.location.href='/messages/inbox/'">
+        <li>
+            <span class="icon">O</span>Organisations
+        </li>
+
+        <li class="active" onclick="window.location.href='/messages/inbox/'" style="cursor:pointer;">
             <span class="icon">M</span>Messages
+        </li>
+
+        <li onclick="window.location.href='/teams/schedule-meeting/'">
+            <span class="icon">S</span>Schedule
         </li>
 
         <li onclick="window.location.href='/reports/'">
@@ -41,42 +77,77 @@
         <li onclick="window.location.href='/visualisation/'">
             <span class="icon">V</span>Visualisation
         </li>
+
+        <li onclick="window.location.href='/accounts/profile/{{ request.user.username }}/'">
+            <span class="icon">P</span>Profile
+        </li>
     </ul>
+
+    {% if request.user.is_staff %}
+    <p class="admin-label">ADMIN</p>
+    <ul class="nav">
+        <li onclick="window.location.href='/admin/teams/team/admin-dashboard/'">
+            <span class="icon">AD</span>Admin Dashboard
+        </li>
+
+        <li onclick="window.location.href='/teams/admin/team-management/'">
+            <span class="icon">TM</span>Team Management
+        </li>
+
+        <li onclick="window.location.href='/teams/admin/user-access/'">
+            <span class="icon">UA</span>User Access
+        </li>
+    </ul>
+    {% endif %}
 </div>
 
 <div class="content">
 
-<h1 class="main-title">Drafts</h1>
+    <h1 class="main-title">Drafts</h1>
 
-<div class="buttons">
-    <a class="btn-outline" href="/messages/inbox/">Inbox</a>
-    <a class="btn-outline" href="/messages/new/">New Message</a>
-    <a class="btn-outline" href="/messages/drafts/">Drafts</a>
-    <a class="btn-outline" href="/messages/sent/">Sent</a>
-</div>
-
-<br>
-
-{% if messages %}
-    {% for message in messages %}
-        <div class="card">
-            <h3>{{ message.subject }}</h3>
-            <p><strong>To:</strong> {{ message.recipient }}</p>
-            <p>{{ message.body }}</p>
-        </div>
-    {% endfor %}
-{% else %}
-    <div class="card">
-        <p>No drafts found.</p>
+    <div class="buttons">
+        <a class="btn-outline" href="/messages/inbox/">Inbox</a>
+        <a class="btn-outline" href="/messages/new/">New Message</a>
+        <a class="btn-outline" href="/messages/drafts/">Drafts</a>
+        <a class="btn-outline" href="/messages/sent/">Sent</a>
     </div>
-{% endif %}
+
+    <br>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="card">
+                <h3>{{ message.subject }}</h3>
+                <p><strong>To:</strong> {{ message.recipient }}</p>
+                <p>{{ message.body }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="card">
+            <p class="muted-text">No drafts found.</p>
+        </div>
+    {% endif %}
 
 </div>
 </div>
 
 <footer>
-© 2026 LOGOSKY • Privacy • Terms • Contact
+    © 2026 LOGOSKY • Privacy • Terms • Contact
 </footer>
+
+<script>
+function toggleMenu() {
+    document.getElementById("dropdownMenu").classList.toggle("show");
+}
+
+window.onclick = function(e) {
+    if (!e.target.closest('.user-menu')) {
+        document.querySelectorAll('.dropdown-menu').forEach(menu => {
+            menu.classList.remove("show");
+        });
+    }
+}
+</script>
 
 </body>
 </html>
