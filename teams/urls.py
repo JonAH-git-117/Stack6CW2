@@ -14,4 +14,5 @@ urlpatterns = [
     path('admin/team-management/', views.team_management, name='team_management'),
     # Admin — User Access Management page (staff only)
     path('admin/user-access/', views.user_access_management, name='user_access_management'),
+    path('delete-meeting/<int:meeting_id>/', views.delete_meeting, name='delete_meeting'),
 ]
