@@ -358,8 +358,9 @@
                         if (m.day === day && m.month === month && m.year === year) {
                             var mdiv = document.createElement("div");
                             mdiv.className = "meeting";
-                            mdiv.innerHTML = '<span>' + m.title + '</span>';
-                            cell.appendChild(mdiv);
+mdiv.innerHTML =
+    '<span>' + m.title + '</span>' +
+    '<a href="/teams/delete-meeting/' + m.id + '/" class="delete-btn" onclick="return confirm(\'Cancel this meeting?\')">✕</a>';                            cell.appendChild(mdiv);
                         }
                     });
                 }
