@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'accounts',
     'reports',
     'visualisation',
+    'django_messages_practice.messages_app',
 ]
 
 
@@ -44,11 +45,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-
-        # global templates folder (optional)
         'DIRS': [BASE_DIR / 'templates'],
-
-        # 🔥 REQUIRED to load app templates
         'APP_DIRS': True,
 
         'OPTIONS': {
@@ -93,12 +90,13 @@ USE_I18N = True
 USE_TZ = True
 
 
-# STATIC FILES (CSS, JS)
+# STATIC FILES
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     BASE_DIR / "teams/static",
 ]
+
 
 # DEFAULT FIELD
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -110,5 +108,5 @@ LOGIN_REDIRECT_URL = '/teams/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 
-# EMAIL (dev only)
+# EMAIL
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
