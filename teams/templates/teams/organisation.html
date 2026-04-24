@@ -1,0 +1,441 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organisation Structure</title>
+    <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=202">
+    <style>
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(130px, 1fr));
+            gap: 14px;
+            margin: 20px 0 25px;
+        }
+
+        .summary-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 18px;
+        }
+
+        .summary-number {
+            display: block;
+            font-size: 28px;
+            font-weight: 700;
+            color: #0A3D93;
+            margin-bottom: 4px;
+        }
+
+        .section-heading {
+            margin-top: 8px;
+            margin-bottom: 14px;
+        }
+
+        .organisation-block,
+        .department-block,
+        .team-type-block,
+        .relationship-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 18px;
+            margin-top: 14px;
+            background: #fff;
+        }
+
+        .department-block {
+            background: #f8f9fc;
+        }
+
+        .department-meta,
+        .team-meta,
+        .type-team-list,
+        .relationship-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .meta-pill {
+            background: #eef1f7;
+            border-radius: 18px;
+            padding: 7px 12px;
+            font-size: 13px;
+        }
+
+        .team-mini-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 14px;
+            margin-top: 12px;
+            background: white;
+        }
+
+        .team-mini-card a,
+        .type-team-list a {
+            color: #0A3D93;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .dependency-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+
+        .dependency-table th {
+            background: #eef1f7;
+            color: #1f2937;
+            text-align: left;
+            padding: 12px;
+        }
+
+        .dependency-table td {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 12px;
+            vertical-align: top;
+        }
+
+        .relationship-card {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-right: 10px;
+        }
+
+        .arrow {
+            color: #0A3D93;
+            font-weight: 700;
+        }
+
+        @media (max-width: 1100px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, minmax(150px, 1fr));
+            }
+
+            .dependency-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="topbar">
+    <div class="logo">
+        <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo" style="height:75px; width:auto; border:3px">
+        <p>Engineering Team Directory</p>
+    </div>
+    <div class="top-actions">
+        <input class="top-search" placeholder="Search directory...">
+        <a href="/accounts/profile/{{ request.user.username }}/" class="profile-btn">View Public Profile</a>
+        <div class="user-menu">
+            <div class="user-circle" onclick="toggleMenu()">
+                {% if request.user.first_name %}
+                    {{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}
+                {% else %}
+                    {{ request.user.username|slice:":2"|upper }}
+                {% endif %}
+            </div>
+            <div class="dropdown-menu" id="dropdownMenu">
+                {% if request.user.is_authenticated %}
+                    <a href="/accounts/profile/{{ request.user.username }}/">Profile</a>
+                    <a href="/accounts/update-profile/">Update Profile</a>
+                    <a href="/accounts/change-password/">Change Password</a>
+                    <a href="/accounts/logout/">Logout</a>
+                {% else %}
+                    <a href="/accounts/login/">Login</a>
+                    <a href="/accounts/signup/">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="layout">
+    <div class="sidebar">
+        <ul class="nav">
+            <li onclick="window.location.href='/teams/dashboard/'">
+                <span class="icon">D</span>Dashboard
+            </li>
+            <li onclick="window.location.href='/teams/'">
+                <span class="icon">T</span>Teams
+            </li>
+            <li class="active" onclick="window.location.href='/organisations/'">
+                <span class="icon">O</span>Organisations
+            </li>
+            <li onclick="window.location.href='/messages/inbox/'">
+                <span class="icon">M</span>Messages
+            </li>
+            <li onclick="window.location.href='/teams/schedule-meeting/'">
+                <span class="icon">S</span>Schedule
+            </li>
+            <li onclick="window.location.href='/reports/'">
+                <span class="icon">R</span>Reports
+            </li>
+            <li onclick="window.location.href='/visualisation/'">
+                <span class="icon">V</span>Visualisation
+            </li>
+            <li onclick="window.location.href='/accounts/profile/{{ request.user.username }}/'">
+                <span class="icon">P</span>Profile
+            </li>
+        </ul>
+
+        {% if request.user.is_staff %}
+        <p class="admin-label">ADMIN</p>
+        <ul class="nav">
+            <li onclick="window.location.href='/admin/teams/team/admin-dashboard/'">
+                <span class="icon">AD</span>Admin Dashboard
+            </li>
+            <li onclick="window.location.href='/teams/admin/team-management/'">
+                <span class="icon">TM</span>Team Management
+            </li>
+            <li onclick="window.location.href='/teams/admin/user-access/'">
+                <span class="icon">UA</span>User Access
+            </li>
+        </ul>
+        {% endif %}
+    </div>
+
+    <div class="content">
+        <h1 class="main-title">Organisation Structure</h1>
+        <p class="subtitle">
+            View departments, department leaders, team types, and upstream/downstream dependencies in one place.
+        </p>
+
+        <div class="summary-grid">
+            <div class="summary-card">
+                <span class="summary-number">{{ organisation_count }}</span>
+                <span class="muted-text">Organisations</span>
+            </div>
+            <div class="summary-card">
+                <span class="summary-number">{{ department_count }}</span>
+                <span class="muted-text">Departments</span>
+            </div>
+            <div class="summary-card">
+                <span class="summary-number">{{ team_count }}</span>
+                <span class="muted-text">Teams</span>
+            </div>
+            <div class="summary-card">
+                <span class="summary-number">{{ team_type_count }}</span>
+                <span class="muted-text">Team Types</span>
+            </div>
+            <div class="summary-card">
+                <span class="summary-number">{{ dependency_count }}</span>
+                <span class="muted-text">Dependencies</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Search and Filters</h3>
+            <form method="GET">
+                <div class="filters">
+                    <input type="text" name="q" value="{{ query }}" placeholder="Team, department, manager, dependency">
+                    <select name="department">
+                        <option value="">All Departments</option>
+                        {% for dept in departments_for_filter %}
+                        <option value="{{ dept.id }}" {% if selected_department == dept.id|stringformat:"s" %}selected{% endif %}>
+                            {{ dept.department_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <select name="team_type">
+                        <option value="">All Team Types</option>
+                        {% for type in team_types_for_filter %}
+                        <option value="{{ type.id }}" {% if selected_team_type == type.id|stringformat:"s" %}selected{% endif %}>
+                            {{ type.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <select name="direction">
+                        <option value="">All Dependencies</option>
+                        <option value="upstream" {% if selected_direction == "upstream" %}selected{% endif %}>Has upstream teams</option>
+                        <option value="downstream" {% if selected_direction == "downstream" %}selected{% endif %}>Has downstream teams</option>
+                    </select>
+                </div>
+                <div class="buttons">
+                    <button class="btn-primary" type="submit">Search</button>
+                    <a href="/organisations/" class="btn-outline">Clear</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2 class="section-heading">Organisation Hierarchy</h2>
+
+            {% for org in organisations %}
+            <div class="organisation-block">
+                <h3>{{ org.organisation_name }}</h3>
+                <p>{{ org.organisation_description }}</p>
+
+                {% for dept in org.filtered_departments %}
+                <div class="department-block">
+                    <h4>{{ dept.department_name }}</h4>
+                    <p>{{ dept.department_description }}</p>
+
+                    <div class="department-meta">
+                        <span class="meta-pill">
+                            Department leader:
+                            {% if dept.dept_head %}
+                                {{ dept.dept_head.get_full_name|default:dept.dept_head.username }}
+                            {% else %}
+                                Not assigned
+                            {% endif %}
+                        </span>
+                        <span class="meta-pill">Specialisation: {{ dept.specialisation|default:"Not set" }}</span>
+                        <span class="meta-pill">Teams: {{ dept.team_count }}</span>
+                        <span class="meta-pill">Location: {{ dept.department_location|default:"Not set" }}</span>
+                    </div>
+
+                    <h5>Teams</h5>
+                    {% for team in dept.filtered_teams %}
+                    <div class="team-mini-card">
+                        <a href="{% url 'team_detail' team.id %}">{{ team.name }}</a>
+                        <div class="team-meta">
+                            <span class="meta-pill">
+                                Manager:
+                                {% if team.manager %}
+                                    {{ team.manager.get_full_name|default:team.manager.username }}
+                                {% else %}
+                                    Not assigned
+                                {% endif %}
+                            </span>
+                            <span class="meta-pill">Status: {{ team.get_status_display }}</span>
+                            <span class="meta-pill">Team type: {{ team.team_type.name|default:"Unassigned" }}</span>
+                            <span class="meta-pill">Upstream dependencies: {{ team.upstream_count }}</span>
+                            <span class="meta-pill">Downstream teams: {{ team.downstream_count }}</span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="empty-state">No teams found for this department.</p>
+                    {% endfor %}
+                </div>
+                {% empty %}
+                <p class="empty-state">No departments found.</p>
+                {% endfor %}
+            </div>
+            {% empty %}
+            <p class="empty-state">No organisations found.</p>
+            {% endfor %}
+        </div>
+
+        <div class="card">
+            <h2 class="section-heading">Team Types</h2>
+            {% for type in team_types %}
+            <div class="team-type-block">
+                <h3>{{ type.name }}</h3>
+                <p>{{ type.description|default:"No description provided." }}</p>
+                <p class="muted-text">{{ type.team_count }} teams assigned</p>
+                <div class="type-team-list">
+                    {% for team in type.filtered_teams %}
+                        <a href="{% url 'team_detail' team.id %}">{{ team.name }}</a>
+                    {% empty %}
+                        <span class="muted-text">No matching teams assigned to this type.</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% empty %}
+            <p class="empty-state">No team types created yet.</p>
+            {% endfor %}
+
+            {% if unassigned_teams %}
+            <div class="team-type-block">
+                <h3>Unassigned</h3>
+                <p class="muted-text">Teams without a team type.</p>
+                <div class="type-team-list">
+                    {% for team in unassigned_teams %}
+                        <a href="{% url 'team_detail' team.id %}">{{ team.name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h2 class="section-heading">Dependencies</h2>
+            {% if dependencies %}
+            <table class="dependency-table">
+                <thead>
+                    <tr>
+                        <th>Downstream team</th>
+                        <th>Depends on / upstream team</th>
+                        <th>Relationship explanation</th>
+                        <th>Dependency type</th>
+                        <th>Downstream department</th>
+                        <th>Upstream department</th>
+                        <th>Downstream team type</th>
+                        <th>Upstream team type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dep in dependencies %}
+                    <tr>
+                        <td><a href="{% url 'team_detail' dep.team.id %}">{{ dep.team.name }}</a></td>
+                        <td><a href="{% url 'team_detail' dep.depends_on.id %}">{{ dep.depends_on.name }}</a></td>
+                        <td>
+                            {{ dep.team.name }} depends on {{ dep.depends_on.name }}.
+                            {{ dep.depends_on.name }} is upstream of {{ dep.team.name }}.
+                            {{ dep.team.name }} is downstream from {{ dep.depends_on.name }}.
+                        </td>
+                        <td>{{ dep.dependency_type|default:"General" }}</td>
+                        <td>{{ dep.team.department.department_name }}</td>
+                        <td>{{ dep.depends_on.department.department_name }}</td>
+                        <td>{{ dep.team.team_type.name|default:"Unassigned" }}</td>
+                        <td>{{ dep.depends_on.team_type.name|default:"Unassigned" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="empty-state">No dependencies recorded yet.</p>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h2 class="section-heading">Relationship Map</h2>
+            {% if dependencies %}
+            <div class="relationship-list">
+                {% for dep in dependencies %}
+                <div class="relationship-card">
+                    <strong>{{ dep.depends_on.name }}</strong>
+                    <span class="arrow">-&gt;</span>
+                    <strong>{{ dep.team.name }}</strong>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="empty-state">No dependencies recorded yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<footer>
+    &copy; 2026 LOGOSKY &bull; Privacy &bull; Terms &bull; Contact
+</footer>
+
+<script>
+    function toggleMenu() {
+        document.getElementById("dropdownMenu").classList.toggle("show");
+    }
+
+    window.onclick = function (e) {
+        if (!e.target.closest('.user-menu')) {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.classList.remove("show");
+            });
+        }
+    }
+</script>
+
+</body>
+</html>

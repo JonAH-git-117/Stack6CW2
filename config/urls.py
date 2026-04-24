@@ -1,10 +1,11 @@
 from django.contrib import admin
 from django.urls import path, include
-from teams.views import team_list
+from teams.views import team_list, organisation_page
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', team_list, name='home'),
+    path('organisations/', organisation_page, name='organisation_page_root'),
     path('teams/', include('teams.urls')),
 
     # Student 3 - Messages

@@ -49,7 +49,7 @@
                 <li class="active" onclick="window.location.href='/teams/'">
                     <span class="icon">T</span>Teams
                 </li>
-                <li>
+                <li onclick="window.location.href='/organisations/'">
                     <span class="icon">O</span>Organisations
                 </li>
                 <li>
@@ -128,6 +128,11 @@
                     <div class="mini-stat">
                         <span class="mini-label">Department</span>
                         <span class="mini-value">{{ team.department }}</span>
+                    </div>
+
+                    <div class="mini-stat">
+                        <span class="mini-label">Team Type</span>
+                        <span class="mini-value">{{ team.team_type.name|default:"Unassigned" }}</span>
                     </div>
 
                     <div class="mini-stat">

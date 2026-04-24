@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 # from weasyprint import HTML, CSS
 
 from .models import (
-    Team, Skill, Dependency, 
+    Team, TeamType, Skill, Dependency,
     Organisation, Department, ContactChannel, 
     Repository, Project, Message, 
     Meeting, AuditLog
@@ -20,6 +20,9 @@ from .models import (
 
 
 class TeamModelAdmin(admin.ModelAdmin):
+    list_display = ('name', 'department', 'manager', 'team_type', 'status')
+    search_fields = ('name', 'department__department_name', 'manager__username')
+    list_filter = ('status', 'department', 'team_type')
 
     def get_urls(self):
         """Register custom admin URLs for report and admin dashboard pages."""
@@ -75,12 +78,42 @@ class TeamModelAdmin(admin.ModelAdmin):
         return TemplateResponse(request, 'admin/teams/admin_dashboard.html', context)
 
 
+class OrganisationAdmin(admin.ModelAdmin):
+    list_display = ('organisation_name',)
+    search_fields = ('organisation_name', 'organisation_description')
+
+
+class DepartmentAdmin(admin.ModelAdmin):
+    list_display = ('department_name', 'organisation', 'dept_head', 'specialisation')
+    search_fields = (
+        'department_name',
+        'department_description',
+        'specialisation',
+        'dept_head__username',
+        'dept_head__first_name',
+        'dept_head__last_name',
+    )
+    list_filter = ('organisation',)
+
+
+class TeamTypeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'description')
+    search_fields = ('name', 'description')
+
+
+class DependencyAdmin(admin.ModelAdmin):
+    list_display = ('team', 'depends_on', 'dependency_type')
+    search_fields = ('team__name', 'depends_on__name', 'dependency_type')
+    list_filter = ('dependency_type',)
+
+
 # Register all models with the Django admin site
 admin.site.register(Team, TeamModelAdmin)
+admin.site.register(TeamType, TeamTypeAdmin)
 admin.site.register(Skill)
-admin.site.register(Dependency)
-admin.site.register(Organisation)
-admin.site.register(Department)
+admin.site.register(Dependency, DependencyAdmin)
+admin.site.register(Organisation, OrganisationAdmin)
+admin.site.register(Department, DepartmentAdmin)
 admin.site.register(ContactChannel)
 admin.site.register(Repository)
 admin.site.register(Project)

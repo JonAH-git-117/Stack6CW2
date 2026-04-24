@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     # Teams directory page — displays all teams with search and filter
     path('', views.team_list, name='team_list'),
+    path('organisations/', views.organisation_page, name='organisation_page'),
     # Individual team detail page — displays full info for a specific team
     path('team/<int:id>/', views.team_detail, name='team_detail'),
     # Schedule meeting page — allows users to schedule a meeting

@@ -14,6 +14,7 @@ class Department(models.Model):
     department_name = models.CharField(max_length=100)
     department_description = models.TextField()
     department_location = models.CharField(max_length=100, blank=True, null=True)
+    specialisation = models.CharField(max_length=150, blank=True, default="")
 
     organisation = models.ForeignKey(
         Organisation,
@@ -31,6 +32,17 @@ class Department(models.Model):
 
     def __str__(self):
         return self.department_name
+
+
+class TeamType(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
 
 
 class Team(models.Model):
@@ -60,6 +72,14 @@ class Team(models.Model):
         null=True,
         blank=True,
         related_name='managed_teams'
+    )
+
+    team_type = models.ForeignKey(
+        TeamType,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="teams"
     )
 
     members = models.ManyToManyField(
@@ -110,6 +130,7 @@ class Skill(models.Model):
 class Dependency(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='dependencies')
     depends_on = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='dependent_teams')
+    dependency_type = models.CharField(max_length=100, blank=True, default="")
 
     class Meta:
         unique_together = ('team', 'depends_on')

@@ -15,7 +15,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 
 # Q objects allow complex database queries using OR conditions
-from django.db.models import Q
+from django.db.models import Count, Prefetch, Q
 
 # timezone is used for upcoming meetings
 from django.utils import timezone
@@ -25,7 +25,7 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 
 # Import models from the teams app
-from .models import Team, Department, AuditLog, Meeting
+from .models import Team, TeamType, Organisation, Department, Dependency, AuditLog, Meeting
 
 
 @login_required
@@ -92,6 +92,154 @@ def team_detail(request, id):
     }
 
     return render(request, 'teams/team_detail.html', context)
+
+
+@login_required
+def organisation_page(request):
+    query = request.GET.get('q', '').strip()
+    department_filter = request.GET.get('department', '')
+    team_type_filter = request.GET.get('team_type', '')
+    direction_filter = request.GET.get('direction', '')
+
+    teams = Team.objects.select_related(
+        'department',
+        'department__organisation',
+        'manager',
+        'team_type',
+    )
+
+    if query:
+        teams = teams.filter(
+            Q(name__icontains=query) |
+            Q(department__department_name__icontains=query) |
+            Q(manager__username__icontains=query) |
+            Q(manager__first_name__icontains=query) |
+            Q(manager__last_name__icontains=query) |
+            Q(dependencies__depends_on__name__icontains=query) |
+            Q(dependent_teams__team__name__icontains=query)
+        )
+
+    if department_filter:
+        teams = teams.filter(department_id=department_filter)
+
+    if team_type_filter:
+        teams = teams.filter(team_type_id=team_type_filter)
+
+    if direction_filter == 'upstream':
+        teams = teams.filter(dependencies__isnull=False)
+    elif direction_filter == 'downstream':
+        teams = teams.filter(dependent_teams__isnull=False)
+
+    teams = teams.distinct().annotate(
+        upstream_count=Count('dependencies', distinct=True),
+        downstream_count=Count('dependent_teams', distinct=True),
+    ).order_by('name')
+
+    departments = Department.objects.select_related(
+        'organisation',
+        'dept_head',
+    ).annotate(
+        team_count=Count('teams', distinct=True)
+    ).prefetch_related(
+        Prefetch('teams', queryset=teams, to_attr='filtered_teams')
+    ).order_by('department_name')
+
+    if department_filter:
+        departments = departments.filter(id=department_filter)
+
+    if query:
+        departments = departments.filter(
+            Q(id__in=teams.values('department_id')) |
+            Q(department_name__icontains=query) |
+            Q(department_description__icontains=query) |
+            Q(dept_head__username__icontains=query) |
+            Q(dept_head__first_name__icontains=query) |
+            Q(dept_head__last_name__icontains=query)
+        ).distinct()
+    elif team_type_filter or direction_filter:
+        departments = departments.filter(id__in=teams.values('department_id')).distinct()
+
+    organisations = Organisation.objects.prefetch_related(
+        Prefetch('departments', queryset=departments, to_attr='filtered_departments')
+    ).order_by('organisation_name')
+
+    if query or department_filter or team_type_filter or direction_filter:
+        organisations = organisations.filter(
+            id__in=departments.values('organisation_id')
+        ).distinct()
+
+    team_types = TeamType.objects.prefetch_related(
+        Prefetch('teams', queryset=teams, to_attr='filtered_teams')
+    ).annotate(
+        team_count=Count('teams', distinct=True)
+    ).order_by('name')
+
+    if team_type_filter:
+        team_types = team_types.filter(id=team_type_filter)
+    elif query or department_filter or direction_filter:
+        team_types = team_types.filter(id__in=teams.values('team_type_id')).distinct()
+
+    unassigned_teams = teams.filter(team_type__isnull=True)
+
+    dependencies = Dependency.objects.select_related(
+        'team',
+        'team__department',
+        'team__team_type',
+        'depends_on',
+        'depends_on__department',
+        'depends_on__team_type',
+    )
+
+    if query:
+        dependencies = dependencies.filter(
+            Q(team__name__icontains=query) |
+            Q(depends_on__name__icontains=query) |
+            Q(team__department__department_name__icontains=query) |
+            Q(depends_on__department__department_name__icontains=query) |
+            Q(team__manager__username__icontains=query) |
+            Q(depends_on__manager__username__icontains=query)
+        )
+
+    if department_filter:
+        dependencies = dependencies.filter(
+            Q(team__department_id=department_filter) |
+            Q(depends_on__department_id=department_filter)
+        )
+
+    if team_type_filter:
+        dependencies = dependencies.filter(
+            Q(team__team_type_id=team_type_filter) |
+            Q(depends_on__team_type_id=team_type_filter)
+        )
+
+    if direction_filter == 'upstream':
+        dependencies = dependencies.filter(team__in=teams)
+    elif direction_filter == 'downstream':
+        dependencies = dependencies.filter(depends_on__in=teams)
+
+    dependencies = dependencies.distinct().order_by('team__name', 'depends_on__name')
+
+    context = {
+        'organisations': organisations,
+        'departments': departments,
+        'teams': teams,
+        'team_types': team_types,
+        'unassigned_teams': unassigned_teams,
+        'dependencies': dependencies,
+        'departments_for_filter': Department.objects.order_by('department_name'),
+        'team_types_for_filter': TeamType.objects.order_by('name'),
+        'query': query,
+        'selected_department': department_filter,
+        'selected_team_type': team_type_filter,
+        'selected_direction': direction_filter,
+        'organisation_count': Organisation.objects.count(),
+        'department_count': Department.objects.count(),
+        'team_count': Team.objects.count(),
+        'team_type_count': TeamType.objects.count(),
+        'dependency_count': Dependency.objects.count(),
+    }
+
+    return render(request, 'teams/organisation.html', context)
 
 
 @login_required
