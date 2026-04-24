@@ -1,0 +1,34 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inbox</title>
+    <link rel="stylesheet" href="{% static 'messages_app/style.css' %}">
+</head>
+<body>
+
+<div class="container">
+
+<a href="/messages/inbox/">Inbox</a>
+<a href="/messages/new/">New Message</a>
+<a href="/messages/drafts/">Drafts</a>
+<a href="/messages/sent/">Sent</a>
+
+<h1>Inbox</h1>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="message">
+            <strong>{{ message.subject }}</strong><br>
+            To: {{ message.recipient }}<br><br>
+            {{ message.body }}
+        </div>
+    {% endfor %}
+{% else %}
+    <p>No messages found.</p>
+{% endif %}
+
+</div>
+
+</body>
+</html>
