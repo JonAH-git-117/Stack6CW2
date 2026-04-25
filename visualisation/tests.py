@@ -5,7 +5,7 @@
 
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
-from teams.models import Organisation, Department, Team
+from teams.models import Organisation, Department, Project, Team
 
 
 class VisualisationViewTestCase(TestCase):
@@ -44,6 +44,12 @@ class VisualisationViewTestCase(TestCase):
             status='active',
             department=self.dept
         )
+        self.project = Project.objects.create(
+            name='Client Lightning Xtv',
+            description='Demo project',
+            status='active',
+        )
+        self.project.teams.add(self.team)
 
     def test_visualisation_page_requires_login(self):
         """
@@ -81,6 +87,14 @@ class VisualisationViewTestCase(TestCase):
         self.client.login(username='testuser', password='testpass123')
         response = self.client.get('/visualisation/')
         self.assertContains(response, 'xTV_Web')
+
+    def test_visualisation_contains_project_charts(self):
+        self.client.login(username='testuser', password='testpass123')
+        response = self.client.get('/visualisation/')
+
+        self.assertContains(response, 'Department Name vs Projects')
+        self.assertContains(response, 'Department Head vs Project Name')
+        self.assertContains(response, 'Client Lightning Xtv')
 
     def test_visualisation_with_multiple_teams(self):
         """

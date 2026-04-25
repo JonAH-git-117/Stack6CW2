@@ -48,10 +48,17 @@ def team_list(request):
     manager = request.GET.get('manager')
     status = request.GET.get('status')
 
-    teams = Team.objects.all()
+    teams = Team.objects.select_related('department', 'manager').prefetch_related('members')
 
     if keyword:
-        teams = teams.filter(name__icontains=keyword)
+        teams = teams.filter(
+            Q(name__icontains=keyword) |
+            Q(description__icontains=keyword) |
+            Q(department__department_name__icontains=keyword) |
+            Q(manager__username__icontains=keyword) |
+            Q(manager__first_name__icontains=keyword) |
+            Q(manager__last_name__icontains=keyword)
+        )
 
     if department:
         teams = teams.filter(department__department_name=department)
@@ -257,6 +264,11 @@ def schedule_meeting(request):
 
         from django.utils.dateparse import parse_datetime
         scheduled_at = parse_datetime(f"{date}T{time}")
+        if scheduled_at is None:
+            messages.error(request, "Please provide a valid meeting date and time.")
+            return redirect('schedule_meeting')
+        if timezone.is_naive(scheduled_at):
+            scheduled_at = timezone.make_aware(scheduled_at)
 
         team = get_object_or_404(Team, id=team_id) if team_id else None
 

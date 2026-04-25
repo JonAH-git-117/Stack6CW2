@@ -63,7 +63,7 @@
             <li onclick="window.location.href='/organisations/'">
                 <span class="icon">O</span>Organisations
             </li>
-            <li>
+            <li onclick="window.location.href='/messages/inbox/'">
                 <span class="icon">M</span>Messages
             </li>
             <li onclick="window.location.href='/teams/schedule-meeting/'">
@@ -118,6 +118,16 @@
             {{ plot2_html|safe }}
         </div>
 
+        <div class="card">
+            <h3>Department Name vs Projects</h3>
+            {{ plot3_html|safe }}
+        </div>
+
+        <div class="card">
+            <h3>Department Head vs Project Name</h3>
+            {{ plot4_html|safe }}
+        </div>
+
     </div>
 </div>
 
@@ -131,6 +141,8 @@
 {# |safe prevents Django from escaping the JavaScript #}
 {{ script1|safe }}
 {{ script2|safe }}
+{{ script3|safe }}
+{{ script4|safe }}
 
 {# Toggle menu script — closes dropdown when clicking outside #}
 <script>

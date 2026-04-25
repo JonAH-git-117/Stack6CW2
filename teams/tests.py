@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
-from .models import Department, Dependency, Organisation, Team, TeamType
+from .models import ContactChannel, Department, Dependency, Meeting, Organisation, Repository, Skill, Team, TeamType
 
 
 class OrganisationPageEmptyDatabaseTests(TestCase):
@@ -167,3 +168,84 @@ class OrganisationPageDataTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Backend Services")
+
+
+class TeamAndScheduleTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        User = get_user_model()
+        cls.user = User.objects.create_user(
+            username="teamviewer",
+            password="test-password",
+            first_name="Taylor",
+            last_name="Manager",
+            email="manager@example.com",
+        )
+        cls.member = User.objects.create_user(
+            username="member1",
+            password="test-password",
+            email="member1@example.com",
+        )
+        org = Organisation.objects.create(
+            organisation_name="Sky",
+            organisation_description="Demo org",
+        )
+        cls.department = Department.objects.create(
+            department_name="Search Department",
+            department_description="Department for search tests.",
+            organisation=org,
+        )
+        cls.team_type = TeamType.objects.create(name="Delivery")
+        cls.team = Team.objects.create(
+            name="Searchable Team",
+            description="Mission and responsibilities for the team.",
+            department=cls.department,
+            manager=cls.user,
+            team_type=cls.team_type,
+        )
+        cls.team.members.add(cls.member)
+        Skill.objects.create(team=cls.team, name="Python")
+        Repository.objects.create(
+            team=cls.team,
+            name="Main Repository",
+            url="https://example.com/repo",
+        )
+        ContactChannel.objects.create(
+            team=cls.team,
+            channel_type="email",
+            channel_value="searchable@example.com",
+        )
+
+    def setUp(self):
+        self.client.force_login(self.user)
+
+    def test_team_list_keyword_search_matches_department_and_manager(self):
+        by_department = self.client.get("/teams/", {"keyword": "Search Department"})
+        by_manager = self.client.get("/teams/", {"keyword": "Taylor"})
+
+        self.assertContains(by_department, "Searchable Team")
+        self.assertContains(by_manager, "Searchable Team")
+
+    def test_team_detail_displays_core_team_information(self):
+        response = self.client.get(reverse("team_detail", args=[self.team.id]))
+
+        self.assertContains(response, "Mission and responsibilities")
+        self.assertContains(response, "teamviewer")
+        self.assertContains(response, "member1")
+        self.assertContains(response, "Python")
+        self.assertContains(response, "Main Repository")
+        self.assertContains(response, "Open Link")
+
+    def test_schedule_page_creates_meeting(self):
+        response = self.client.post("/teams/schedule-meeting/", {
+            "title": "Planning Meeting",
+            "team": str(self.team.id),
+            "date": (timezone.now() + timezone.timedelta(days=1)).date().isoformat(),
+            "time": "10:30",
+            "platform": "teams",
+            "attendees": [str(self.member.id)],
+            "agenda": "Planning agenda",
+        })
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Meeting.objects.filter(title="Planning Meeting").exists())

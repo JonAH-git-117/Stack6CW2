@@ -17,6 +17,62 @@ from django.template.loader import render_to_string
 from teams.models import Department, Organisation, Team
 
 
+def _report_context():
+    return {
+        'teams': Team.objects.select_related(
+            'department',
+            'department__organisation',
+            'manager'
+        ).prefetch_related('members'),
+        'departments': Department.objects.annotate(
+            team_count=Count('teams')
+        ).select_related('organisation', 'dept_head'),
+        'teams_without_manager': Team.objects.filter(
+            manager__isnull=True
+        ).select_related('department'),
+        'total_teams': Team.objects.count(),
+        'total_departments': Department.objects.count(),
+    }
+
+
+def _escape_pdf_text(value):
+    return str(value).replace('\\', '\\\\').replace('(', '\\(').replace(')', '\\)')
+
+
+def _build_simple_pdf(lines):
+    text_commands = ["BT", "/F1 12 Tf", "72 770 Td", "16 TL"]
+    for line in lines[:42]:
+        text_commands.append(f"({_escape_pdf_text(line)}) Tj")
+        text_commands.append("T*")
+    text_commands.append("ET")
+    stream = "\n".join(text_commands).encode("latin-1", errors="replace")
+
+    objects = [
+        b"<< /Type /Catalog /Pages 2 0 R >>",
+        b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+        b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>",
+        b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+        b"<< /Length " + str(len(stream)).encode("ascii") + b" >>\nstream\n" + stream + b"\nendstream",
+    ]
+
+    pdf = bytearray(b"%PDF-1.4\n")
+    offsets = [0]
+    for index, obj in enumerate(objects, start=1):
+        offsets.append(len(pdf))
+        pdf.extend(f"{index} 0 obj\n".encode("ascii"))
+        pdf.extend(obj)
+        pdf.extend(b"\nendobj\n")
+    xref_offset = len(pdf)
+    pdf.extend(f"xref\n0 {len(objects) + 1}\n".encode("ascii"))
+    pdf.extend(b"0000000000 65535 f \n")
+    for offset in offsets[1:]:
+        pdf.extend(f"{offset:010d} 00000 n \n".encode("ascii"))
+    pdf.extend(
+        f"trailer\n<< /Size {len(objects) + 1} /Root 1 0 R >>\nstartxref\n{xref_offset}\n%%EOF\n".encode("ascii")
+    )
+    return bytes(pdf)
+
+
 @login_required
 def reports_dashboard(request):
     total_teams = Team.objects.count()
@@ -47,37 +103,31 @@ def reports_dashboard(request):
 
 @login_required
 def generate_pdf(request):
-    """
-    Generates a PDF report of all teams and departments using WeasyPrint.
-    Renders the report.html template to an HTML string using render_to_string,
-    then converts it to PDF using WeasyPrint's HTML class.
-    Returns the PDF as a file download response.
-    As per lecture pattern — render template to string, convert to PDF, return FileResponse.
-    """
-    from weasyprint import HTML, CSS
+    context = _report_context()
+    html_string = render_to_string('reports/report.html', context)
 
-    # Build the context — same data as the reports dashboard
-    html_string = render_to_string('reports/report.html', {
-        'teams': Team.objects.select_related(
-            'department',
-            'department__organisation',
-            'manager'
-        ).prefetch_related('members'),
-        'departments': Department.objects.annotate(
-            team_count=Count('teams')
-        ).select_related('organisation'),
-        'teams_without_manager': Team.objects.filter(
-            manager__isnull=True
-        ).select_related('department'),
-        'total_teams': Team.objects.count(),
-        'total_departments': Department.objects.count(),
-    })
+    try:
+        from weasyprint import HTML
+        html = HTML(string=html_string, base_url=request.build_absolute_uri())
+        pdf = html.write_pdf()
+    except Exception:
+        lines = [
+            "Sky Engineering Teams Report",
+            f"Total teams: {context['total_teams']}",
+            f"Total departments: {context['total_departments']}",
+            f"Teams without managers: {context['teams_without_manager'].count()}",
+            "",
+            "Departments",
+        ]
+        for dept in context['departments']:
+            lines.append(f"- {dept.department_name}: {dept.team_count} teams")
+        lines.append("")
+        lines.append("Teams")
+        for team in context['teams']:
+            manager = team.manager.get_full_name() or team.manager.username if team.manager else "No Manager"
+            lines.append(f"- {team.name} | {team.department.department_name} | {manager}")
+        pdf = _build_simple_pdf(lines)
 
-    # Convert HTML string to PDF using WeasyPrint
-    html = HTML(string=html_string, base_url=request.build_absolute_uri())
-    pdf = html.write_pdf()
-
-    # Return PDF as a downloadable file response
     buffer = io.BytesIO(pdf)
     return FileResponse(buffer, as_attachment=True, filename='sky_teams_report.pdf')
 

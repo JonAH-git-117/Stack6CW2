@@ -13,15 +13,13 @@ from django.shortcuts import render
 
 # Import models from the teams app — visualisation has no models of its own
 # as it only reads and displays existing data
-from teams.models import Department, Team
+from teams.models import Department, Project, Team
 
 # Only logged-in users can access this page
 @login_required  
 def visualisation_dashboard(request):
     """
-    Display interactive Bokeh bar charts showing:
-    1. Number of teams per department
-    2. Active vs disabled team counts
+    Display interactive Bokeh charts showing team, project and department data.
     Charts are generated server-side with Bokeh and embedded into the template.
     """
 
@@ -37,7 +35,10 @@ def visualisation_dashboard(request):
     dept_names = [dept.department_name for dept in departments] # x-axis labels
     dept_counts = [dept.team_count for dept in departments] # y-axis values
 
-    # Creates the Bokeh figure (the canvas for plotting)
+    if not dept_names:
+        dept_names = ['No departments']
+        dept_counts = [0]
+
     plot1 = figure(
         # x_range sets the categorical x-axis labels
         x_range = dept_names,
@@ -117,6 +118,74 @@ def visualisation_dashboard(request):
     plot2.xgrid.grid_line_color = None
     plot2.y_range.start = 0
 
+    project_departments = Department.objects.annotate(
+        project_count=Count('teams__projects', distinct=True)
+    ).select_related('dept_head')
+
+    project_dept_names = [dept.department_name for dept in project_departments] or ['No departments']
+    project_counts = [dept.project_count for dept in project_departments] or [0]
+
+    plot3 = figure(
+        x_range=project_dept_names,
+        height=400,
+        title='Department Name vs Projects',
+        toolbar_location=None,
+        tools=''
+    )
+
+    plot3_vbar = plot3.vbar(
+        x=project_dept_names,
+        top=project_counts,
+        width=0.5,
+        fill_color='#0A3D93',
+        alpha=0.85,
+        hover_alpha=1
+    )
+    plot3.add_tools(HoverTool(
+        tooltips=[('Department', '@x'), ('Projects', '@top')],
+        renderers=[plot3_vbar],
+        mode='mouse'
+    ))
+    plot3.xgrid.grid_line_color = None
+    plot3.y_range.start = 0
+
+    head_project_pairs = []
+    for project in Project.objects.prefetch_related('teams__department__dept_head').order_by('name'):
+        departments_for_project = {
+            team.department for team in project.teams.all()
+            if team.department_id
+        }
+        for department in departments_for_project:
+            head_name = (
+                department.dept_head.get_full_name() or department.dept_head.username
+                if department.dept_head else 'No department head'
+            )
+            head_project_pairs.append((head_name, project.name))
+
+    head_names = sorted({head for head, project_name in head_project_pairs}) or ['No department head']
+    project_names = sorted({project_name for head, project_name in head_project_pairs}) or ['No projects recorded']
+    head_values = [head for head, project_name in head_project_pairs] or ['No department head']
+    project_values = [project_name for head, project_name in head_project_pairs] or ['No projects recorded']
+
+    plot4 = figure(
+        x_range=head_names,
+        y_range=project_names,
+        height=400,
+        title='Department Head vs Project Name',
+        toolbar_location=None,
+        tools=''
+    )
+    plot4.scatter(
+        x=head_values,
+        y=project_values,
+        size=12,
+        fill_color='#2ecc71',
+        line_color='#1f6b36',
+        alpha=0.9,
+    )
+    plot4.add_tools(HoverTool(tooltips=[('Department head', '@x'), ('Project', '@y')]))
+    plot4.xgrid.grid_line_color = None
+
     # components() splits each Bokeh plot into two parts:
     # - script: a <script> tag containing JavaScript to render the chart
     # - plot_html: a <div> tag that acts as the container for the chart
@@ -124,6 +193,8 @@ def visualisation_dashboard(request):
     # to prevent Django from escaping the HTML/JavaScript
     script1, plot1_html = components(plot1)
     script2, plot2_html = components(plot2)
+    script3, plot3_html = components(plot3)
+    script4, plot4_html = components(plot4)
 
     # Pass all chart components to the template via context
     context = {
@@ -131,5 +202,9 @@ def visualisation_dashboard(request):
         'plot1_html': plot1_html, # HTML div container for chart 1
         'script2':    script2,    # JavaScript for chart 2
         'plot2_html': plot2_html, # HTML div container for chart 2
+        'script3': script3,
+        'plot3_html': plot3_html,
+        'script4': script4,
+        'plot4_html': plot4_html,
     }
     return render(request, 'visualisation/visualisation.html', context)
