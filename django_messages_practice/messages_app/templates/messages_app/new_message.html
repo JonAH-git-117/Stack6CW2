@@ -5,106 +5,198 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Message</title>
+
     <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=202">
-    <link rel="stylesheet" href="{% static 'teams/dashboard.css' %}">
+
+    <style>
+
+        .main-title {
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            max-width: 700px;
+        }
+
+        .message-form {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #374151;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: #0A3D93;
+            color: white;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-outline {
+            border: 1px solid #d1d5db;
+            padding: 10px 18px;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn-outline:hover {
+            background: #f3f4f6;
+        }
+
+        .cancel-btn {
+            color: #6b7280;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+    </style>
 </head>
 
 <body>
-
-<div class="topbar">
-    <div class="logo">
-        <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo" style="height:75px; width:auto; border:3px">
-        <p>Engineering Team Directory</p>
-    </div>
-
-    <div class="top-actions">
-        <input class="top-search" placeholder="Search directory...">
-        <a href="/accounts/profile/{{ request.user.username }}/" class="profile-btn">View Public Profile</a>
-
-        <div class="user-menu">
-            <div class="user-circle" onclick="toggleMenu()">
-                {% if request.user.first_name %}
+<!-- Top navigation bar with logo, search and profile -->
+    <div class="topbar">
+        <div class="logo">
+            <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo" style="height:75px; width:auto; border:3px">
+            <p>Engineering Team Directory</p>
+        </div>
+        <div class="top-actions">
+            <input class="top-search" placeholder="Search directory...">
+            <!-- View Public Profile links to the logged-in user's profile page -->
+            <a href="/accounts/profile/{{ request.user.username }}/" class="profile-btn">View Public Profile</a>
+            <!-- User menu dropdown — shows profile/logout options when clicked -->
+            <div class="user-menu">
+                <div class="user-circle" onclick="toggleMenu()">
+                    {% if request.user.first_name %}
                     {{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}
-                {% else %}
+                    {% else %}
                     {{ request.user.username|slice:":2"|upper }}
-                {% endif %}
-            </div>
-
-            <div class="dropdown-menu" id="dropdownMenu">
-                {% if request.user.is_authenticated %}
+                    {% endif %}
+                </div>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    {% if request.user.is_authenticated %}
                     <a href="/accounts/profile/{{ request.user.username }}/">Profile</a>
                     <a href="/accounts/update-profile/">Update Profile</a>
                     <a href="/accounts/change-password/">Change Password</a>
                     <a href="/accounts/logout/">Logout</a>
-                {% else %}
+                    {% else %}
                     <a href="/accounts/login/">Login</a>
                     <a href="/accounts/signup/">Sign Up</a>
-                {% endif %}
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="layout">
+    <div class="layout">
 
-<div class="sidebar">
-    <ul class="nav">
+        <!-- Sidebar navigation — consistent across all pages -->
+        <div class="sidebar">
+            <ul class="nav">
+                <!-- Dashboard link — no page built yet -->
+                <li onclick="window.location.href='/teams/dashboard/'">
+                    <span class="icon">D</span>Dashboard
+                </li>
+                <!-- Teams directory — active page -->
+                <li  onclick="window.location.href='/teams/'">
+                    <span class="icon">T</span>Teams
+                </li>
+                <!-- Organisations — no page built yet -->
+                <li>
+                    <span class="icon">O</span>Organisations
+                </li>
+                <!-- Messages — no page built yet -->
+                <li class="active"onclick="window.location.href='/messages/inbox/'" style="cursor:pointer;">
+                    <span class="icon">M</span>Messages
+                </li>
+                <!-- Schedule meeting page -->
+                <li onclick="window.location.href='/teams/schedule-meeting/'">
+                    <span class="icon">S</span>Schedule
+                </li>
+                <!-- Reports dashboard -->
+                <li onclick="window.location.href='/reports/'">
+                    <span class="icon">R</span>Reports
+                </li>
+                <!-- Data visualisation page -->
+                <li onclick="window.location.href='/visualisation/'">
+                    <span class="icon">V</span>Visualisation
+                </li>
+                <!-- Profile page — links to the logged-in user's profile -->
+                <li onclick="window.location.href='/accounts/profile/{{ request.user.username }}/'">
+                    <span class="icon">P</span>Profile
+                </li>
+            </ul>
 
-        <li onclick="window.location.href='/teams/dashboard/'">
-            <span class="icon">D</span>Dashboard
-        </li>
-
-        <li onclick="window.location.href='/teams/'">
-            <span class="icon">T</span>Teams
-        </li>
-
-        <li onclick="window.location.href='/organisations/'">
-            <span class="icon">O</span>Organisations
-        </li>
-
-        <li class="active" onclick="window.location.href='/messages/inbox/'" style="cursor:pointer;">
-            <span class="icon">M</span>Messages
-        </li>
-
-        <li onclick="window.location.href='/teams/schedule-meeting/'">
-            <span class="icon">S</span>Schedule
-        </li>
-
-        <li onclick="window.location.href='/reports/'">
-            <span class="icon">R</span>Reports
-        </li>
-
-        <li onclick="window.location.href='/visualisation/'">
-            <span class="icon">V</span>Visualisation
-        </li>
-
-        <li onclick="window.location.href='/accounts/profile/{{ request.user.username }}/'">
-            <span class="icon">P</span>Profile
-        </li>
-    </ul>
-
-    {% if request.user.is_staff %}
-    <p class="admin-label">ADMIN</p>
-    <ul class="nav">
-        <li onclick="window.location.href='/admin/teams/team/admin-dashboard/'">
-            <span class="icon">AD</span>Admin Dashboard
-        </li>
-
-        <li onclick="window.location.href='/teams/admin/team-management/'">
-            <span class="icon">TM</span>Team Management
-        </li>
-
-        <li onclick="window.location.href='/teams/admin/user-access/'">
-            <span class="icon">UA</span>User Access
-        </li>
-    </ul>
-    {% endif %}
-</div>
+            <!-- Admin section only shown to staff users -->
+            {% if request.user.is_staff %}
+            <p class="admin-label">ADMIN</p>
+            <ul class="nav">
+                <!-- Admin Dashboard links to the Django admin custom dashboard page -->
+                <li onclick="window.location.href='/admin/teams/team/admin-dashboard/'">
+                    <span class="icon">AD</span>Admin Dashboard
+                </li>
+                <!-- Team Management links to the custom team management page -->
+                <li onclick="window.location.href='/teams/admin/team-management/'">
+                    <span class="icon">TM</span>Team Management
+                </li>
+                <!-- User Access links to the custom user access management page -->
+                <li onclick="window.location.href='/teams/admin/user-access/'">
+                    <span class="icon">UA</span>User Access
+                </li>
+            </ul>
+            {% endif %}
+        </div>
 
 <div class="content">
 
     <h1 class="main-title">New Message</h1>
 
+    <!-- NAV BUTTONS -->
     <div class="buttons">
         <a class="btn-outline" href="/messages/inbox/">Inbox</a>
         <a class="btn-outline" href="/messages/new/">New Message</a>
@@ -112,16 +204,35 @@
         <a class="btn-outline" href="/messages/sent/">Sent</a>
     </div>
 
-    <br>
-
+    <!-- FORM CARD -->
     <div class="card">
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
 
-            <button class="btn-primary" type="submit">Send Message</button>
-            <button class="btn-outline" type="submit" name="save_draft">Save Draft</button>
+        <form method="post" class="message-form">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label>Recipient</label>
+                {{ form.recipient }}
+            </div>
+
+            <div class="form-group">
+                <label>Subject</label>
+                {{ form.subject }}
+            </div>
+
+            <div class="form-group">
+                <label>Message</label>
+                {{ form.body }}
+            </div>
+
+            <div class="form-actions">
+                <button class="btn-primary" type="submit">Send Message</button>
+                <button class="btn-outline" type="submit" name="save_draft">Save Draft</button>
+                <a href="/messages/inbox/" class="btn-outline cancel-btn">Cancel</a>
+            </div>
+
         </form>
+
     </div>
 
 </div>
