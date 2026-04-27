@@ -7,7 +7,7 @@
     <!-- Main shared stylesheet — consistent across all pages -->
     <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=202">
     <!-- Schedule-specific styles for calendar, form and week navigation -->
-    <link rel="stylesheet" href="{% static 'teams/schedule_meeting.css' %}?v=9">
+    <link rel="stylesheet" href="{% static 'teams/schedule_meeting.css' %}?v=10">
 </head>
 
 <body>
@@ -53,8 +53,10 @@
             <ul class="nav">
                 <li onclick="window.location.href='/teams/dashboard/'"><span class="icon">D</span>Dashboard</li>
                 <li onclick="window.location.href='/teams/'"><span class="icon">T</span>Teams</li>
-                <li onclick="window.location.href='/organisations/'"><span class="icon">O</span>Organisations</li>
-                <li onclick="window.location.href='/messages/inbox/'"><span class="icon">M</span>Messages</li>
+                <li><span class="icon">O</span>Organisations</li>
+                <li onclick="window.location.href='/messages/inbox/'" style="cursor:pointer;">
+                    <span class="icon">M</span>Messages
+                </li>
                 <!-- Schedule is the active page -->
                 <li class="active"><span class="icon">S</span>Schedule</li>
                 <li onclick="window.location.href='/reports/'"><span class="icon">R</span>Reports</li>
@@ -229,8 +231,9 @@
                         </option>
                         {% endfor %}
                     </select>
-                    <small>Hold Ctrl / Cmd to select multiple. Select a team above to filter participants.</small>
-
+<p class="help-text">
+    Hold Ctrl / Cmd to select multiple. Select a team above to filter participants.
+</p>
                     <label>Agenda</label>
                     <textarea name="agenda"></textarea>
 
@@ -492,3 +495,6 @@ mdiv.innerHTML =
 </body>
 
 </html>
+
+
+
