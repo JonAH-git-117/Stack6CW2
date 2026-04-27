@@ -5,15 +5,69 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Drafts</title>
+
     <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=202">
     <link rel="stylesheet" href="{% static 'teams/dashboard.css' %}">
+
+    <style>
+        .draft-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .draft-actions button,
+        .draft-actions a {
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 8px;
+            height: 38px;
+            cursor: pointer;
+        }
+
+        .btn-send {
+            background: #0A3D93;
+            color: white;
+            border: none;
+        }
+
+        .btn-send:hover {
+            background: #0A3D93;
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid #ccc;
+            color: #0A3D93;
+            text-decoration: none;
+            padding: 12px;
+
+        }
+        .draft-actions {
+        display: flex;
+        align-items: center;   
+        gap: 10px;
+    }
+    .draft-actions button,
+    .draft-actions a {
+    height: 40px;
+    padding: 0 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    }
+
+        .btn-secondary:hover {
+            background: #f5f5f5;
+        }
+    </style>
 </head>
 
 <body>
 
 <div class="topbar">
     <div class="logo">
-        <img src="{% static 'teams/sky-logo.png' %}" alt="Sky Logo" style="height:75px; width:auto; border:3px">
+        <img src="{% static 'teams/sky-logo.png' %}" style="height:75px;">
         <p>Engineering Team Directory</p>
     </div>
 
@@ -49,54 +103,22 @@
 
 <div class="sidebar">
     <ul class="nav">
-
-        <li onclick="window.location.href='/teams/dashboard/'">
-            <span class="icon">D</span>Dashboard
-        </li>
-
-        <li onclick="window.location.href='/teams/'">
-            <span class="icon">T</span>Teams
-        </li>
-
-        <li onclick="window.location.href='/organisations/'">
-            <span class="icon">O</span>Organisations
-        </li>
-
-        <li class="active" onclick="window.location.href='/messages/inbox/'" style="cursor:pointer;">
-            <span class="icon">M</span>Messages
-        </li>
-
-        <li onclick="window.location.href='/teams/schedule-meeting/'">
-            <span class="icon">S</span>Schedule
-        </li>
-
-        <li onclick="window.location.href='/reports/'">
-            <span class="icon">R</span>Reports
-        </li>
-
-        <li onclick="window.location.href='/visualisation/'">
-            <span class="icon">V</span>Visualisation
-        </li>
-
-        <li onclick="window.location.href='/accounts/profile/{{ request.user.username }}/'">
-            <span class="icon">P</span>Profile
-        </li>
+        <li onclick="window.location.href='/teams/dashboard/'"><span class="icon">D</span>Dashboard</li>
+        <li onclick="window.location.href='/teams/'"><span class="icon">T</span>Teams</li>
+        <li><span class="icon">O</span>Organisations</li>
+        <li class="active" onclick="window.location.href='/messages/inbox/'"><span class="icon">M</span>Messages</li>
+        <li onclick="window.location.href='/teams/schedule-meeting/'"><span class="icon">S</span>Schedule</li>
+        <li onclick="window.location.href='/reports/'"><span class="icon">R</span>Reports</li>
+        <li onclick="window.location.href='/visualisation/'"><span class="icon">V</span>Visualisation</li>
+        <li onclick="window.location.href='/accounts/profile/{{ request.user.username }}/'"><span class="icon">P</span>Profile</li>
     </ul>
 
     {% if request.user.is_staff %}
     <p class="admin-label">ADMIN</p>
     <ul class="nav">
-        <li onclick="window.location.href='/admin/teams/team/admin-dashboard/'">
-            <span class="icon">AD</span>Admin Dashboard
-        </li>
-
-        <li onclick="window.location.href='/teams/admin/team-management/'">
-            <span class="icon">TM</span>Team Management
-        </li>
-
-        <li onclick="window.location.href='/teams/admin/user-access/'">
-            <span class="icon">UA</span>User Access
-        </li>
+        <li onclick="window.location.href='/admin/teams/team/admin-dashboard/'"><span class="icon">AD</span>Admin Dashboard</li>
+        <li onclick="window.location.href='/teams/admin/team-management/'"><span class="icon">TM</span>Team Management</li>
+        <li onclick="window.location.href='/teams/admin/user-access/'"><span class="icon">UA</span>User Access</li>
     </ul>
     {% endif %}
 </div>
@@ -120,6 +142,25 @@
                 <h3>{{ message.subject }}</h3>
                 <p><strong>To:</strong> {{ message.recipient }}</p>
                 <p>{{ message.body }}</p>
+
+                <div class="draft-actions">
+
+                    <a href="/messages/new/?edit={{ message.id }}" class="btn-secondary">
+                        Edit
+                    </a>
+
+                    <button class="btn-send">
+                        Send Draft
+                    </button>
+
+                    <form method="post" action="/messages/delete/{{ message.id }}/" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-secondary">
+                             Delete
+                        </button>
+                    </form>
+
+                </div>
             </div>
         {% endfor %}
     {% else %}
@@ -139,51 +180,11 @@
 function toggleMenu() {
     document.getElementById("dropdownMenu").classList.toggle("show");
 }
-
-window.onclick = function(e) {
-    if (!e.target.closest('.user-menu')) {
-        document.querySelectorAll('.dropdown-menu').forEach(menu => {
-            menu.classList.remove("show");
-        });
-    }
-}
 </script>
 
 </body>
 </html>
-Draft 
-
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drafts</title>
-
-    <link rel="stylesheet" href="{% static 'teams/style.css' %}?v=202">
-    <link rel="stylesheet" href="{% static 'teams/dashboard.css' %}">
-
-    <style>
-        .draft-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .draft-actions button,
-        .draft-actions a {
-            padding: 8px 16px;
-            font-size: 14px;
-            border-radius: 8px;
-            height: 38px;
-            cursor: pointer;
-        }
-
-        .btn-send {
-            background: #0A3D93;
-            color: white;
-            border: none;
+     border: none;
         }
 
         .btn-send:hover {
